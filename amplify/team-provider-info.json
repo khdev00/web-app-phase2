@@ -10,34 +10,6 @@
       "StackName": "amplify-phasetwo-dev-210956",
       "StackId": "arn:aws:cloudformation:us-east-2:269961640318:stack/amplify-phasetwo-dev-210956/0c9f8c80-6d53-11ee-9da8-029120db9423",
       "AmplifyAppId": "dosswansif4ib"
-    },
-    "categories": {
-      "function": {
-        "downloadPackages": {
-          "deploymentBucketName": "amplify-phasetwo-dev-210956-deployment",
-          "s3Key": "amplify-builds/downloadPackages-6e4b4168366365657a73-build.zip"
-        },
-        "gradePackages": {
-          "deploymentBucketName": "amplify-phasetwo-dev-210956-deployment",
-          "s3Key": "amplify-builds/gradePackages-687a434a767848317237-build.zip"
-        },
-        "addPackageToRegistry": {
-          "deploymentBucketName": "amplify-phasetwo-dev-210956-deployment",
-          "s3Key": "amplify-builds/addPackageToRegistry-4d69627157786d427630-build.zip"
-        },
-        "viewRegistry": {
-          "deploymentBucketName": "amplify-phasetwo-dev-210956-deployment",
-          "s3Key": "amplify-builds/viewRegistry-64707341396261305879-build.zip"
-        },
-        "deleteRegistry": {
-          "deploymentBucketName": "amplify-phasetwo-dev-210956-deployment",
-          "s3Key": "amplify-builds/deleteRegistry-65514d6c7a7144482b69-build.zip"
-        },
-        "deletePackage": {
-          "deploymentBucketName": "amplify-phasetwo-dev-210956-deployment",
-          "s3Key": "amplify-builds/deletePackage-44473048434b4a7a5167-build.zip"
-        }
-      }
     }
   }
 }

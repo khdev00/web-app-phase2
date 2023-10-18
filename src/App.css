@@ -33,7 +33,8 @@
 }
 
 .textbox-width-large {
-  width: 35%; 
+  width: 20%; /* Adjust this value as needed */
+  max-width: 600px; /* Optional: set a maximum width */
 }
 .left { 
   margin-left: 5px;
