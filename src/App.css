@@ -28,13 +28,17 @@
   color: #61dafb;
 }
 
-.textbox-width {
-  width: 32%; /* Adjust the value as needed */
+.textbox-width-medium {
+  width: 31%; 
+}
+
+.textbox-width-large {
+  width: 35%; 
 }
 .left { 
   margin-left: 5px;
 }
 .button-spacing {
-  margin-right: 10px; /* Adjust the value as needed */
+  margin-right: 10px; 
 }
 

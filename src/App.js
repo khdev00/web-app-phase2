@@ -38,6 +38,8 @@ function App() {
     // Similar logic to downloadPackages
   };
 
+
+
   const addPackageToRegistry = () => {
     const packageLink = packageLinkInput.current.value.trim();
     if (!packageLink) {
@@ -65,29 +67,38 @@ function App() {
     }
   };
 
+  const deletePackage = () => { 
+    const confirmation = window.confirm("Are you sure you want to delete this package?");
+    if (confirmation) {
+      console.log("Deleting the package...");
+    }
+
+    sendToLambda({ packageLinkInput }, "deletePackage");
+  };
+  
   // JSX rendering
   return (
     <div className="App">
         <h2>Process NPM Packages</h2>
-        
-        <label htmlFor="urlFileInput">Upload a text file with valid npm/github links separated by newline:</label>
-        
+        <label htmlFor="urlFileInput">Upload valid NPM/GITHUB urls separated by newline (.txt)</label>
             <input className = "left" input type="file" ref={urlFileInput} id="urlFileInput" accept=".txt" />
-        
-        <div>
             <button className = "button-spacing" button onClick={downloadPackages}>Download Packages</button>
             <button className = "button-spacing" button onClick={gradePackages}>Grade Packages</button>
-        </div>
-
-        <h2>Add a Package to Registry</h2>
-        
-        <input className = "textbox-width" input type="text" ref={packageLinkInput} id="packageLink" placeholder="Enter npm/github link for your package" />
+        <h2>Add Package to Registry</h2>
+        <input className = "textbox-width-large" input type="text" ref={packageLinkInput} id="packageLink" placeholder="Enter npm/github link for your package" />
         <button className = "left" button onClick={addPackageToRegistry}>Add to Registry</button>
-       
-
-        <h2>Package Registry</h2>
+        <h2>Package Registry Settings</h2>
         <button className = "button-spacing" button onClick={viewRegistry}>View Registry</button>
         <button className = "button-spacing" button onClick={deleteRegistry}>Delete Registry</button>
+        <div>
+        <h3>Update Package</h3>
+        <label htmlFor="urlFileInput">Upload package to update (.zip)</label>
+            <input className = "left" input type="file" ref={urlFileInput} id="urlFileInput" accept=".zip" />
+        </div> 
+        <h4>Delete Package in Registry</h4>
+        <label htmlFor="urlFileInput">Enter package NPM/GITHUB url to delete</label>
+            <input className = "textbox-width-medium" input type="text" ref={packageLinkInput} id="packageLink" placeholder="Enter npm/github link for your package" />
+            <button className = "left" button onClick={deletePackage}>Delete Package</button>
     </div>
   );
 }
