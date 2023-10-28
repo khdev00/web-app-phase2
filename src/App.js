@@ -8,6 +8,7 @@ import './App.css';
 function App() {
   const urlInput = useRef(null);
   const packageLinkInput = useRef(null);
+  const packageLinkDeleteInput = useRef(null);
   const updateUrlInput = useRef(null);
   const tokenInput = useRef(null);
   const [fileContent, setFileContent] = React.useState('');
@@ -61,7 +62,7 @@ function App() {
 
 
   const addPackageToRegistry = () => {
-    const packageLink = packageLinkInput.current.value.trim();
+    const packageLink = packageLinkInput.current.value;
     if (!packageLink) {
       alert("Please provide the NPM/GitHub link for your package.");
       return;
@@ -88,7 +89,7 @@ function App() {
   };
 
   const deletePackage = () => { 
-    const packageLink = packageLinkInput.current.value.trim();
+    const packageLink = packageLinkDeleteInput.current.value.trim();
     if (!packageLink) {
       alert("Please provide the NPM/GitHub link for the package you want to delete.");
       return;
@@ -140,7 +141,7 @@ function App() {
 
     <h4>Delete Package in Registry</h4>
     <label htmlFor="packageLinkDelete">Enter NPM/GITHUB package url to delete</label><br />
-    <input className="textbox-width-medium" type="text" ref={packageLinkInput} id="packageLinkDelete" placeholder="Enter npm/github link for your package" /><br />
+    <input className="textbox-width-medium" type="text" ref={packageLinkDeleteInput} id="packageLinkDelete" placeholder="Enter npm/github link for your package" /><br />
     <button className="left" onClick={deletePackage}>Delete Package</button>
   </div>
   );
