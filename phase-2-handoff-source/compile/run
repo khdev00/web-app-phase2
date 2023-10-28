@@ -1,0 +1,131 @@
+#!/bin/bash
+
+# File path for dependencies
+dep_file_path="deps.txt";
+
+# Checks if the package exists
+check_if_exists() {
+  local name="$1";
+  npm show $name &> /dev/null || return 0;
+  return 1;
+}
+
+# Handles the case where the dep could not be installed
+handle_install_error() {
+  local name="$1";
+  check_if_exists $name
+  local exists=$?
+
+  if [[ exists == 1 ]]; then
+    echo "Failed to install $name"; 
+  else
+    echo "It seems that the npm module: $name does not exist. Please fix that and try again";
+  fi
+  
+  exit 1;
+}
+
+# Trims all leading and trailing whitespace, as well as newlines
+trim_name() {
+  local str="$1"
+  # Trim leading and trailing whitespace
+  str="${str#"${str%%[![:space:]]*}"}"
+  str="${str%"${str##*[![:space:]]}"}"
+  
+  # Remove newline characters
+  str="$(echo -e "$str" | tr -d '\n')"
+  
+  echo "$str"
+}
+
+install_dependencies() {
+  # Installs all dependencies listed in the file at $file_path
+  npm install &> /dev/null || { echo "Failed to install dependencies"; exit 1; }
+  local file_path="$1"
+  local num_installed=1
+
+  # Check if the file exists
+  if [ ! -f "$file_path" ]; then
+    echo "Dependency file not found: $file_path, ensure that it exists."
+    exit 1;
+  fi
+
+  # Loops through all names in the file
+  while IFS= read -r line || [[ -n "$line" ]]; do 
+    # trims names
+    trimmed_line=$(trim_name "$line");
+
+    # only try to install if the string is nonempty
+    if [ -n "$trimmed_line" ]; then
+      npm install $trimmed_line &> /dev/null || handle_install_error $trimmed_line
+      ((num_installed++))
+    fi
+  done < "$file_path"
+
+  # Output to stdout
+  echo "$num_installed dependencies installed..."
+}
+
+
+# Main logic for the file
+if [ "$1" == "install" ]; then
+  # Install Node.js dependencies
+  #rm -rf node_modules
+  install_dependencies "$dep_file_path"
+  exit 0
+elif [ "$1" == "test" ]; then
+  # Run Jest tests
+  test_output=$(npx jest --coverage --silent 2>&1 | tee jest.log.txt)
+
+  if grep -q "FAIL " jest.log.txt; then
+    # Extract the entire line containing test results
+    test_results_line=$(echo "$test_output" | grep "Tests: *[0-9]\+ failed, *[0-9]\+ passed, *[0-9]\+ total")
+
+    tests_passed=$(echo "$test_results_line" | grep -o '[0-9]\+ passed' | cut -d ' ' -f 1)
+    total_tests=$(echo "$test_results_line" | grep -o '[0-9]\+ total' | cut -d ' ' -f 1)
+  else
+    test_results_line=$(echo "$test_output" | grep "Tests: *[0-9]\+ passed, *[0-9]\+ total")
+
+    tests_passed=$(echo "$test_results_line" | grep -o '[0-9]\+ passed' | cut -d ' ' -f 1)
+    total_tests=$(echo "$test_results_line" | grep -o '[0-9]\+ total' | cut -d ' ' -f 1)
+  fi
+
+  total_line_coverage=$(grep "All files" jest.log.txt | awk '{print int($10)}')
+  # Calculate tests_failed
+  ((tests_failed = total_tests - tests_passed))
+
+  # Print the results
+  #echo "Total: $total_tests"
+  #echo "Passed: $tests_passed"
+  #echo "Coverage: $total_line_coverage%"
+  echo "$tests_passed/$total_tests test cases passed. $total_line_coverage% line coverage achieved."
+
+  # Exit with status 1 if tests failed
+  if [ "$tests_failed" -gt 0 ]; then
+    exit 1
+  else
+    exit 0
+  fi
+  
+else
+  source .env
+  # Runs if the first argument is a valid file
+  if [ -f "$1" ]; then
+    if [ -n "$LOG_FILE" ]; then
+      # Check if GITHUB_TOKEN is set
+      if [ -n "$GITHUB_TOKEN" ]; then
+        npx ts-node ./run_URL_FILE/fetch_url.ts "$1";
+        exit 0;
+      else
+        echo "GITHUB_TOKEN is not set in .env."
+        exit 1
+      fi
+    else
+      echo "LOG_FILE is not set in .env."
+      exit 1
+    fi
+  else
+    echo "URL file $1 not found";
+    exit 1;
+  fi
+fi

@@ -1,0 +1,15 @@
+typescript@4.7.4
+dotenv
+@types/node
+axios
+@types/jest
+ts-jest
+ndjson
+@types/ndjson
+bluebird
+tar
+winston
+jest
+@types/fs-extra
+ts-node@10.9.1
+@istanbuljs/schema
