@@ -1,3 +1,43 @@
 {
-  "function": {}
+  "api": {
+    "gradeAPII": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "gradePackage"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "function": {
+    "gradePackage": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_gradePackage_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "gradePackage"
+        }
+      ]
+    },
+    "AMPLIFY_function_gradePackage_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "gradePackage"
+        }
+      ]
+    }
+  }
 }
