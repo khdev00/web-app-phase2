@@ -63,7 +63,7 @@ function App() {
   const addPackageToRegistry = () => {
     const packageLink = packageLinkInput.current.value.trim();
     if (!packageLink) {
-      alert("Please provide the npm/github link for your package.");
+      alert("Please provide the NPM/GitHub link for your package.");
       return;
     }
 
@@ -90,7 +90,7 @@ function App() {
   const deletePackage = () => { 
     const packageLink = packageLinkInput.current.value.trim();
     if (!packageLink) {
-      alert("Please provide the npm/github link for the package you want to delete.");
+      alert("Please provide the NPM/GitHub link for the package you want to delete.");
       return;
     }
 
@@ -124,7 +124,7 @@ function App() {
 
     <h2>Add Package to Registry</h2>
     <label htmlFor="packageLinkAdd">Enter NPM/GITHUB url for your package</label><br />
-    <input className="textbox-width-large" type="text" ref={packageLinkInput} id="packageLinkAdd" placeholder="Enter npm/github link for your package" /><br />
+    <input className="textbox-width-large" type="text" ref={packageLinkInput} id="packageLinkAdd" placeholder="Enter NPM/GitHub link for your package" /><br />
     <button className="left" onClick={addPackageToRegistry}>Add to Registry</button>
 
     <h2>Package Registry Settings</h2>
@@ -133,13 +133,13 @@ function App() {
 
     <div>
         <h3>Update Package</h3>
-        <label htmlFor="urlInputUpdate">Enter package NPM/GITHUB url to update</label><br />
+        <label htmlFor="urlInputUpdate">Enter NPM/GITHUB package url to update</label><br />
         <textarea className="left textbox-width-large" ref={updateUrlInput} id="urlInputUpdate" rows="1"></textarea><br />
         <button onClick={updatePackage}>Update Package</button>
     </div> 
 
     <h4>Delete Package in Registry</h4>
-    <label htmlFor="packageLinkDelete">Enter package NPM/GITHUB url to delete</label><br />
+    <label htmlFor="packageLinkDelete">Enter NPM/GITHUB package url to delete</label><br />
     <input className="textbox-width-medium" type="text" ref={packageLinkInput} id="packageLinkDelete" placeholder="Enter npm/github link for your package" /><br />
     <button className="left" onClick={deletePackage}>Delete Package</button>
   </div>

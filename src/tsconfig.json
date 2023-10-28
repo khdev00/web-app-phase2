@@ -11,6 +11,7 @@
     },
     "include": [
       "./*.ts"                     // Specifies the files to include in compilation
+    
     ],
     "exclude": [
       "node_modules"                    // Specifies the files to exclude from compilation
