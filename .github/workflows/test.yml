@@ -22,13 +22,15 @@ jobs:
     - name: Run tests
       run: npm test
 
-    - name: Deploy to Amplify
-      if: github.ref == 'refs/heads/master' && github.event_name == 'push'  # Only deploy on push to master
+    - name: Install Amplify CLI
+      run: npm install -g @aws-amplify/cli
+
+    - name: Configure and Deploy to Amplify
       run: |
         amplify configure
           --accessKeyId ${{ secrets.AWS_ACCESS_KEY_ID }}
           --secretAccessKey ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          --region us-east-2  # e.g., us-west-2
+          --region us-east-2
         amplify push
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
