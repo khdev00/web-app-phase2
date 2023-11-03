@@ -171,7 +171,7 @@ class Url {
 }
 exports.Url = Url;
 function retrieveGithubKey() {
-    const githubApiKey = "";
+    const githubApiKey = "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";
     if (!githubApiKey) {
         const error = new Error("GitHub API key not found in environment variables.");
         console.log(error);
