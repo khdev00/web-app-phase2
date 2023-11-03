@@ -24,7 +24,7 @@
         "Name": "gradePackage-dev",
         "LambdaExecutionRole": "phasetwoLambdaRoleaaa08614-dev"
       },
-      "lastPushTimeStamp": "2023-11-03T19:23:25.023Z",
+      "lastPushTimeStamp": "2023-11-03T20:30:16.355Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-dev-210956-deployment/amplify-cfn-templates/function/gradePackage-cloudformation-template.json",
         "logicalId": "functiongradePackage"
@@ -38,32 +38,6 @@
         "s3Key": "amplify-builds/gradePackage-75466678686b68425842-build.zip"
       },
       "lastPushDirHash": "nS1ClO8+marxLsfGfRZXto+CoIY="
-    },
-    "uploadPackage": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "lastBuildTimeStamp": "2023-11-03T19:21:20.277Z",
-      "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-11-03T19:21:20.329Z",
-      "distZipFilename": "uploadPackage-486c6638456b5a37334a-build.zip",
-      "s3Bucket": {
-        "deploymentBucketName": "amplify-phasetwo-dev-210956-deployment",
-        "s3Key": "amplify-builds/uploadPackage-486c6638456b5a37334a-build.zip"
-      },
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-dev-210956-deployment/amplify-cfn-templates/function/uploadPackage-cloudformation-template.json",
-        "logicalId": "functionuploadPackage"
-      },
-      "lastPushTimeStamp": "2023-11-03T19:23:25.023Z",
-      "output": {
-        "LambdaExecutionRoleArn": "arn:aws:iam::269961640318:role/phasetwoLambdaRolee2ce94ff-dev",
-        "Region": "us-east-2",
-        "Arn": "arn:aws:lambda:us-east-2:269961640318:function:uploadPackage-dev",
-        "Name": "uploadPackage-dev",
-        "LambdaExecutionRole": "phasetwoLambdaRolee2ce94ff-dev"
-      },
-      "lastPushDirHash": "SEcSjVc9nqDfrnpd9Hh93L2XNVw="
     }
   },
   "api": {
@@ -84,38 +58,13 @@
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-dev-210956-deployment/amplify-cfn-templates/api/gradeAPII-cloudformation-template.json",
         "logicalId": "apigradeAPII"
       },
-      "lastPushTimeStamp": "2023-11-03T19:23:25.023Z",
+      "lastPushTimeStamp": "2023-11-03T20:30:16.357Z",
       "output": {
         "ApiName": "gradeAPII",
         "RootUrl": "https://xuzp1n3x96.execute-api.us-east-2.amazonaws.com/dev",
         "ApiId": "xuzp1n3x96"
       },
       "lastPushDirHash": "4S2MpkVqcTOvc4qiekzw9rVjljI="
-    },
-    "uploadPackages": {
-      "service": "API Gateway",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "uploadPackage",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        }
-      ],
-      "providerMetadata": {
-        "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-dev-210956-deployment/amplify-cfn-templates/api/uploadPackages-cloudformation-template.json",
-        "logicalId": "apiuploadPackages"
-      },
-      "lastPushTimeStamp": "2023-11-03T19:23:25.023Z",
-      "output": {
-        "ApiName": "uploadPackages",
-        "RootUrl": "https://edsq46uwfa.execute-api.us-east-2.amazonaws.com/dev",
-        "ApiId": "edsq46uwfa"
-      },
-      "lastPushDirHash": "3HWItWkJciP9yQ0d8//5QCAPCfg="
     }
   }
 }
