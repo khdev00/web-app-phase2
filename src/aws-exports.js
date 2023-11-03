@@ -8,7 +8,7 @@ const awsmobile = {
         },
         // Add more APIs as needed
     ],
-    "aws_cognito_identity_pool_id": "us-east-2:8ce19b78-0b23-4ee2-8cef-9d72d18d06e8",
+    "aws_cognito_identity_pool_id": "us-east-2:d9347fa7-177b-4baf-9f2e-ea602e855ec3",
     "aws_cognito_region": "us-east-2",
     "aws_user_files_s3_bucket": "packageregistry",
     "aws_user_files_s3_bucket_region": "us-east-2",
