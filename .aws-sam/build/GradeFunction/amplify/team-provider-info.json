@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-phasetwo-dev-210956-authRole",
+      "UnauthRoleArn": "arn:aws:iam::269961640318:role/amplify-phasetwo-dev-210956-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::269961640318:role/amplify-phasetwo-dev-210956-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-phasetwo-dev-210956-deployment",
+      "UnauthRoleName": "amplify-phasetwo-dev-210956-unauthRole",
+      "StackName": "amplify-phasetwo-dev-210956",
+      "StackId": "arn:aws:cloudformation:us-east-2:269961640318:stack/amplify-phasetwo-dev-210956/0c9f8c80-6d53-11ee-9da8-029120db9423",
+      "AmplifyAppId": "dosswansif4ib"
+    },
+    "categories": {
+      "function": {
+        "gradePackage": {}
+      }
+    }
+  }
+}

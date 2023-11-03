@@ -1,0 +1,78 @@
+{
+  "api": {
+    "gradeAPII": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "gradePackage"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
+    "uploadPackages": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "uploadPackage"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "function": {
+    "gradePackage": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "uploadPackage": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_gradePackage_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "gradePackage"
+        }
+      ]
+    },
+    "AMPLIFY_function_gradePackage_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "gradePackage"
+        }
+      ]
+    },
+    "AMPLIFY_function_uploadPackage_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "uploadPackage"
+        }
+      ]
+    },
+    "AMPLIFY_function_uploadPackage_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "uploadPackage"
+        }
+      ]
+    }
+  }
+}

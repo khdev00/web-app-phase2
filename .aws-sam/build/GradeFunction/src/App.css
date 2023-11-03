@@ -1,0 +1,45 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.textbox-width-medium {
+  width: 31%; 
+}
+
+.textbox-width-large {
+  width: 20%; /* Adjust this value as needed */
+  max-width: 600px; /* Optional: set a maximum width */
+}
+.left { 
+  margin-left: 5px;
+}
+.button-spacing {
+  margin-right: 10px; 
+}
+
