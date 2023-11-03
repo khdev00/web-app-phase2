@@ -368,7 +368,7 @@
         "Name": "gradeAPII"
       }
     },
-    "gradeAPIIDefault4XXResponse03c78933": {
+    "gradeAPIIDefault4XXResponse73edd2ea": {
       "Type": "AWS::ApiGateway::GatewayResponse",
       "Properties": {
         "ResponseType": "DEFAULT_4XX",
@@ -383,7 +383,7 @@
         }
       }
     },
-    "gradeAPIIDefault5XXResponse03c78933": {
+    "gradeAPIIDefault5XXResponse73edd2ea": {
       "Type": "AWS::ApiGateway::GatewayResponse",
       "Properties": {
         "ResponseType": "DEFAULT_5XX",
@@ -398,7 +398,7 @@
         }
       }
     },
-    "DeploymentAPIGWgradeAPIIec67d876": {
+    "DeploymentAPIGWgradeAPIIea928f11": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -416,8 +416,8 @@
         }
       },
       "DependsOn": [
-        "gradeAPIIDefault4XXResponse03c78933",
-        "gradeAPIIDefault5XXResponse03c78933"
+        "gradeAPIIDefault4XXResponse73edd2ea",
+        "gradeAPIIDefault5XXResponse73edd2ea"
       ]
     }
   }

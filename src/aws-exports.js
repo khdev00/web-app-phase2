@@ -6,11 +6,6 @@ const awsmobile = {
             "endpoint": "https://xuzp1n3x96.execute-api.us-east-2.amazonaws.com/dev",
             "region": "us-east-2"
         },
-        {
-            "name": "uploadPackages",
-            "endpoint": "https://edsq46uwfa.execute-api.us-east-2.amazonaws.com/dev",
-            "region": "us-east-2"
-        },
         // Add more APIs as needed
     ],
     "aws_cognito_identity_pool_id": "us-east-2:8023f868-d821-47b8-943e-eef587136b49",
