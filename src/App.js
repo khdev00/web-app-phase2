@@ -43,7 +43,8 @@ function App() {
 
     try {
       const response = await Storage.put(uploadedPackage.name, uploadedPackage, {
-        contentType: 'application/zip' // Set the content type to zip
+        contentType: 'application/zip', // Set the content type to zip
+        region: 'us-east-2'
       });
 
       console.log(response); // This should log the response from S3
