@@ -122,13 +122,14 @@ function App() {
     const packageVersion = packageVersionInput.current.value;
     const packageContent = packageContentInput.current.value;
     const packageURL = packageURLInput.current.value;
-
+  
     if (!packageName || !packageVersion || !packageContent || !packageURL) {
       alert('Please enter all fields.');
       return;
     }
+    console.log(packageName);
     try {
-      const response = await API.post('phase2api', '/package/createinjest', {});
+      const response = await API.get('phase2api', `/package/${packageNameInputForCreation.current.value}`, {});
       console.log(response);
       alert('Package created successfully!');
     } catch (error) {

@@ -191,7 +191,7 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/createingest-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/createingest-72724f57524770727843-build.zip",
+          "s3Key": "amplify-builds/createingest-657147684c79474f7671-build.zip",
           "env": "phasetw"
         }
       }

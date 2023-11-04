@@ -49,7 +49,7 @@
         },
         "createingest": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/createingest-72724f57524770727843-build.zip"
+          "s3Key": "amplify-builds/createingest-657147684c79474f7671-build.zip"
         },
         "resetreg": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",

@@ -10,8 +10,9 @@ exports.handler = async (event) => {
     //  Uncomment below to enable CORS requests
       headers: {
           "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "*"
+          "Access-Control-Allow-Headers": "*",
+         
       },
-        body: JSON.stringify('Hello from Lambda!'),
+        body: JSON.stringify('Hello from Lambda Test!'),
     };
 };
