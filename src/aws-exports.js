@@ -2,16 +2,13 @@ const awsmobile = {
     "aws_project_region": "us-east-2",
     "aws_cloud_logic_custom": [
         {
-            "name": "gradeAPII",
-            "endpoint": "https://xuzp1n3x96.execute-api.us-east-2.amazonaws.com/dev",
+            "name": "phase2api",
+            "endpoint": "https://m7zq85awg3.execute-api.us-east-2.amazonaws.com/beta",
             "region": "us-east-2"
         },
         // Add more APIs as needed
     ],
-    "aws_cognito_identity_pool_id": "us-east-2:d9347fa7-177b-4baf-9f2e-ea602e855ec3",
-    "aws_cognito_region": "us-east-2",
-    "aws_user_files_s3_bucket": "packageregistry",
-    "aws_user_files_s3_bucket_region": "us-east-2",
+    
 };
 
 export default awsmobile;

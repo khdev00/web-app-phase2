@@ -1,41 +1,133 @@
 {
-  "api": {
-    "gradeAPII": {
-      "dependsOn": [
-        {
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "gradePackage"
-        }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "API Gateway"
-    }
-  },
+  "api": {},
+  "auth": {},
   "function": {
-    "gradePackage": {
+    "auth": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "byID": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "byName": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "byRegex": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "createingest": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "resetreg": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
   },
   "parameters": {
-    "AMPLIFY_function_gradePackage_deploymentBucketName": {
+    "AMPLIFY_function_auth_deploymentBucketName": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "gradePackage"
+          "resourceName": "auth"
         }
       ]
     },
-    "AMPLIFY_function_gradePackage_s3Key": {
+    "AMPLIFY_function_auth_s3Key": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "gradePackage"
+          "resourceName": "auth"
+        }
+      ]
+    },
+    "AMPLIFY_function_byID_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "byID"
+        }
+      ]
+    },
+    "AMPLIFY_function_byID_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "byID"
+        }
+      ]
+    },
+    "AMPLIFY_function_byName_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "byName"
+        }
+      ]
+    },
+    "AMPLIFY_function_byName_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "byName"
+        }
+      ]
+    },
+    "AMPLIFY_function_byRegex_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "byRegex"
+        }
+      ]
+    },
+    "AMPLIFY_function_byRegex_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "byRegex"
+        }
+      ]
+    },
+    "AMPLIFY_function_createingest_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createingest"
+        }
+      ]
+    },
+    "AMPLIFY_function_createingest_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createingest"
+        }
+      ]
+    },
+    "AMPLIFY_function_resetreg_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "resetreg"
+        }
+      ]
+    },
+    "AMPLIFY_function_resetreg_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "resetreg"
         }
       ]
     }

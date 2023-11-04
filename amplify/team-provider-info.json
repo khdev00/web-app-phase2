@@ -13,13 +13,52 @@
     },
     "categories": {
       "function": {
-        "gradePackage": {
-          "deploymentBucketName": "amplify-phasetwo-dev-210956-deployment",
-          "s3Key": "amplify-builds/gradePackage-64647342625834563052-build.zip"
+        "createingest": {},
+        "resetreg": {},
+        "auth": {},
+        "byName": {},
+        "byID": {}
+      }
+    }
+  },
+  "phasetw": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-phasetwo-phasetw-132459-authRole",
+      "UnauthRoleArn": "arn:aws:iam::269961640318:role/amplify-phasetwo-phasetw-132459-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::269961640318:role/amplify-phasetwo-phasetw-132459-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+      "UnauthRoleName": "amplify-phasetwo-phasetw-132459-unauthRole",
+      "StackName": "amplify-phasetwo-phasetw-132459",
+      "StackId": "arn:aws:cloudformation:us-east-2:269961640318:stack/amplify-phasetwo-phasetw-132459/155f02f0-7b37-11ee-93c8-06bbcebe0041",
+      "AmplifyAppId": "dosswansif4ib"
+    },
+    "categories": {
+      "function": {
+        "auth": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/auth-6e792b674a4953634d66-build.zip"
+        },
+        "byID": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/byID-514f4a585665394a4e4f-build.zip"
+        },
+        "byName": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/byName-45537346446352457762-build.zip"
+        },
+        "createingest": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/createingest-5368656e42704636314a-build.zip"
+        },
+        "resetreg": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/resetreg-5a4e4a6c43567a746a34-build.zip"
+        },
+        "byRegex": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/byRegex-494976695645396e4963-build.zip"
         }
-      },
-      "api": {
-        "gradeAPII": {}
       }
     }
   }

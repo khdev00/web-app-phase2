@@ -1,161 +1,313 @@
 import React, { useRef, useState } from 'react';
 import './App.css';
-import { Amplify, API, Storage } from 'aws-amplify';
+import { Amplify, API } from 'aws-amplify';
 import awsconfig from './aws-exports';
 Amplify.configure(awsconfig);
 
 function App() {
-  const urlInput = useRef(null);
-  const packageLinkDeleteInput = useRef(null);
-  const updateUrlInput = useRef(null);
-  const tokenInput = useRef(null);
-  const [fileContent, setFileContent] = useState('');
-  const [githubToken, setGithubToken] = useState('');
-  const [uploadedPackage, setUploadedPackage] = useState(null);
+  // Refs and state variables
+  const [authToken, setAuthToken] = useState('');
+  const packageIdInput = useRef(null);
+  const packageNameInput = useRef(null);
+  const packageVersionInput = useRef(null);
+  const packageContentInput = useRef(null);
+  const packageURLInput = useRef(null);
+  const packageRatingInput = useRef(null);
+  const usernameInput = useRef(null);
+  const passwordInput = useRef(null);
 
-  const handleTokenChange = () => {
-    setGithubToken(tokenInput.current.value);
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setFileContent(e.target.result);
-    };
-    reader.readAsText(file);
-  };
-
-  const handlePackageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setUploadedPackage(file);
-    } else {
-      alert("Please upload a valid zip file.");
-    }
-  };
-
-  const uploadPackage = async () => {
-    if (!uploadedPackage) {
-      alert("Please upload a package first.");
-      return;
-    }
+  // Function to create an authentication token
+  const createAuthToken = async () => {
+    const username = usernameInput.current.value;
+    const password = passwordInput.current.value;
 
     try {
-      const response = await Storage.put(uploadedPackage.name, uploadedPackage, {
-        contentType: 'application/zip', // Set the content type to zip
-        region: 'us-east-2'
+      const response = await API.put('phase2api', '/authenticate', {
+        body: {
+          User: {
+            name: username,
+            isAdmin: true // Assuming admin user for simplicity
+          },
+          Secret: {
+            password: password
+          }
+        }
       });
-
-      console.log(response); // This should log the response from S3
-      alert("Package uploaded successfully!");
+      setAuthToken(response);
+      alert('Authentication token created successfully!');
     } catch (error) {
       console.error(error);
-      alert("Failed to upload package.");
+      alert('Failed to create authentication token.');
     }
   };
 
-  // Package processing functions
-  const downloadPackages = () => {
-    const urls = urlInput.current.value.split('\n').filter(url => url.trim());
-    if (!urls.length) {
-      alert("Please enter valid URLs.");
-      return;
-    }
-    // Implement your download logic here
-  };
+  // Function to retrieve a package by ID
+  const retrievePackageById = async () => {
+    const packageId = packageIdInput.current.value;
 
-  const updatePackage = () => {
-    const urls = updateUrlInput.current.value.split('\n').filter(url => url.trim());
-    if (!urls.length) {
-      alert("Please enter valid URLs.");
-      return;
-    }
-    // Implement your update logic here
-  };
-
-  const gradePackages = async () => {
-    const apiName = 'gradeAPII';
-    const path = '/grade';
     try {
-      const response = await API.post(apiName, path, {
-        body: {}  // No need to send any body for now since we're not grading anything yet
+      const response = await API.get('phase2api', `/package/${packageId}`, {
+        headers: {
+          'X-Authorization': authToken
+        }
       });
-      console.log(response);  // This should log the response from Lambda
+      console.log(response);
+      alert('Package retrieved successfully!');
     } catch (error) {
       console.error(error);
+      alert('Failed to retrieve package.');
     }
   };
 
-  // Registry management functions
-  const viewRegistry = () => {
-    console.log("Fetching and displaying the package registry...");
-    // Implement your view logic here
-  };
+  // Function to update a package version
+  const updatePackageVersion = async () => {
+    const packageId = packageIdInput.current.value;
+    const packageContent = packageContentInput.current.value;
+    const packageURL = packageURLInput.current.value;
 
-  const deleteRegistry = () => {
-    const confirmation = window.confirm("Are you sure you want to delete the package registry?");
-    if (confirmation) {
-      console.log("Deleting the package registry...");
-      // Implement your delete logic here
+    try {
+      const response = await API.put('phase2api', `/package/${packageId}`, {
+        headers: {
+          'X-Authorization': authToken
+        },
+        body: {
+          Content: packageContent,
+          URL: packageURL
+        }
+      });
+      console.log(response);
+      alert('Package version updated successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to update package version.');
     }
   };
 
-  const deletePackage = () => {
-    const packageLink = packageLinkDeleteInput.current.value.trim();
-    if (!packageLink) {
-      alert("Please provide the NPM/GitHub link for the package you want to delete.");
-      return;
-    }
+  // Function to rate a package
+  const ratePackage = async () => {
+    const packageId = packageIdInput.current.value;
+    const packageRating = packageRatingInput.current.value;
 
-    const confirmation = window.confirm("Are you sure you want to delete this package?");
-    if (confirmation) {
-      console.log("Deleting the package from the registry...");
-      // Implement your delete logic here
+    try {
+      const response = await API.post('phase2api', `/package/${packageId}/rate`, {
+        headers: {
+          'X-Authorization': authToken
+        },
+        body: {
+          Rating: packageRating
+        }
+      });
+      console.log(response);
+      alert('Package rated successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to rate package.');
+    }
+  };
+
+  // Function to ingest a package
+  const ingestPackage = async () => {
+    const packageContent = packageContentInput.current.value;
+    const packageURL = packageURLInput.current.value;
+
+    try {
+      const response = await API.post('phase2api', '/package', {
+        headers: {
+          'X-Authorization': authToken
+        },
+        body: {
+          Content: packageContent,
+          URL: packageURL
+        }
+      });
+      console.log(response);
+      alert('Package ingested successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to ingest package.');
+    }
+  };
+
+  // Function to create a package
+  const createPackage = async () => {
+    const packageName = packageNameInput.current.value;
+    const packageVersion = packageVersionInput.current.value;
+    const packageContent = packageContentInput.current.value;
+    const packageURL = packageURLInput.current.value;
+
+    try {
+      const response = await API.post('phase2api', '/package', {
+        headers: {
+          'X-Authorization': authToken
+        },
+        body: {
+          metadata: {
+            Name: packageName,
+            Version: packageVersion
+          },
+          data: {
+            Content: packageContent,
+            URL: packageURL
+          }
+        }
+      });
+      console.log(response);
+      alert('Package created successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to create package.');
+    }
+  };
+
+  // Function to retrieve a package by name
+  const retrievePackageByName = async () => {
+    const packageName = packageNameInput.current.value;
+
+    try {
+      const response = await API.get('phase2api', `/package/byName/${packageName}`, {
+        headers: {
+          'X-Authorization': authToken
+        }
+      });
+      console.log(response);
+      alert('Package retrieved successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to retrieve package.');
+    }
+  };
+
+  // Function to delete a specific version of a package
+  const deletePackageVersion = async () => {
+    const packageId = packageIdInput.current.value;
+
+    try {
+      const response = await API.del('phase2api', `/package/${packageId}`, {
+        headers: {
+          'X-Authorization': authToken
+        }
+      });
+      console.log(response);
+      alert('Package version deleted successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete package version.');
+    }
+  };
+
+  // Function to delete all versions of a package by name
+  const deleteAllVersionsOfPackage = async () => {
+    const packageName = packageNameInput.current.value;
+
+    try {
+      const response = await API.del('phase2api', `/package/byName/${packageName}`, {
+        headers: {
+          'X-Authorization': authToken
+        }
+      });
+      console.log(response);
+      alert('All versions of the package deleted successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete all versions of the package.');
+    }
+  };
+
+  // Function to reset the registry
+  const resetRegistry = async () => {
+    try {
+      const response = await API.del('phase2api', '/reset', {
+        headers: {
+          'X-Authorization': authToken
+        }
+      });
+      console.log(response);
+      alert('Registry reset successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to reset registry.');
     }
   };
 
   // JSX rendering
   return (
     <div className="App">
-      <div className="github-token-section">
-        <h2>GitHub Token</h2>
-        <p>A valid GitHub token must be entered to access features.</p>
-        <label htmlFor="githubTokenInput">Enter your GitHub token:</label><br />
-        <input 
-            type="password" 
-            id="githubTokenInput" 
-            placeholder="Enter GitHub token"
-            ref={tokenInput}
-            onChange={handleTokenChange}
-        /><br />
+      {/* Authentication token creation */}
+      <div>
+        <h2>Create Authentication Token</h2>
+        <input type="text" ref={usernameInput} placeholder="Username" />
+        <input type="password" ref={passwordInput} placeholder="Password" />
+        <button onClick={createAuthToken}>Create Auth Token</button>
       </div>
 
-      <h2>Process NPM Packages</h2>
-      <label htmlFor="urlInput">Enter valid NPM/GITHUB url(s) .txt file separated by newline</label><br />
-      <input type="file" onChange={handleFileChange} /><br />
-      <button className="button-spacing" onClick={downloadPackages}>Download Packages</button>
-      <button className="button-spacing" onClick={gradePackages}>Grade Packages</button>
-
-      <h2>Upload Package</h2>
-      <input type="file" accept=".zip" onChange={handlePackageUpload} /><br />
-      <button className="left" onClick={uploadPackage}>Upload Package</button>
-
-      <h2>Package Registry Settings</h2>
-      <button className="button-spacing" onClick={viewRegistry}>View Registry</button>
-      <button className="button-spacing" onClick={deleteRegistry}>Delete Registry</button>
-
+      {/* Package retrieval by ID */}
       <div>
-        <h3>Update Package</h3>
-        <label htmlFor="urlInputUpdate">Enter NPM/GITHUB package url to update</label><br />
-        <textarea className="left textbox-width-large" ref={updateUrlInput} id="urlInputUpdate" rows="1"></textarea><br />
-        <button onClick={updatePackage}>Update Package</button>
-      </div> 
+        <h2>Retrieve Package by ID</h2>
+        <input type="text" ref={packageIdInput} placeholder="Package ID" />
+        <button onClick={retrievePackageById}>Retrieve Package</button>
+      </div>
 
-      <h4>Delete Package in Registry</h4>
-      <label htmlFor="packageLinkDelete">Enter NPM/GITHUB package url to delete</label><br />
-      <input className="textbox-width-medium" type="text" ref={packageLinkDeleteInput} id="packageLinkDelete" placeholder="Enter npm/github link for your package" /><br />
-      <button className="left" onClick={deletePackage}>Delete Package</button>
+      {/* Package version update */}
+      <div>
+        <h2>Update Package Version</h2>
+        <input type="text" ref={packageIdInput} placeholder="Package ID" />
+        <input type="text" ref={packageContentInput} placeholder="Package Content" />
+        <input type="text" ref={packageURLInput} placeholder="Package URL" />
+        <button onClick={updatePackageVersion}>Update Package Version</button>
+      </div>
+
+      {/* Package rating */}
+      <div>
+        <h2>Rate Package</h2>
+        <input type="text" ref={packageIdInput} placeholder="Package ID" />
+        <input type="text" ref={packageRatingInput} placeholder="Package Rating" />
+        <button onClick={ratePackage}>Rate Package</button>
+      </div>
+
+      {/* Package ingestion */}
+      <div>
+        <h2>Ingest Package</h2>
+        <input type="text" ref={packageContentInput} placeholder="Package Content" />
+        <input type="text" ref={packageURLInput} placeholder="Package URL" />
+        <button onClick={ingestPackage}>Ingest Package</button>
+      </div>
+
+      {/* Package creation */}
+      <div>
+        <h2>Create Package</h2>
+        <input type="text" ref={packageNameInput} placeholder="Package Name" />
+        <input type="text" ref={packageVersionInput} placeholder="Package Version" />
+        <input type="text" ref={packageContentInput} placeholder="Package Content" />
+        <input type="text" ref={packageURLInput} placeholder="Package URL" />
+        <button onClick={createPackage}>Create Package</button>
+      </div>
+
+      {/* Package retrieval by name */}
+      <div>
+        <h2>Retrieve Package by Name</h2>
+        <input type="text" ref={packageNameInput} placeholder="Package Name" />
+        <button onClick={retrievePackageByName}>Retrieve Package</button>
+      </div>
+
+      {/* Delete a specific version of a package */}
+      <div>
+        <h2>Delete a Specific Version of a Package</h2>
+        <input type="text" ref={packageIdInput} placeholder="Package ID" />
+        <button onClick={deletePackageVersion}>Delete Package Version</button>
+      </div>
+
+      {/* Delete all versions of a package by name */}
+      <div>
+        <h2>Delete All Versions of a Package by Name</h2>
+        <input type="text" ref={packageNameInput} placeholder="Package Name" />
+        <button onClick={deleteAllVersionsOfPackage}>Delete All Versions</button>
+      </div>
+
+      {/* Registry reset */}
+      <div>
+        <h2>Reset Registry</h2>
+        <button onClick={resetRegistry}>Reset Registry</button>
+      </div>
     </div>
   );
 }
