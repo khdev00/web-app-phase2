@@ -23,7 +23,14 @@ function App() {
   const packageNameInputForCreation = useRef(null);
   const packageVersionInput = useRef(null);
   const packageContentInput = useRef(null);
-  const packageURLInput = useRef(null);
+  const packageContentInputCreate = useRef(null);
+  const packageContentInputIngest = useRef(null);
+  const packageContentInputUpdate = useRef(null);
+  
+  
+  const packageURLInputCreate = useRef(null);
+  const packageURLInputIngest = useRef(null);
+  const packageURLInputUpdate = useRef(null);
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
 
@@ -63,8 +70,8 @@ function App() {
   // Function to update a package version
   const updatePackageVersion = async () => {
     const packageId = packageIdInputForUpdate.current.value;
-    const packageContent = packageContentInput.current.value;
-    const packageURL = packageURLInput.current.value;
+    const packageContent = packageContentInputUpdate.current.value;
+    const packageURL = packageURLInputUpdate.current.value;
     if (!packageId || !packageContent || !packageURL) {
       alert('Please enter all fields.');
       return;
@@ -99,15 +106,17 @@ function App() {
 
   // Function to ingest a package
   const ingestPackage = async () => {
-    const packageContent = packageContentInput.current.value;
-    const packageURL = packageURLInput.current.value;
-    if (!packageContent || !packageURL) {
+    const packageContent = packageContentInputIngest.current.value;
+    const packageURL = packageURLInputIngest.current.value;
+    console.log(packageContent);
+    console.log(packageURL);
+    if (!packageURL || !packageContent) {
       alert('Please enter all fields.');
       return;
     }
 
     try {
-      const response = await API.post('phase2api', '/package', {});
+      const response = await API.put('phase2api', `/package/${packageURL}`, {});
       console.log(response);
       alert('Package ingested successfully!');
     } catch (error) {
@@ -120,8 +129,8 @@ function App() {
   const createPackage = async () => {
     const packageName = packageNameInputForCreation.current.value;
     const packageVersion = packageVersionInput.current.value;
-    const packageContent = packageContentInput.current.value;
-    const packageURL = packageURLInput.current.value;
+    const packageContent = packageContentInputCreate.current.value;
+    const packageURL = packageURLInputCreate.current.value;
   
     if (!packageName || !packageVersion || !packageContent || !packageURL) {
       alert('Please enter all fields.');
@@ -129,7 +138,7 @@ function App() {
     }
     console.log(packageName);
     try {
-      const response = await API.get('phase2api', `/package/${packageNameInputForCreation.current.value}`, {});
+      const response = await API.put('phase2api', `/package/${packageNameInputForCreation.current.value}`, {});
       console.log(response);
       alert('Package created successfully!');
     } catch (error) {
@@ -243,8 +252,8 @@ function App() {
       <div>
         <h2>Update Package Version</h2>
         <input type="text" ref={packageIdInputForUpdate} placeholder="Package ID" />
-        <input type="text" ref={packageContentInput} placeholder="Package Content" />
-        <input type="text" ref={packageURLInput} placeholder="Package URL" />
+        <input type="text" ref={packageContentInputUpdate} placeholder="Package Content" />
+        <input type="text" ref={packageURLInputUpdate} placeholder="Package URL" />
         <button onClick={updatePackageVersion}>Update Package Version</button>
       </div>
 
@@ -258,8 +267,8 @@ function App() {
       {/* Package ingestion */}
       <div>
         <h2>Ingest Package</h2>
-        <input type="text" ref={packageContentInput} placeholder="Package Content" />
-        <input type="text" ref={packageURLInput} placeholder="Package URL" />
+        <input type="text" ref={packageContentInputIngest} placeholder="Package Content" />
+        <input type="text" ref={packageURLInputIngest} placeholder="Package URL" />
         <button onClick={ingestPackage}>Ingest Package</button>
       </div>
 
@@ -268,8 +277,8 @@ function App() {
         <h2>Create Package</h2>
         <input type="text" ref={packageNameInputForCreation} placeholder="Package Name" />
         <input type="text" ref={packageVersionInput} placeholder="Package Version" />
-        <input type="text" ref={packageContentInput} placeholder="Package Content" />
-        <input type="text" ref={packageURLInput} placeholder="Package URL" />
+        <input type="text" ref={packageContentInputCreate} placeholder="Package Content" />
+        <input type="text" ref={packageURLInputCreate} placeholder="Package URL" />
         <button onClick={createPackage}>Create Package</button>
       </div>
 
