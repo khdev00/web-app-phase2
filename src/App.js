@@ -7,12 +7,17 @@ Amplify.configure(awsconfig);
 function App() {
   // Refs and state variables
   const [authToken, setAuthToken] = useState('');
-  const packageIdInput = useRef(null);
-  const packageNameInput = useRef(null);
+  const packageIdInputForRetrieval = useRef(null);
+  const packageIdInputForUpdate = useRef(null);
+  const packageIdInputForRating = useRef(null);
+  const packageIdInputForDeletion = useRef(null);
+  const packageNameInputForRetrieval = useRef(null);
+  const packageNameRegexInputForRetrieval = useRef(null);
+  const packageNameInputForDeletion = useRef(null);
+  const packageNameInputForCreation = useRef(null);
   const packageVersionInput = useRef(null);
   const packageContentInput = useRef(null);
   const packageURLInput = useRef(null);
-  const packageRatingInput = useRef(null);
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
 
@@ -20,37 +25,27 @@ function App() {
   const createAuthToken = async () => {
     const username = usernameInput.current.value;
     const password = passwordInput.current.value;
-
-    try {
-      const response = await API.put('phase2api', '/authenticate', {
-        body: {
-          User: {
-            name: username,
-            isAdmin: true // Assuming admin user for simplicity
-          },
-          Secret: {
-            password: password
-          }
-        }
-      });
-      setAuthToken(response);
-      alert('Authentication token created successfully!');
-    } catch (error) {
-      console.error(error);
-      alert('Failed to create authentication token.');
+    if (!username || !password) {
+      alert('Please enter a username and password.');
+      return;
     }
+  
+    const response = await API.put('phase2api', '/authenticate', {}); 
+    console.log(response);
+
   };
 
   // Function to retrieve a package by ID
   const retrievePackageById = async () => {
-    const packageId = packageIdInput.current.value;
+    const packageId = packageIdInputForRetrieval.current.value;
+    if (!packageId) {
+      alert('Please enter a Package ID.');
+      return;
+    }
+    console.log(packageId);
 
     try {
-      const response = await API.get('phase2api', `/package/${packageId}`, {
-        headers: {
-          'X-Authorization': authToken
-        }
-      });
+      const response = await API.get('phase2api', `/package/${packageId}`, {});
       console.log(response);
       alert('Package retrieved successfully!');
     } catch (error) {
@@ -61,20 +56,16 @@ function App() {
 
   // Function to update a package version
   const updatePackageVersion = async () => {
-    const packageId = packageIdInput.current.value;
+    const packageId = packageIdInputForUpdate.current.value;
     const packageContent = packageContentInput.current.value;
     const packageURL = packageURLInput.current.value;
+    if (!packageId || !packageContent || !packageURL) {
+      alert('Please enter all fields.');
+      return;
+    }
 
     try {
-      const response = await API.put('phase2api', `/package/${packageId}`, {
-        headers: {
-          'X-Authorization': authToken
-        },
-        body: {
-          Content: packageContent,
-          URL: packageURL
-        }
-      });
+      const response = await API.put('phase2api', `/package/${packageId}`, {});
       console.log(response);
       alert('Package version updated successfully!');
     } catch (error) {
@@ -85,18 +76,13 @@ function App() {
 
   // Function to rate a package
   const ratePackage = async () => {
-    const packageId = packageIdInput.current.value;
-    const packageRating = packageRatingInput.current.value;
-
+    const packageId = packageIdInputForRating.current.value;
+    if (!packageId) {
+      alert('Please enter a Package ID.');
+      return;
+    }
     try {
-      const response = await API.post('phase2api', `/package/${packageId}/rate`, {
-        headers: {
-          'X-Authorization': authToken
-        },
-        body: {
-          Rating: packageRating
-        }
-      });
+      const response = await API.get('phase2api', `/package/${packageId}/rate`, {});
       console.log(response);
       alert('Package rated successfully!');
     } catch (error) {
@@ -109,17 +95,13 @@ function App() {
   const ingestPackage = async () => {
     const packageContent = packageContentInput.current.value;
     const packageURL = packageURLInput.current.value;
+    if (!packageContent || !packageURL) {
+      alert('Please enter all fields.');
+      return;
+    }
 
     try {
-      const response = await API.post('phase2api', '/package', {
-        headers: {
-          'X-Authorization': authToken
-        },
-        body: {
-          Content: packageContent,
-          URL: packageURL
-        }
-      });
+      const response = await API.post('phase2api', '/package', {});
       console.log(response);
       alert('Package ingested successfully!');
     } catch (error) {
@@ -130,27 +112,17 @@ function App() {
 
   // Function to create a package
   const createPackage = async () => {
-    const packageName = packageNameInput.current.value;
+    const packageName = packageNameInputForCreation.current.value;
     const packageVersion = packageVersionInput.current.value;
     const packageContent = packageContentInput.current.value;
     const packageURL = packageURLInput.current.value;
 
+    if (!packageName || !packageVersion || !packageContent || !packageURL) {
+      alert('Please enter all fields.');
+      return;
+    }
     try {
-      const response = await API.post('phase2api', '/package', {
-        headers: {
-          'X-Authorization': authToken
-        },
-        body: {
-          metadata: {
-            Name: packageName,
-            Version: packageVersion
-          },
-          data: {
-            Content: packageContent,
-            URL: packageURL
-          }
-        }
-      });
+      const response = await API.post('phase2api', '/package/createinjest', {});
       console.log(response);
       alert('Package created successfully!');
     } catch (error) {
@@ -161,14 +133,31 @@ function App() {
 
   // Function to retrieve a package by name
   const retrievePackageByName = async () => {
-    const packageName = packageNameInput.current.value;
+    const packageName = packageNameInputForRetrieval.current.value;
+    if (!packageName) {
+      alert('Please enter a Package Name.');
+      return;
+    }
 
     try {
-      const response = await API.get('phase2api', `/package/byName/${packageName}`, {
-        headers: {
-          'X-Authorization': authToken
-        }
-      });
+      const response = await API.get('phase2api', `/package/byName/${packageName}`, {});
+      console.log(response);
+      alert('Package retrieved successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to retrieve package.');
+    }
+  };
+
+  const retrievePackageByRegex = async () => {
+    const packageName = packageNameRegexInputForRetrieval.current.value;
+    if (!packageName) {
+      alert('Please enter a Package Name.');
+      return;
+    }
+
+    try {
+      const response = await API.get('phase2api', `/package/byRegex`, {});
       console.log(response);
       alert('Package retrieved successfully!');
     } catch (error) {
@@ -179,14 +168,14 @@ function App() {
 
   // Function to delete a specific version of a package
   const deletePackageVersion = async () => {
-    const packageId = packageIdInput.current.value;
+    const packageId = packageIdInputForDeletion.current.value;
+    if (!packageId) {
+      alert('Please enter a Package ID.');
+      return;
+    }
 
     try {
-      const response = await API.del('phase2api', `/package/${packageId}`, {
-        headers: {
-          'X-Authorization': authToken
-        }
-      });
+      const response = await API.del('phase2api', `/package/${packageId}`, {});
       console.log(response);
       alert('Package version deleted successfully!');
     } catch (error) {
@@ -197,14 +186,14 @@ function App() {
 
   // Function to delete all versions of a package by name
   const deleteAllVersionsOfPackage = async () => {
-    const packageName = packageNameInput.current.value;
+    const packageName = packageNameInputForDeletion.current.value;
+    if (!packageName) {
+      alert('Please enter a Package Name.');
+      return;
+    }
 
     try {
-      const response = await API.del('phase2api', `/package/byName/${packageName}`, {
-        headers: {
-          'X-Authorization': authToken
-        }
-      });
+      const response = await API.del('phase2api', `/package/byName/${packageName}`, {});
       console.log(response);
       alert('All versions of the package deleted successfully!');
     } catch (error) {
@@ -216,11 +205,7 @@ function App() {
   // Function to reset the registry
   const resetRegistry = async () => {
     try {
-      const response = await API.del('phase2api', '/reset', {
-        headers: {
-          'X-Authorization': authToken
-        }
-      });
+      const response = await API.del('phase2api', '/reset', {});
       console.log(response);
       alert('Registry reset successfully!');
     } catch (error) {
@@ -240,17 +225,17 @@ function App() {
         <button onClick={createAuthToken}>Create Auth Token</button>
       </div>
 
-      {/* Package retrieval by ID */}
-      <div>
+       {/* Package retrieval by ID */}
+       <div>
         <h2>Retrieve Package by ID</h2>
-        <input type="text" ref={packageIdInput} placeholder="Package ID" />
+        <input type="text" ref={packageIdInputForRetrieval} placeholder="Package ID" />
         <button onClick={retrievePackageById}>Retrieve Package</button>
       </div>
 
       {/* Package version update */}
       <div>
         <h2>Update Package Version</h2>
-        <input type="text" ref={packageIdInput} placeholder="Package ID" />
+        <input type="text" ref={packageIdInputForUpdate} placeholder="Package ID" />
         <input type="text" ref={packageContentInput} placeholder="Package Content" />
         <input type="text" ref={packageURLInput} placeholder="Package URL" />
         <button onClick={updatePackageVersion}>Update Package Version</button>
@@ -259,8 +244,7 @@ function App() {
       {/* Package rating */}
       <div>
         <h2>Rate Package</h2>
-        <input type="text" ref={packageIdInput} placeholder="Package ID" />
-        <input type="text" ref={packageRatingInput} placeholder="Package Rating" />
+        <input type="text" ref={packageIdInputForRating} placeholder="Package ID" />
         <button onClick={ratePackage}>Rate Package</button>
       </div>
 
@@ -275,7 +259,7 @@ function App() {
       {/* Package creation */}
       <div>
         <h2>Create Package</h2>
-        <input type="text" ref={packageNameInput} placeholder="Package Name" />
+        <input type="text" ref={packageNameInputForCreation} placeholder="Package Name" />
         <input type="text" ref={packageVersionInput} placeholder="Package Version" />
         <input type="text" ref={packageContentInput} placeholder="Package Content" />
         <input type="text" ref={packageURLInput} placeholder="Package URL" />
@@ -285,21 +269,28 @@ function App() {
       {/* Package retrieval by name */}
       <div>
         <h2>Retrieve Package by Name</h2>
-        <input type="text" ref={packageNameInput} placeholder="Package Name" />
+        <input type="text" ref={packageNameInputForRetrieval} placeholder="Package Name" />
         <button onClick={retrievePackageByName}>Retrieve Package</button>
+      </div>
+
+      {/* Package retrieval by Regex */}
+      <div>
+        <h2>Retrieve Package by Regex</h2>
+        <input type="text" ref={packageNameRegexInputForRetrieval} placeholder="Package Name Regex" />
+        <button onClick={retrievePackageByRegex}>Retrieve Package</button>
       </div>
 
       {/* Delete a specific version of a package */}
       <div>
         <h2>Delete a Specific Version of a Package</h2>
-        <input type="text" ref={packageIdInput} placeholder="Package ID" />
+        <input type="text" ref={packageIdInputForDeletion} placeholder="Package ID" />
         <button onClick={deletePackageVersion}>Delete Package Version</button>
       </div>
 
       {/* Delete all versions of a package by name */}
       <div>
         <h2>Delete All Versions of a Package by Name</h2>
-        <input type="text" ref={packageNameInput} placeholder="Package Name" />
+        <input type="text" ref={packageNameInputForDeletion} placeholder="Package Name" />
         <button onClick={deleteAllVersionsOfPackage}>Delete All Versions</button>
       </div>
 
