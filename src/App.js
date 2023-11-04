@@ -2,7 +2,13 @@ import React, { useRef, useState } from 'react';
 import './App.css';
 import { Amplify, API } from 'aws-amplify';
 import awsconfig from './aws-exports';
-Amplify.configure(awsconfig);
+import apiConfig from './apiconfig';
+Amplify.configure({
+  ...awsconfig,
+  API: {
+    endpoints: apiConfig.aws_cloud_logic_custom
+  }
+});
 
 function App() {
   // Refs and state variables
