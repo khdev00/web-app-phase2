@@ -136,16 +136,25 @@ function App() {
       alert('Please enter all fields.');
       return;
     }
-    console.log(packageName);
+  
     try {
-      const response = await API.put('phase2api', `/package/${packageNameInputForCreation.current.value}`, {});
+      const body = {
+        packageName,
+        packageVersion,
+        packageContent,
+        packageURL
+      };
+
+      console.log('Request Body:', JSON.stringify(body)); // Log the request body
+      const response = await API.post('phase2api', `/package/${packageNameInputForCreation.current.value}`, {});
       console.log(response);
       alert('Package created successfully!');
     } catch (error) {
       console.error(error);
       alert('Failed to create package.');
     }
-  };
+};
+
 
   // Function to retrieve a package by name
   const retrievePackageByName = async () => {

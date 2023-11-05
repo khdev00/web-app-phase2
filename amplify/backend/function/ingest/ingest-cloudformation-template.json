@@ -47,12 +47,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "createingest",
+            "ingest",
             {
               "Fn::Join": [
                 "",
                 [
-                  "createingest",
+                  "ingest",
                   "-",
                   {
                     "Ref": "env"
@@ -89,12 +89,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "phasetwoLambdaRole5ec24a98",
+            "phasetwoLambdaRole358278fd",
             {
               "Fn::Join": [
                 "",
                 [
-                  "phasetwoLambdaRole5ec24a98",
+                  "phasetwoLambdaRole358278fd",
                   "-",
                   {
                     "Ref": "env"

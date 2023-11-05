@@ -23,12 +23,47 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
-    "createingest": {
+    "create": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteAllByName": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deletePackageByIDVersion": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "ingest": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "ratePackage": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
     "resetreg": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "retrieveByID": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "retrievePackageByName": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "updateVersion": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
@@ -99,19 +134,83 @@
         }
       ]
     },
-    "AMPLIFY_function_createingest_deploymentBucketName": {
+    "AMPLIFY_function_create_deploymentBucketName": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "createingest"
+          "resourceName": "create"
         }
       ]
     },
-    "AMPLIFY_function_createingest_s3Key": {
+    "AMPLIFY_function_create_s3Key": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "createingest"
+          "resourceName": "create"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteAllByName_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteAllByName"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteAllByName_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteAllByName"
+        }
+      ]
+    },
+    "AMPLIFY_function_deletePackageByIDVersion_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deletePackageByIDVersion"
+        }
+      ]
+    },
+    "AMPLIFY_function_deletePackageByIDVersion_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deletePackageByIDVersion"
+        }
+      ]
+    },
+    "AMPLIFY_function_ingest_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "ingest"
+        }
+      ]
+    },
+    "AMPLIFY_function_ingest_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "ingest"
+        }
+      ]
+    },
+    "AMPLIFY_function_ratePackage_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "ratePackage"
+        }
+      ]
+    },
+    "AMPLIFY_function_ratePackage_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "ratePackage"
         }
       ]
     },
@@ -128,6 +227,54 @@
         {
           "category": "function",
           "resourceName": "resetreg"
+        }
+      ]
+    },
+    "AMPLIFY_function_retrieveByID_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "retrieveByID"
+        }
+      ]
+    },
+    "AMPLIFY_function_retrieveByID_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "retrieveByID"
+        }
+      ]
+    },
+    "AMPLIFY_function_retrievePackageByName_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "retrievePackageByName"
+        }
+      ]
+    },
+    "AMPLIFY_function_retrievePackageByName_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "retrievePackageByName"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateVersion_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateVersion"
+        }
+      ]
+    },
+    "AMPLIFY_function_updateVersion_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "updateVersion"
         }
       ]
     }

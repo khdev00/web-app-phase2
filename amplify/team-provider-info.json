@@ -47,10 +47,6 @@
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
           "s3Key": "amplify-builds/byName-4b703157716265576334-build.zip"
         },
-        "createingest": {
-          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/createingest-657147684c79474f7671-build.zip"
-        },
         "resetreg": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
           "s3Key": "amplify-builds/resetreg-5378766d515176687036-build.zip"
@@ -58,6 +54,38 @@
         "byRegex": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
           "s3Key": "amplify-builds/byRegex-494976695645396e4963-build.zip"
+        },
+        "create": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/create-78314c6947362f69796e-build.zip"
+        },
+        "ingest": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/ingest-5974473678645a6b4448-build.zip"
+        },
+        "retrieveByID": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/retrieveByID-5173784868552b6e7a46-build.zip"
+        },
+        "updateVersion": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/updateVersion-694f3948584154514f6e-build.zip"
+        },
+        "ratePackage": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/ratePackage-596c5a7662795733724b-build.zip"
+        },
+        "retrievePackageByName": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/retrievePackageByName-572b4277615131675a7a-build.zip"
+        },
+        "deletePackageByIDVersion": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/deletePackageByIDVersion-486562734b4b2b795a6d-build.zip"
+        },
+        "deleteAllByName": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/deleteAllByName-557032736d55752b4d76-build.zip"
         }
       }
     }
