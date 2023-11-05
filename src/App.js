@@ -42,7 +42,6 @@ function App() {
       alert('Please enter a username and password.');
       return;
     }
-  
     const response = await API.put('phase2api', '/authenticate', {}); 
     console.log(response);
 
