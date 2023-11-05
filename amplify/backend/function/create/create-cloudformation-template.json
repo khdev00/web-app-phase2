@@ -160,6 +160,24 @@
                   }
                 ]
               }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:PutItem"
+              ],
+              "Resource": [
+                "arn:aws:dynamodb:us-east-2:269961640318:table/PackageMetadata"
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject"
+              ],
+              "Resource": [
+                "arn:aws:s3:::packageregistry/*"
+              ]
             }
           ]
         }

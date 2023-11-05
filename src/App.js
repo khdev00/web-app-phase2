@@ -71,14 +71,26 @@ function App() {
   const updatePackageVersion = async () => {
     const packageId = packageIdInputForUpdate.current.value;
     const packageContent = packageContentInputUpdate.current.value;
-    const packageURL = packageURLInputUpdate.current.value;
-    if (!packageId || !packageContent || !packageURL) {
+   
+  
+    if (!packageId || !packageContent) {
       alert('Please enter all fields.');
       return;
     }
-
+  
     try {
-      const response = await API.put('phase2api', `/package/${packageId}`, {});
+      const body = {
+        packageId: packageId,
+        packageContent: packageContent
+      };
+  
+      console.log('Request Body:', body);
+      const response = await API.put('phase2api', `/package/${packageId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
       console.log(response);
       alert('Package version updated successfully!');
     } catch (error) {
@@ -86,6 +98,7 @@ function App() {
       alert('Failed to update package version.');
     }
   };
+  
 
   // Function to rate a package
   const ratePackage = async () => {
@@ -268,10 +281,9 @@ const createPackage = async () => {
 
       {/* Package version update */}
       <div>
-        <h2>Update Package Version</h2>
+        <h2>Update Package</h2>
         <input type="text" ref={packageIdInputForUpdate} placeholder="Package ID" />
         <input type="text" ref={packageContentInputUpdate} placeholder="Package Content" />
-        <input type="text" ref={packageURLInputUpdate} placeholder="Package URL" />
         <button onClick={updatePackageVersion}>Update Package Version</button>
       </div>
 
