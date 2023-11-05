@@ -58,7 +58,16 @@ function App() {
     console.log(packageId);
 
     try {
-      const response = await API.get('phase2api', `/package/${packageId}`, {});
+      const body = {
+        packageId: packageId
+      };
+      console.log('Request Body:', body);
+      const response = await API.get('phase2api', `/package/${packageId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
       console.log(response);
       alert('Package retrieved successfully!');
     } catch (error) {

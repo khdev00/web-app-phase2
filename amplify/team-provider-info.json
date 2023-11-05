@@ -65,7 +65,7 @@
         },
         "retrieveByID": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/retrieveByID-6d32514d674857306c41-build.zip"
+          "s3Key": "amplify-builds/retrieveByID-6f576841596238424d4e-build.zip"
         },
         "updateVersion": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
