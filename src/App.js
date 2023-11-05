@@ -16,6 +16,7 @@ function App() {
   const packageIdInputForRetrieval = useRef(null);
   const packageIdInputForUpdate = useRef(null);
   const packageIdInputForRating = useRef(null);
+  const packageIdInputForCreation = useRef(null);
   const packageIdInputForDeletion = useRef(null);
   const packageNameInputForRetrieval = useRef(null);
   const packageNameRegexInputForRetrieval = useRef(null);
@@ -124,34 +125,43 @@ function App() {
     }
   };
 
-  // Function to create a package
-  const createPackage = async () => {
-    const packageName = packageNameInputForCreation.current.value;
-    const packageVersion = packageVersionInput.current.value;
-    const packageContent = packageContentInputCreate.current.value;
-    const packageURL = packageURLInputCreate.current.value;
   
-    if (!packageName || !packageVersion || !packageContent || !packageURL) {
-      alert('Please enter all fields.');
-      return;
-    }
-  
-    try {
-      const body = {
-        packageName,
-        packageVersion,
-        packageContent,
-        packageURL
-      };
+ // Function to create a package
+const createPackage = async () => {
+  const packageName = packageIdInputForCreation.current.value;
+  const packageVersion = packageVersionInput.current.value;
+  const packageContent = packageContentInputCreate.current.value;
+  const packageURL = packageURLInputCreate.current.value;
 
-      console.log('Request Body:', JSON.stringify(body)); // Log the request body
-      const response = await API.post('phase2api', `/package/${packageNameInputForCreation.current.value}`, {});
-      console.log(response);
-      alert('Package created successfully!');
-    } catch (error) {
-      console.error(error);
-      alert('Failed to create package.');
-    }
+  if (!packageName || !packageVersion || !packageContent || !packageURL) {
+    alert('Please enter all fields.');
+    return;
+  }
+
+  try {
+    const body = {
+      packageName: packageName,
+      packageVersion: packageVersion,
+      packageContent: packageContent,
+      packageURL: packageURL,
+      packageScore: "0"
+    };
+
+    console.log('Request Body:', body);
+    const response = await API.post('phase2api', `/package/${packageName}`, {
+
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      
+      body: JSON.stringify(body)
+    });
+    console.log(response);
+    alert('Package created successfully!');
+  } catch (error) {
+    console.error(error);
+    alert('Failed to create package.');
+  }
 };
 
 
@@ -283,7 +293,7 @@ function App() {
       {/* Package creation */}
       <div>
         <h2>Create Package</h2>
-        <input type="text" ref={packageNameInputForCreation} placeholder="Package Name" />
+        <input type="text" ref={packageIdInputForCreation} placeholder="Package Name" />
         <input type="text" ref={packageVersionInput} placeholder="Package Version" />
         <input type="text" ref={packageContentInputCreate} placeholder="Package Content" />
         <input type="text" ref={packageURLInputCreate} placeholder="Package URL" />
