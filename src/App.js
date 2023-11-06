@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import './App.css';
 import { Amplify, API } from 'aws-amplify';
 import awsconfig from './aws-exports';
@@ -27,7 +27,9 @@ function App() {
   const packageContentInputCreate = useRef(null);
   const packageContentInputIngest = useRef(null);
   const packageContentInputUpdate = useRef(null);
-  
+  const [downloadUrl, setDownloadUrl] = useState('');
+  const [downloadUrlTimeout, setDownloadUrlTimeout] = useState(null);
+
   
   const packageURLInputCreate = useRef(null);
   const packageURLInputIngest = useRef(null);
@@ -51,6 +53,7 @@ function App() {
   // Function to retrieve a package by ID
   const retrievePackageById = async () => {
     const packageId = packageIdInputForRetrieval.current.value;
+    
     if (!packageId) {
       alert('Please enter a Package ID.');
       return;
@@ -58,23 +61,35 @@ function App() {
     console.log(packageId);
 
     try {
-      const body = {
-        packageId: packageId
-      };
-      console.log('Request Body:', body);
       const response = await API.get('phase2api', `/package/${packageId}`, {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body)
       });
+      const responseBody = JSON.parse(response.body);
+      setDownloadUrl(responseBody.downloadUrl); // Set the download URL
+      const timeout = setTimeout(() => {
+        setDownloadUrl('');
+      }, 60000); // Clear the download URL after 60 seconds
       console.log(response);
       alert('Package retrieved successfully!');
+      setDownloadUrlTimeout(timeout);
     } catch (error) {
       console.error(error);
       alert('Failed to retrieve package.');
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (downloadUrlTimeout) {
+        clearTimeout(downloadUrlTimeout);
+      }
+    };
+  }, [downloadUrlTimeout]);
+
+
+  
 
   // Function to update a package version
   const updatePackageVersion = async () => {
@@ -288,12 +303,22 @@ const createPackage = async () => {
         <button onClick={retrievePackageById}>Retrieve Package</button>
       </div>
 
+       {/* Download Button */}
+       {downloadUrl && (
+        <div>
+          <h2>Download Package</h2>
+          <a href={downloadUrl} download>
+            <button>Download</button>
+          </a>
+        </div>
+      )}
+
       {/* Package version update */}
       <div>
         <h2>Update Package</h2>
         <input type="text" ref={packageIdInputForUpdate} placeholder="Package ID" />
         <input type="text" ref={packageContentInputUpdate} placeholder="Package Content" />
-        <button onClick={updatePackageVersion}>Update Package Version</button>
+        <button onClick={updatePackageVersion}>Update Package Content</button>
       </div>
 
       {/* Package rating */}
