@@ -67,6 +67,11 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "viewRegistry": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
@@ -275,6 +280,22 @@
         {
           "category": "function",
           "resourceName": "updateVersion"
+        }
+      ]
+    },
+    "AMPLIFY_function_viewRegistry_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "viewRegistry"
+        }
+      ]
+    },
+    "AMPLIFY_function_viewRegistry_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "viewRegistry"
         }
       ]
     }

@@ -86,6 +86,10 @@
         "deleteAllByName": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
           "s3Key": "amplify-builds/deleteAllByName-6f48766b656565646d6e-build.zip"
+        },
+        "viewRegistry": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/viewRegistry-75674554665357366370-build.zip"
         }
       }
     }

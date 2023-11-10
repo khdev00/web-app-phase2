@@ -294,6 +294,17 @@
           "env": "phasetw"
         }
       }
+    },
+    "functionviewRegistry": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/viewRegistry-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/viewRegistry-75674554665357366370-build.zip",
+          "env": "phasetw"
+        }
+      }
     }
   }
 }

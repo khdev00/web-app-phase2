@@ -10,9 +10,24 @@ Amplify.configure({
   }
 });
 
+function Modal({ isOpen, onClose, children }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal">
+      <div className="modal-content">
+        <button onClick={onClose}>Close</button>
+        {children}
+      </div>
+    </div>
+  );
+}
 function App() {
   // Refs and state variables
   const [authToken, setAuthToken] = useState('');
+  const [packages, setPackages] = useState([]);
+  const [nextToken, setNextToken] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const packageIdInputForRetrieval = useRef(null);
   const packageIdInputForUpdate = useRef(null);
   const packageIdInputForRating = useRef(null);
@@ -36,6 +51,10 @@ function App() {
   const packageURLInputUpdate = useRef(null);
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
 
   // Function to create an authentication token
   const createAuthToken = async () => {
@@ -237,6 +256,21 @@ const createPackage = async () => {
     }
   };
 
+  // Function to view packages in the registry 
+  const viewPackages = async (token = null) => {
+    try {
+      const response = await API.get('phase2api', '/view', {
+        queryStringParameters: { nextToken: token }
+      });
+      const data = JSON.parse(response.body);
+      setPackages(prevPackages => [...prevPackages, ...data.items]);
+      setNextToken(data.nextToken);
+    } catch (error) {
+      console.error('Error fetching packages:', error);
+      alert('Failed to retrieve packages.');
+    }
+  };
+
   // Function to delete a specific version of a package
   const deletePackageVersion = async () => {
     const packageId = packageIdInputForDeletion.current.value;
@@ -313,6 +347,32 @@ const createPackage = async () => {
         </div>
       )}
 
+     
+       {/* Button to open the modal */}
+        <h2>View Registry</h2>
+      <button onClick={toggleModal}>View Registry</button>
+
+      {/* Modal for viewing packages */}
+      <Modal isOpen={isModalOpen} onClose={toggleModal}>
+        <h2>Registry</h2>
+        <button onClick={() => viewPackages()}>Load Packages</button>
+        <div>
+          {packages.map((pkg, index) => (
+            <div key={index}>
+              {/* Render package details */}
+              <p>Package ID: {pkg.packageName}</p>
+              <p>Version: {pkg.Version}</p>
+              <p>URL: {pkg.URL}</p>
+              <p>Metric Score: {pkg.MetricScore}</p>
+            </div>
+          ))}
+          {nextToken && (
+            <button onClick={() => viewPackages(nextToken)}>Load More</button>
+          )}
+        </div>
+      </Modal>
+
+
       {/* Package version update */}
       <div>
         <h2>Update Package</h2>
@@ -320,6 +380,8 @@ const createPackage = async () => {
         <input type="text" ref={packageContentInputUpdate} placeholder="Package Content" />
         <button onClick={updatePackageVersion}>Update Package Content</button>
       </div>
+
+     
 
       {/* Package rating */}
       <div>
