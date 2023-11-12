@@ -26,7 +26,9 @@ function App() {
   // Refs and state variables
   const [authToken, setAuthToken] = useState('');
   const [packages, setPackages] = useState([]);
+  const [packagesRegex, setPackagesRegex] = useState([]);
   const [nextToken, setNextToken] = useState(null);
+  const [nextTokenRegex, setNextTokenRegex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const packageIdInputForRetrieval = useRef(null);
   const packageIdInputForUpdate = useRef(null);
@@ -36,21 +38,17 @@ function App() {
   const packageNameInputForRetrieval = useRef(null);
   const packageNameRegexInputForRetrieval = useRef(null);
   const packageNameInputForDeletion = useRef(null);
-  const packageNameInputForCreation = useRef(null);
   const packageVersionInput = useRef(null);
-  const packageContentInput = useRef(null);
   const packageContentInputCreate = useRef(null);
   const packageContentInputIngest = useRef(null);
   const packageContentInputUpdate = useRef(null);
   const [downloadUrl, setDownloadUrl] = useState('');
   const [downloadUrlTimeout, setDownloadUrlTimeout] = useState(null);
-
-  
   const packageURLInputCreate = useRef(null);
   const packageURLInputIngest = useRef(null);
-  const packageURLInputUpdate = useRef(null);
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
+  const [currentRegex, setCurrentRegex] = useState('');
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -239,25 +237,50 @@ const createPackage = async () => {
     }
   };
 
-  const retrievePackageByRegex = async () => {
-    const packageName = packageNameRegexInputForRetrieval.current.value;
-    if (!packageName) {
-      alert('Please enter a Package Name.');
+  const retrievePackageByRegex = async (token = null) => {
+    const regexPattern = packageNameRegexInputForRetrieval.current.value;
+    if (!regexPattern) {
+      alert('Please enter a regex pattern.');
       return;
     }
+    
+    // Store the current regex pattern
+    if (!token) setCurrentRegex(regexPattern);
 
     try {
-      const response = await API.get('phase2api', `/package/byRegex`, {});
-      console.log(response);
-      alert('Package retrieved successfully!');
+      const queryParams = { regex: regexPattern };
+      if (token) {
+        queryParams.nextToken = token;
+      }
+
+      const response = await API.get('phase2api', `/package/byRegEx`, {
+        queryStringParameters: queryParams
+      });
+      const data = response;
+      
+      console.log(data.items);
+      console.log(data.nextToken);
+
+      setPackagesRegex(prevPackages => [...prevPackages, ...data.items]);
+      setNextTokenRegex(data.nextToken);
     } catch (error) {
       console.error(error);
-      alert('Failed to retrieve package.');
+      alert('Failed to retrieve packages.');
     }
+  };
+
+  // Load more button handler
+  const handleLoadMoreRegexPackages = () => {
+    retrievePackageByRegex(nextTokenRegex);
   };
 
   // Function to view packages in the registry 
   const viewPackages = async (token = null) => {
+
+    if (!token) {
+      // Clear existing packages when loading packages initially
+      setPackages([]);
+    }
     try {
       const response = await API.get('phase2api', '/view', {
         queryStringParameters: { nextToken: token }
@@ -265,10 +288,12 @@ const createPackage = async () => {
       const data = JSON.parse(response.body);
       setPackages(prevPackages => [...prevPackages, ...data.items]);
       setNextToken(data.nextToken);
+      console.log(data.nextToken);
     } catch (error) {
       console.error('Error fetching packages:', error);
       alert('Failed to retrieve packages.');
     }
+
   };
 
   // Function to delete a specific version of a package
@@ -415,11 +440,27 @@ const createPackage = async () => {
         <button onClick={retrievePackageByName}>Retrieve Package</button>
       </div>
 
-      {/* Package retrieval by Regex */}
-      <div>
+       {/* Package retrieval by Regex */}
+       <div>
         <h2>Retrieve Package by Regex</h2>
         <input type="text" ref={packageNameRegexInputForRetrieval} placeholder="Package Name Regex" />
-        <button onClick={retrievePackageByRegex}>Retrieve Package</button>
+        <button onClick={() => retrievePackageByRegex()}>Retrieve Package</button>
+      </div>
+
+      {/* Display Regex Search Results */}
+      <div>
+        <h2>Regex Search Results</h2>
+        {packagesRegex.map((pkg, index) => (
+          <div key={index}>
+            <p>Package Name: {pkg.packageName}</p>
+            <p>Version: {pkg.Version}</p>
+            <p>URL: {pkg.URL}</p>
+            <p>Metric Score: {pkg.MetricScore}</p>
+          </div>
+        ))}
+        {nextTokenRegex && (
+          <button onClick={() => retrievePackageByRegex(nextTokenRegex)}>Load More</button>
+        )}
       </div>
 
       {/* Delete a specific version of a package */}
