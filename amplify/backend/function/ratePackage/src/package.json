@@ -21,5 +21,9 @@
     "isomorphic-git": "^1.24.5",
     "@aws-sdk/client-secrets-manager": "^3.451.0",
     "core-js": "3.33.2"
+  },
+
+  "engines" : {
+    "node" : ">=18.0.0"
   }
 }
