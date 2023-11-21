@@ -57,7 +57,7 @@
         },
         "create": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/create-61786956366f75504736-build.zip"
+          "s3Key": "amplify-builds/create-692f374b6f554f76784b-build.zip"
         },
         "ingest": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -73,7 +73,7 @@
         },
         "ratePackage": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/ratePackage-2b2b724e512b47774e36-build.zip"
+          "s3Key": "amplify-builds/ratePackage-392f7653304737614b66-build.zip"
         },
         "retrievePackageByName": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
