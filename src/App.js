@@ -10,6 +10,7 @@ Amplify.configure({
   }
 });
  
+ 
 
 function Modal({ isOpen, onClose, children }) {
   if (!isOpen) return null;
