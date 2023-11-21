@@ -9,6 +9,7 @@ Amplify.configure({
     endpoints: apiConfig.aws_cloud_logic_custom
   }
 });
+ 
 
 function Modal({ isOpen, onClose, children }) {
   if (!isOpen) return null;
