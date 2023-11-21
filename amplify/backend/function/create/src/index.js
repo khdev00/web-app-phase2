@@ -11,6 +11,7 @@ const folderName = 'nongradedpackages';
 /**
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  */
+
 exports.handler = async (event) => {
     console.log('Event Body:', event.body);
 
