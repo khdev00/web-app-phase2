@@ -3,7 +3,7 @@ AWS.config.update({ region: 'us-east-2' });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
-const { v4: uuidv4 } = require('uuid');
+
 
 const tableName = 'pkgmetadata';
 const bucketName = 'packageregistry';
@@ -60,7 +60,8 @@ exports.handler = async (event) => {
     const packageContent = body.packageContent; // This is base64-encoded
     const packageURL = body.packageURL;
     const packageScore = body.packageScore;
-    let packageID = uuidv4(); 
+    let packageID = packageName + packageVersion; 
+    console.log('packageID', packageID);
 
     // Decode the base64-encoded content
     const decodedContent = Buffer.from(packageContent, 'base64');
