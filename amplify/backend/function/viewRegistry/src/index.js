@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 AWS.config.update({ region: 'us-east-2' });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
-const tableName = 'PackageMetadata';
+const tableName = 'pkgmetadata';
 
 exports.handler = async (event) => {
     try {

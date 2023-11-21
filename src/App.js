@@ -77,6 +77,11 @@ function App() {
     }
     console.log(packageId);
 
+    if (packageId.length > 50) {
+      alert('Entered ID is too large. Please view the registry to find the package ID.');
+      return;
+    }
+
     try {
       const response = await API.get('phase2api', `/package/${packageId}`, {
         headers: {
@@ -89,8 +94,16 @@ function App() {
         setDownloadUrl('');
       }, 60000); // Clear the download URL after 60 seconds
       console.log(response);
-      alert('Package retrieved successfully!');
-      setDownloadUrlTimeout(timeout);
+      if (response.statusCode === 200) {
+        alert('Package retrieved successfully!');
+        setDownloadUrlTimeout(timeout);
+      } else if (response.statusCode === 404) {
+        alert('Package does not exist.');
+      } else if (response.statusCode === 500) {
+        alert('Failed to retrieve package in database');
+      } else if (response.statusCode === 400) {
+        alert('There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.');
+      }
     } catch (error) {
       console.error(error);
       alert('Failed to retrieve package.');
@@ -114,10 +127,13 @@ function App() {
     const packageContent = packageContentInputUpdate.current.value;
    
   
-    if (!packageId || !packageContent) {
+    if (!packageId || !packageContent ) {
+      alert('Please enter all fields.');
       alert('Please enter all fields.');
       return;
     }
+
+    
   
     try {
       const body = {
@@ -385,7 +401,8 @@ const createPackage = async () => {
           {packages.map((pkg, index) => (
             <div key={index}>
               {/* Render package details */}
-              <p>Package ID: {pkg.packageName}</p>
+              <p>Package Name: {pkg.packageName}</p>
+              <p>Package ID: {pkg.pkgID}</p>
               <p>Version: {pkg.Version}</p>
               <p>URL: {pkg.URL}</p>
               <p>Metric Score: {pkg.MetricScore}</p>
@@ -453,6 +470,7 @@ const createPackage = async () => {
         {packagesRegex.map((pkg, index) => (
           <div key={index}>
             <p>Package Name: {pkg.packageName}</p>
+            <p>Package ID: {pkg.pkgID}</p>
             <p>Version: {pkg.Version}</p>
             <p>URL: {pkg.URL}</p>
             <p>Metric Score: {pkg.MetricScore}</p>

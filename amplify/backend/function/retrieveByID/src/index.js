@@ -4,7 +4,7 @@ AWS.config.update({ region: 'us-east-2' });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
 
-const tableName = 'PackageMetadata';
+const tableName = 'pkgmetadata';
 const bucketName = 'packageregistry'; // Replace with your S3 bucket name
 const folderName = 'nongradedpackages';
 exports.handler = async (event) => {
@@ -19,7 +19,7 @@ exports.handler = async (event) => {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
             },
-            body: JSON.stringify({ message: 'Package ID is required' }),
+            body: JSON.stringify({ message: 'There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.' }),
         };
     }
 
@@ -29,7 +29,7 @@ exports.handler = async (event) => {
         const params = {
             TableName: tableName,
             Key: {
-                "packageName": packageId
+                "pkgID": packageId
             }
         };
         const data = await dynamoDb.get(params).promise();
@@ -42,7 +42,7 @@ exports.handler = async (event) => {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
             },
-            body: JSON.stringify({ message: 'Failed to retrieve package metadata' }),
+            body: JSON.stringify({ message: 'Failed to retrieve package metadata from database' }),
         };
     }
 
@@ -54,7 +54,7 @@ exports.handler = async (event) => {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
             },
-            body: JSON.stringify({ message: 'S3 URL not found in package metadata' }),
+            body: JSON.stringify({ message: 'Package does not exist' }),
         };
     }
 
@@ -79,6 +79,14 @@ exports.handler = async (event) => {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "*",
             "Content-Type": "application/json"
+        },
+        "metadata": {
+            "Name": packageMetadata.packageName,
+            "Version": packageMetadata.Version,
+            "ID": packageMetadata.pkgID,
+        },
+        "data": {
+            "Content": packageMetadata.Content,
         },
         body: JSON.stringify({ downloadUrl: presignedUrl })
     };

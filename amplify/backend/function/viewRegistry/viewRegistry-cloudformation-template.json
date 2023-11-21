@@ -172,7 +172,7 @@
                 "dynamodb:Query"
               ],
               "Resource": [
-                "arn:aws:dynamodb:us-east-2:269961640318:table/PackageMetadata"
+                "arn:aws:dynamodb:us-east-2:269961640318:table/pkgmetadata"
               ]
             },
             {

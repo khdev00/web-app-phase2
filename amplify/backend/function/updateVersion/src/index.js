@@ -4,7 +4,7 @@ AWS.config.update({ region: 'us-east-2' });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
 
-const tableName = 'PackageMetadata';
+const tableName = 'pkgmetadata';
 const bucketName = 'packageregistry'; // Replace with your S3 bucket name
 const folderName = 'nongradedpackages';
 
@@ -55,13 +55,9 @@ exports.handler = async (event) => {
     }
 
     // Access the properties
-    const packageName = body.packageId;
+    const packageID = body.packageId;
     const packageContent = body.packageContent; // This is base64-encoded
     
-    
-
-    
-
     // Decode the base64-encoded content
     const decodedContent = Buffer.from(packageContent, 'base64');
 
@@ -69,7 +65,7 @@ exports.handler = async (event) => {
     const getParams = {
         TableName: tableName,
         Key: {
-            'packageName': packageName // Adjust based on your table's primary key
+            "pkgID": packageID // Adjust based on your table's primary key
         }
     };
 
@@ -77,7 +73,15 @@ exports.handler = async (event) => {
         const { Item: existingPackage } = await dynamoDb.get(getParams).promise();
 
         if (!existingPackage) {
-            throw new Error(`Package with ID ${packageName} not found.`);
+            console.error('Package not found');
+            return {
+                statusCode: 404,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+                body: JSON.stringify({ message: 'Package not found' }),
+            };
         }
 
         // Define S3 upload parameters
@@ -96,7 +100,7 @@ exports.handler = async (event) => {
         const updateParams = {
             TableName: tableName,
             Key: {
-                'packageName': packageName
+                "pkgID": packageID
             },
             UpdateExpression: 'set S3Location = :s',
             ExpressionAttributeValues: {

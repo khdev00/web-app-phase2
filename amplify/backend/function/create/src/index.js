@@ -3,9 +3,10 @@ AWS.config.update({ region: 'us-east-2' });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
+const { v4: uuidv4 } = require('uuid');
 
-const tableName = 'PackageMetadata';
-const bucketName = 'packageregistry'; // Replace with your S3 bucket name
+const tableName = 'pkgmetadata';
+const bucketName = 'packageregistry';
 const folderName = 'nongradedpackages';
 /**
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
@@ -59,6 +60,7 @@ exports.handler = async (event) => {
     const packageContent = body.packageContent; // This is base64-encoded
     const packageURL = body.packageURL;
     const packageScore = body.packageScore;
+    let packageID = uuidv4(); 
 
     // Decode the base64-encoded content
     const decodedContent = Buffer.from(packageContent, 'base64');
@@ -85,6 +87,8 @@ exports.handler = async (event) => {
                 S3Location: s3Result.Location, // Use S3 file location for quick access
                 URL: packageURL,
                 MetricScore: packageScore,
+                pkgID: packageID,
+                Content: packageContent,
             },
         };
 
