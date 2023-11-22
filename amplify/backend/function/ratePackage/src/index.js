@@ -3,7 +3,7 @@ AWS.config.update({ region: 'us-east-2' });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
-const tableName = 'PackageMetadata';
+const tableName = 'pkgmetadata';
 
 const {fetchUrlData, calculateAllMetrics} = require("./fetch_url")
 const { SecretsManagerClient, GetSecretValueCommand, } = require("@aws-sdk/client-secrets-manager");
@@ -16,7 +16,7 @@ const updateDynamoDBItem = async (packageId, metricScore) => {
         const updateParams = {
             TableName: tableName,
             Key: {
-                "packageName": packageId,
+                "pkgID": packageId,
             },
             UpdateExpression: "SET MetricScore = :metricScore",
             ExpressionAttributeValues: {
@@ -81,7 +81,7 @@ exports.handler = async (event) => {
         const params = {
             TableName: tableName,
             Key: {
-                "packageName": packageId
+                "pkgID": packageId
             }
         };
         const data = await dynamoDb.get(params).promise();

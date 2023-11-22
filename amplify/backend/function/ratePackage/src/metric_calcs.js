@@ -38,8 +38,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculateNetScore = exports.calculateResponsiveMaintainer = exports.calculateCorrectness = exports.calculateBusFactor = exports.calculateRampUp = exports.calculateDependency = exports.calculateCodeReviewMetric = void 0;
 var axios = require("axios");
-var winston = require("winston");
-var Logform = require("winston").Logform;
 var metric_calcs_helpers_1 = require("./metric_calcs_helpers");
 // This is what controlls the rounding for the metrics,
 // In class we were told to round to 5dp without padding with zeros
@@ -202,6 +200,7 @@ function calculateCorrectness(owner, packageName, token) {
                 case 3:
                     error_4 = _a.sent();
                     console.log("Error calculating correctness metric: ".concat(error_4));
+                    console.log("Error calculating correctness metric: ".concat(error_4));
                     return [2 /*return*/, -1];
                 case 4: return [2 /*return*/];
             }
@@ -230,6 +229,7 @@ function calculateResponsiveMaintainer(owner, packageName, token) {
                     return [2 /*return*/, score];
                 case 3:
                     error_5 = _a.sent();
+                    console.log("Error calculating responsive maintainer score: ".concat(error_5));
                     console.log("Error calculating responsive maintainer score: ".concat(error_5));
                     return [2 /*return*/, -1];
                 case 4: return [2 /*return*/];

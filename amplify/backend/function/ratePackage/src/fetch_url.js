@@ -48,19 +48,12 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getGithubDetailsFromNpm = exports.fetchUrlData = exports.calculateAllMetrics = exports.Url = exports.Package = void 0;
-if (!Symbol.asyncIterator) {
-    Symbol.asyncIterator = Symbol.for("Symbol.asyncIterator");
-}
-var dotenv = require("dotenv");
+exports.getGithubDetailsFromNpm = exports.fetchUrlData = exports.fetchUrlsFromFile = exports.Url = exports.Package = void 0;
 var axios = require("axios");
-var winston = require("winston");
-var Logform = require("winston").Logform;
 //import { getLogger } from './logger';
 //import * as ndjson from 'ndjson';
 var ndjson = require("ndjson");
 var fs = require("fs");
-var os = require("os");
 var path = require("path");
 var http = require("isomorphic-git/http/node");
 // For cloning repo
@@ -179,7 +172,7 @@ var Url = /** @class */ (function () {
 }());
 exports.Url = Url;
 function retrieveGithubKey() {
-    var githubApiKey = process.env.GITHUB_TOKEN;
+    var githubApiKey = '';
     if (!githubApiKey) {
         var error = new Error("GitHub API key not found in environment variables.");
         console.log(error);
@@ -220,6 +213,7 @@ function getPackageObject(owner, packageName, token, packageObj) {
                         console.log("Contributors retrieved for ".concat(owner, "/").concat(packageName));
                     }
                     else {
+                        console.log("Failed to retrieve contributors for ".concat(owner, "/").concat(packageName));
                         console.log("Failed to retrieve contributors for ".concat(owner, "/").concat(packageName));
                     }
                     return [4 /*yield*/, (0, metric_calcs_1.calculateCorrectness)(owner, packageName, token).then(function (correctness) {
@@ -314,7 +308,7 @@ function cloneRepository(repoUrl, packageObj) {
         });
     });
 }
-function calculateAllMetrics(urlObjs, token) {
+function calculateAllMetrics(urlObjs, githubToken) {
     var _a, urlObjs_1, urlObjs_1_1;
     var _b, e_1, _c, _d;
     return __awaiter(this, void 0, void 0, function () {
@@ -327,15 +321,15 @@ function calculateAllMetrics(urlObjs, token) {
                 case 1:
                     _e.trys.push([1, 7, 8, 13]);
                     _loop_1 = function () {
-                        var url_1, packageObj;
+                        var url, packageObj;
                         return __generator(this, function (_f) {
                             switch (_f.label) {
                                 case 0:
                                     _d = urlObjs_1_1.value;
                                     _a = false;
-                                    url_1 = _d;
+                                    url = _d;
                                     packageObj = new Package;
-                                    return [4 /*yield*/, getPackageObject(url_1.getPackageOwner(), url_1.packageName, token, packageObj)
+                                    return [4 /*yield*/, getPackageObject(url.getPackageOwner(), url.packageName, githubToken, packageObj)
                                             .then(function (returnedPackageObject) {
                                             packageObj = returnedPackageObject;
                                         })];
@@ -391,11 +385,72 @@ function calculateAllMetrics(urlObjs, token) {
         });
     });
 }
-exports.calculateAllMetrics = calculateAllMetrics;
+// Asynchronous function to fetch URLs from a given file path.
+function fetchUrlsFromFile(filePath) {
+    return __awaiter(this, void 0, void 0, function () {
+        var data, lines, urls, _i, lines_1, line, packageName, packageOwner, parts, githubDetails, parts, urlObj, error_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 9, , 10]);
+                    return [4 /*yield*/, fs.promises.readFile(filePath, 'utf-8')];
+                case 1:
+                    data = _a.sent();
+                    lines = data.split('\n');
+                    urls = [];
+                    _i = 0, lines_1 = lines;
+                    _a.label = 2;
+                case 2:
+                    if (!(_i < lines_1.length)) return [3 /*break*/, 8];
+                    line = lines_1[_i];
+                    line = line.trim();
+                    if (!(line.startsWith('http') && (line.includes('npmjs.com') || line.includes('github.com')))) return [3 /*break*/, 6];
+                    packageName = '';
+                    packageOwner = '';
+                    if (!line.includes('npmjs.com')) return [3 /*break*/, 4];
+                    parts = line.split('/');
+                    packageName = parts[parts.length - 1];
+                    packageOwner = null;
+                    return [4 /*yield*/, getGithubDetailsFromNpm(line)];
+                case 3:
+                    githubDetails = _a.sent();
+                    if (githubDetails) {
+                        packageOwner = githubDetails.owner;
+                        packageName = githubDetails.name;
+                    }
+                    return [3 /*break*/, 5];
+                case 4:
+                    if (line.includes('github.com')) {
+                        parts = line.split('/');
+                        packageName = parts[parts.length - 1];
+                        packageOwner = parts[parts.length - 2];
+                    }
+                    _a.label = 5;
+                case 5:
+                    urlObj = new Url(line, packageName, packageOwner);
+                    urls.push(urlObj);
+                    return [3 /*break*/, 7];
+                case 6:
+                    console.log("Invalid URL format: ".concat(line));
+                    _a.label = 7;
+                case 7:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 8: return [2 /*return*/, urls];
+                case 9:
+                    error_2 = _a.sent();
+                    console.log('Error reading file:', error_2);
+                    return [2 /*return*/, []];
+                case 10: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.fetchUrlsFromFile = fetchUrlsFromFile;
 // Asynchronous function to fetch URLs from a given file path.
 function fetchUrlData(url) {
     return __awaiter(this, void 0, void 0, function () {
-        var urls, line, packageName, packageOwner, parts, githubDetails, parts, urlObj, error_2;
+        var urls, line, packageName, packageOwner, parts, githubDetails, parts, urlObj, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -433,8 +488,8 @@ function fetchUrlData(url) {
                     _a.label = 5;
                 case 5: return [2 /*return*/, urls];
                 case 6:
-                    error_2 = _a.sent();
-                    console.log('Error reading file:', error_2);
+                    error_3 = _a.sent();
+                    console.log('Error reading file:', error_3);
                     return [2 /*return*/, []];
                 case 7: return [2 /*return*/];
             }
@@ -444,7 +499,7 @@ function fetchUrlData(url) {
 exports.fetchUrlData = fetchUrlData;
 function getGithubDetailsFromNpm(npmUrl) {
     return __awaiter(this, void 0, void 0, function () {
-        var packageName, res, repositoryUrl, parts, name_1, owner, error_3;
+        var packageName, res, repositoryUrl, parts, name_1, owner, error_4;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -462,8 +517,8 @@ function getGithubDetailsFromNpm(npmUrl) {
                     }
                     return [3 /*break*/, 3];
                 case 2:
-                    error_3 = _a.sent();
-                    console.log('Error fetching npm package data:', error_3);
+                    error_4 = _a.sent();
+                    console.log('Error fetching npm package data:', error_4);
                     return [2 /*return*/, null];
                 case 3: return [2 /*return*/];
             }
@@ -478,19 +533,20 @@ function printAllMetrics(packages) {
     }
 }
 // Usage example
-var githubToken = "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";
+//const  githubToken = retrieveGithubKey();
 // const exampleUrl = new Url("https://github.com/cloudinary/cloudinary_npm", "cloudinary_npm", "cloudinary");
 // const exampleUrl = new Url("https://github.com/mghera02/461Group2", "461Group2", "mghera02");
 // const exampleUrl = new Url("https://github.com/vishnumaiea/ptScheduler", "ptScheduler", "vishnumaiea");
 // let urlsFile = "./run_URL_FILE/urls.txt";
+var urlsFile = process.argv[2];
 var urlObjs = [];
-var url = "https://github.com/expressjs/express";
-fetchUrlData(url).then(function (urls) {
-    urlObjs = urls;
-    calculateAllMetrics(urlObjs, githubToken).then(function () {
-        printAllMetrics(packageObjs);
+var sampleUrl = 'https://www.npmjs.com/package/express';
+/*fetchUrlData(sampleUrl).then((urls) => {
+    urlObjs = urls
+    calculateAllMetrics(urlObjs).then (result => {
+        printAllMetrics(result);
     });
-});
+});*/
 module.exports = {
     retrieveGithubKey: retrieveGithubKey,
     getPackageObject: getPackageObject,
@@ -499,5 +555,6 @@ module.exports = {
     Url: Url,
     getGithubDetailsFromNpm: getGithubDetailsFromNpm,
     calculateAllMetrics: calculateAllMetrics,
+    fetchUrlsFromFile: fetchUrlsFromFile,
     fetchUrlData: fetchUrlData,
 };
