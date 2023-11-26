@@ -2,11 +2,6 @@
   "api": {},
   "auth": {},
   "function": {
-    "andrewtest": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
     "auth": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -80,22 +75,6 @@
     }
   },
   "parameters": {
-    "AMPLIFY_function_andrewtest_deploymentBucketName": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "andrewtest"
-        }
-      ]
-    },
-    "AMPLIFY_function_andrewtest_s3Key": {
-      "usedBy": [
-        {
-          "category": "function",
-          "resourceName": "andrewtest"
-        }
-      ]
-    },
     "AMPLIFY_function_auth_deploymentBucketName": {
       "usedBy": [
         {

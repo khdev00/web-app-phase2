@@ -60,13 +60,29 @@ function App() {
   const createAuthToken = async () => {
     const username = usernameInput.current.value;
     const password = passwordInput.current.value;
+
     if (!username || !password) {
       alert('Please enter a username and password.');
       return;
     }
-    const response = await API.put('phase2api', '/authenticate', {}); 
-    console.log(response);
 
+    const body = {
+      User: {
+        name: username,
+        isAdmin: true
+      },
+      Secret: {
+        password: password
+      }
+    }
+
+    const response = await API.put('phase2api', '/authenticate', {
+      headers: {
+        'Content-Type': 'application/json'
+        },
+      body: JSON.stringify(body)
+    }); 
+    console.log(response);
   };
 
   // Function to retrieve a package by ID

@@ -10,7 +10,7 @@ const { SecretsManagerClient, GetSecretValueCommand, } = require("@aws-sdk/clien
   
 const secret_name = "GITHUB_TOKEN";
 
-const updateDynamoDBItem = async (packageId, metricScore) => {
+const updateDynamoDBItem = async (packageId, netScore, busFactor, correctness, goodPinningPractice, licenseScore, pullRequest, rampUp, responsiveMaintainer) => {
     //Update MetricScore with net score
     try {
         const updateParams = {
@@ -18,9 +18,17 @@ const updateDynamoDBItem = async (packageId, metricScore) => {
             Key: {
                 "pkgID": packageId,
             },
-            UpdateExpression: "SET MetricScore = :metricScore",
+            UpdateExpression: "SET NetScore = :netScore, BusFactor = :busFactor, Correctness = :correctness, GoodPinningPractice = :goodPinningPractice, \
+            LicenseScore = :licenseScore, PullRequest = :pullRequest, RampUp = :rampUp, ResponsiveMaintainer = :responsiveMaintainer",
             ExpressionAttributeValues: {
-                ":metricScore": metricScore,
+                ":netScore": netScore,
+                ":busFactor": busFactor,
+                ":correctness": correctness,
+                ":goodPinningPractice": goodPinningPractice,
+                ":licenseScore": licenseScore,
+                ":pullRequest": pullRequest,
+                ":rampUp": rampUp,
+                ":responsiveMaintainer": responsiveMaintainer,
             },
         };
         const dynamoResult = await dynamoDb.update(updateParams).promise();
@@ -54,7 +62,7 @@ exports.handler = async (event) => {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
             },
-            body: JSON.stringify({ message: 'Failed to retrieve secret' }),
+            body: JSON.stringify({ message: 'Failed to retrieve Github Token' }),
         };
     }
 
@@ -71,7 +79,7 @@ exports.handler = async (event) => {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
             },
-            body: JSON.stringify({ message: 'Package ID is required' }),
+            body: JSON.stringify({ message: 'Invalid Input Field/s' }),
         };
     }
 
@@ -122,7 +130,7 @@ exports.handler = async (event) => {
     } catch (error) {
         console.error("Error calculating metrics:", error);
         return {
-            statusCode: 400,
+            statusCode: 500,
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
@@ -130,11 +138,32 @@ exports.handler = async (event) => {
             body: JSON.stringify({ message: 'Failed to calculate metrics' }),
         };
     }
+
+    const busFactor = packageData[0].busFactor;
+    const correctness = packageData[0].correctness;
+    const rampUp = packageData[0].rampUp;
+    const responsiveMaintainer = packageData[0].responsiveMaintainer;
+    const licenseScore = +packageData[0].hasLicense;
+    const goodPinningPractice = packageData[0].dependencies;
+    const pullRequest = packageData[0].codeReview;
     const netScore = packageData[0].netScore;
+
+    const returnMetrics = {
+        BusFactor: busFactor,
+        Correctness: correctness,
+        RampUp: rampUp,
+        ResponsiveMaintainer: responsiveMaintainer,
+        LicenseScore: licenseScore,
+        GoodPinningPractice: goodPinningPractice,
+        PullRequest: pullRequest,
+        NetScore: netScore
+    }
 
     // Update the DynamoDB item with the package rating
     try {
-        await updateDynamoDBItem(packageId, netScore);
+        await updateDynamoDBItem(packageId, netScore, busFactor, correctness, goodPinningPractice, licenseScore, pullRequest, rampUp, responsiveMaintainer);
+        console.log('Package metric score updated successfully')
+
 
         return {
             statusCode: 200,
@@ -142,7 +171,7 @@ exports.handler = async (event) => {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
             },
-            body: JSON.stringify({ message: 'Package metric score updated successfully' }),
+            body: JSON.stringify(returnMetrics),
         };
     } catch (updateError) {
         console.error('Update Error:', updateError);
