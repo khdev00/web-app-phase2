@@ -56,6 +56,7 @@ function App() {
     setIsModalOpen(!isModalOpen);
   };
 
+  let globalAuth = null;
   // Function to create an authentication token
   const createAuthToken = async () => {
     const username = usernameInput.current.value;
@@ -76,6 +77,7 @@ function App() {
       }
     }
 
+    console.log('Request Body:', body);
     const response = await API.put('phase2api', '/authenticate', {
       headers: {
         'Content-Type': 'application/json'
@@ -83,6 +85,17 @@ function App() {
       body: JSON.stringify(body)
     }); 
     console.log(response);
+
+    if(response.statusCode == 200){
+      const responseBody = JSON.parse(response.body);
+      if(responseBody.auth_token){
+        globalAuth = responseBody.auth_token;
+      }
+      else{
+        console.error('Authentication token not found in the response body.');
+      }
+    }
+
   };
 
   // Function to retrieve a package by ID
@@ -150,8 +163,6 @@ function App() {
       alert('Please enter all fields.');
       return;
     }
-
-    
   
     try {
       const body = {

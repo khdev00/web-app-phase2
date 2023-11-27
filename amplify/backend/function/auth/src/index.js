@@ -17,9 +17,17 @@ function generateHash(data) {
     return hash.digest('hex');
 }
 
-function generateToken(username, secret) {
-    const token = jwt.sign({ username: username }, secret, { expiresIn: '10h' });
+function generateToken(username, isAdmin, secret) {
+    const token = jwt.sign({ username: username, isAdmin: isAdmin }, secret, { expiresIn: '10h' });
     return token;
+}
+
+function validateToken(auth_token, secret) {
+    const payload = jwt.verify(auth_token, secret);
+    const {username, isAdmin} = payload;
+    console.log("validation data");
+    console.log('Username:', username);
+    console.log('isAdmin:', isAdmin);
 }
 
 const setTokenInDB = async (username, auth_token) => {
@@ -33,44 +41,44 @@ const setTokenInDB = async (username, auth_token) => {
             },
         };
         
-        let updateParams;
+        let updateParams, deleteParams;
         const data = await dynamoDb.query(queryParams).promise();
         console.log('Query succeeded:', JSON.stringify(data, null, 2));
-        
-        // Process the retrieved items here
+    
+        // Process the query
         if (data.Items && data.Items.length > 0) {
             data.Items.forEach(item => {
-                updateParams = {
+                deleteParams = {
                     TableName: authTable,
                     Key: {
                         "authToken": item.authToken,
-                    },
-                    UpdateExpression: "SET authToken = :authToken, usages = :maxUsage",
-                    ExpressionAttributeValues: {
-                        ":authToken": auth_token,
-                        ":maxUsage": 1000,
-                    },
+                    }
                 };
             });
         }
-        else{
-            updateParams = {
-                TableName: authTable,
-                Key: {
-                    "authToken": auth_token,
-                },
-                UpdateExpression: "SET username = :username, usages = :maxUsage",
-                ExpressionAttributeValues: {
-                    ":username": username,
-                    ":maxUsage": 1000,
-                },
-            };
+
+        try{
+            await dynamoDb.delete(deleteParams).promise();
+        }catch{
+            console.log("no duplicate auth token!")
         }
+
+        updateParams = {
+            TableName: authTable,
+            Key: {
+                "authToken": auth_token,
+            },
+            UpdateExpression: "SET username = :username, usages = :maxUsage",
+            ExpressionAttributeValues: {
+                ":username": username,
+                ":maxUsage": 1000,
+            },
+        };
 
         // Perform the update operation
         const dynamoResult = await dynamoDb.update(updateParams).promise();
         console.log('Update DynamoDB successful', dynamoResult);
-
+        
     } catch (dbError) {
         console.error('DynamoDB Update Error:', dbError);
         throw new Error('Failed to set auth token in DB');
@@ -78,6 +86,8 @@ const setTokenInDB = async (username, auth_token) => {
 };
 
 exports.handler = async (event) => {
+    console.log('Received event:', JSON.stringify(event, null, 2));
+
     const client = new SecretsManagerClient({
         region: "us-east-2",
     });
@@ -106,7 +116,7 @@ exports.handler = async (event) => {
     const secretObject = JSON.parse(secretString);
     const secretKey = secretObject.JWT_SECRET_KEY;
 
-    if (!event.body) {
+    /*if (!event.body) {
         return {
             statusCode: 400,
             headers: {
@@ -115,17 +125,18 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({ message: 'Missing request body' }),
         };
-    }
+    }*/
 
     //this is just to handle AWS console test formatting
-    if (typeof event.body !== 'string') {
-        event.body = JSON.stringify(event.body);
+    if (typeof event !== 'string') {
+        event = JSON.stringify(event);
     }
 
     // Try to parse the event.body
-    let body, username, password;
+    let body, username, password, isAdmin;
     try {
-        body = JSON.parse(event.body);
+        body = JSON.parse(event);
+        console.log(body);
     } catch (error) {
         console.error("Error parsing JSON:", error);
         return {
@@ -142,6 +153,7 @@ exports.handler = async (event) => {
     try{
         username = body.User.name;
         password = body.Secret.password;
+        isAdmin = body.User.isAdmin;
     }catch{
         return {
             statusCode: 400,
@@ -216,8 +228,9 @@ exports.handler = async (event) => {
         };
     }
 
-    const auth_token = generateToken(username, secretKey);
-
+    const auth_token = generateToken(username, isAdmin, secretKey);
+    //validateToken(auth_token, secretKey);
+    
     // Update the DynamoDB item with the package rating
     try {
         await setTokenInDB(username, auth_token);
