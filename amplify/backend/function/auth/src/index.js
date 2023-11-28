@@ -116,7 +116,7 @@ exports.handler = async (event) => {
     const secretObject = JSON.parse(secretString);
     const secretKey = secretObject.JWT_SECRET_KEY;
 
-    /*if (!event.body) {
+    if (!event.body) {
         return {
             statusCode: 400,
             headers: {
@@ -125,17 +125,18 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({ message: 'Missing request body' }),
         };
-    }*/
+    }
 
     //this is just to handle AWS console test formatting
-    if (typeof event !== 'string') {
-        event = JSON.stringify(event);
+    if (typeof event.body !== 'string') {
+        event.body = JSON.stringify(event.body);
     }
 
     // Try to parse the event.body
-    let body, username, password, isAdmin;
+    let body, username, password, isAdminString;
+    let isAdmin = null;
     try {
-        body = JSON.parse(event);
+        body = JSON.parse(event.body);
         console.log(body);
     } catch (error) {
         console.error("Error parsing JSON:", error);
@@ -153,7 +154,14 @@ exports.handler = async (event) => {
     try{
         username = body.User.name;
         password = body.Secret.password;
-        isAdmin = body.User.isAdmin;
+        isAdminString = body.User.isAdmin;
+
+        if (isAdminString.toLowerCase() === 'true') {
+            isAdmin = true;
+        } else if (isAdminString.toLowerCase() === 'false') {
+            isAdmin = false;
+        }
+
     }catch{
         return {
             statusCode: 400,
@@ -166,7 +174,7 @@ exports.handler = async (event) => {
     }
 
 
-    if (!username || !password) {
+    if (!username || !password || isAdmin === null) {
         return {
             statusCode: 400,
             headers: {
@@ -212,6 +220,18 @@ exports.handler = async (event) => {
                 "Access-Control-Allow-Headers": "*",
             },
             body: JSON.stringify({ message: 'Failed to retrieve package metadata' }),
+        };
+    }
+    const storedAdmin = packageMetadata.isAdmin;
+
+    if(isAdmin && !storedAdmin){
+        return {
+            statusCode: 401,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Requested admin token for non-admin user' }),
         };
     }
 

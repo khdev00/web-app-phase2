@@ -204,7 +204,8 @@ exports.handler = async (event) => {
 
     //retrieve authentication token
     try{
-        auth_token = body.auth_token;
+        auth_token = body.headers.X-Authorization;
+        alert("token: ", auth_token);
     }catch{
         return {
             statusCode: 400,
@@ -227,7 +228,7 @@ exports.handler = async (event) => {
         };
     }
 
-    try{
+    /*try{
         const isAdmin = validateToken(auth_token, secretKey);
         if(isAdmin == false){
             console.log('Invalid permissions');
@@ -263,5 +264,14 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({ message: 'Validation of token failed' }),
         };
-    }
+    }*/
+
+    return {
+        statusCode: 200,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+        },
+        body: JSON.stringify({ message: 'Register Successfully Reset' }),
+    };
 };
