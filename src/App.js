@@ -50,32 +50,40 @@ function App() {
   const packageURLInputIngest = useRef(null);
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
+  const isAdminInput = useRef(null);
   const [currentRegex, setCurrentRegex] = useState('');
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
+  let globalAuth = null;
   // Function to create an authentication token
   const createAuthToken = async () => {
     const username = usernameInput.current.value;
     const password = passwordInput.current.value;
+    const isAdmin = isAdminInput.current.value;
+    if (!username || !password || !isAdmin) {
+      alert('Please enter a username, password, and admin status');
+      return;
+    }
 
-    if (!username || !password) {
-      alert('Please enter a username and password.');
+    if(isAdmin.toLowerCase() !== "true" && isAdmin.toLowerCase() !== "false"){
+      alert('Please enter valid admin status: true or false');
       return;
     }
 
     const body = {
       User: {
         name: username,
-        isAdmin: true
+        isAdmin: isAdmin
       },
       Secret: {
         password: password
       }
     }
 
+    console.log('Request Body:', body);
     const response = await API.put('phase2api', '/authenticate', {
       headers: {
         'Content-Type': 'application/json'
@@ -83,6 +91,17 @@ function App() {
       body: JSON.stringify(body)
     }); 
     console.log(response);
+
+    if(response.statusCode == 200){
+      const responseBody = JSON.parse(response.body);
+      if(responseBody){
+        globalAuth = responseBody;
+      }
+      else{
+        console.error('Authentication token not found in the response body.');
+      }
+    }
+
   };
 
   // Function to retrieve a package by ID
@@ -150,8 +169,6 @@ function App() {
       alert('Please enter all fields.');
       return;
     }
-
-    
   
     try {
       const body = {
@@ -386,6 +403,7 @@ const createPackage = async () => {
         <h2>Create Authentication Token</h2>
         <input type="text" ref={usernameInput} placeholder="Username" />
         <input type="password" ref={passwordInput} placeholder="Password" />
+        <input type="text" ref={isAdminInput} placeholder="Admin Status - true or false" />
         <button onClick={createAuthToken}>Create Auth Token</button>
       </div>
 
