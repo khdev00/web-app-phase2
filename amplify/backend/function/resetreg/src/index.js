@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const AWS = require('aws-sdk');
 AWS.config.update({ region: 'us-east-2' });
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const dynamoDb = new AWS.DynamoDB();
 const userTable = 'phase2users';
 const pkgTable = 'pkgmetadata';
 const authTable = 'AuthTokens';
@@ -22,29 +22,32 @@ async function validateToken(auth_token, secret) {
             }
         };
 
+        //attempt to find token in database
         let authData;
-        const data = await dynamoDb.get(params).promise();
+        const data = await dynamoDb.getItem(params).promise();
         if(data.Item){
             authData = data.Item;
         }
         else {
             console.error('token not found');
-            return;
+            return false;
         }
 
+        //make sure the token is valid for the user
         const dbUsername = authData.username;
         if(dbUsername != username){
             console.error('no user match');
-            return;
+            return false;
         }
 
+        //make sure the token has usages left
         let usageLeft = authData.usages;
         if(usageLeft > 0){
             usageLeft -= 1;
         }
         else {
             console.error('no API usage left');
-            return;
+            return false;
         }
 
         updateParams = {
@@ -61,96 +64,82 @@ async function validateToken(auth_token, secret) {
         const dynamoResult = await dynamoDb.update(updateParams).promise();
         console.log('Update DynamoDB successful', dynamoResult);
 
+        console.log("isAdmin: ", isAdmin);
         return isAdmin;
 
     } catch (err) {
-        console.error('validation error', err);
+        console.error('validation error: ', err);
         throw new Error('Failed to validate token');
         return;
     }
 }
 
-async function resetTables(){
-    //reset user table, but keep default user
-    const defaultUser = "defaultAdmin";
+const deleteTable = async (tableName) => {
+    try {
+        await dynamoDb.deleteTable({ TableName: tableName }).promise();
+        console.log(`Table ${tableName} deleted successfully.`);
+    } catch (error) {
+        console.error(`Error deleting table: ${error.message}`);
+    }
+};
+  
+const createTable = async (tableName, keyName) => {
+    let tableExists = true;
 
-    const scanParams = {
-        TableName: userTable,
-    };
+    // Check if the table still exists
+    while (tableExists) {
+        try {
+            const describeParams = {
+                TableName: tableName,
+            };
 
-    dynamoDb.scan(scanParams, (scanErr, scanData) => {
-        if (scanErr) {
-          console.error('Error scanning user table:', scanErr);
-        } else {
-          // Step 2: Delete items except for the ones with the specified ID
-          const deletePromises = [];
-      
-          scanData.Items.forEach(item => {
-            const username = item.username; // Assuming the ID attribute is of type String
-            if (username !== defaultUser) {
-              const deleteParams = {
-                TableName: userTable,
-                Key: {
-                  username: { S: username },
-                },
-              };
-      
-              const deletePromise = dynamoDb.deleteItem(deleteParams).promise();
-              deletePromises.push(deletePromise);
+            await dynamoDb.describeTable(describeParams).promise();
+
+            // If describeTable succeeds, the table still exists
+            console.log(`Table ${tableName} still exists. Waiting for deletion...`);
+            await new Promise(resolve => setTimeout(resolve, 5000)); // 5 seconds delay (adjust as needed)
+        } catch (error) {
+            // If describeTable fails, the table doesn't exist
+            if (error.code === 'ResourceNotFoundException') {
+                console.log(`Table ${tableName} does not exist.`);
+                tableExists = false;
+            } else {
+                throw error;
             }
-          });
-      
-          // Step 3: Wait for all delete operations to complete
-          Promise.all(deletePromises)
-            .then(() => {
-              console.log('Items deleted successfully.');
-            })
-            .catch(deleteErr => {
-              console.error('Error deleting items:', deleteErr);
-            });
         }
-    });
+    }
 
-    //reset package table entirely
-    const packageScanParams = {
-        TableName: pkgTable,
+    const params = {
+        AttributeDefinitions: [
+            {
+                AttributeName: keyName,
+                AttributeType: 'S', // Assuming a string key, adjust if needed
+            },
+        ],
+        KeySchema: [
+            {
+                AttributeName: keyName,
+                KeyType: 'HASH', // Partition key
+            },
+        ],
+        ProvisionedThroughput: {
+        ReadCapacityUnits: 1,
+        WriteCapacityUnits: 1,
+        },
+        TableName: tableName,
     };
 
-    dynamoDb.scan(packageScanParams, (scanErr, scanData) => {
-        if (scanErr) {
-          console.error('Error scanning package table:', scanErr);
-        } else {
-          // Step 2: Delete items
-          const deletePromises = [];
-      
-          scanData.Items.forEach(item => {
-            const pkgID = item.pkgID;
-              const deleteParams = {
-                TableName: pkgTable,
-                Key: {
-                    pkgID: { S: pkgID },
-                },
-              };
-      
-              const deletePromise = dynamoDb.deleteItem(deleteParams).promise();
-              deletePromises.push(deletePromise); 
-          });
-      
-          // Step 3: Wait for all delete operations to complete
-          Promise.all(deletePromises)
-            .then(() => {
-              console.log('Items deleted successfully.');
-            })
-            .catch(deleteErr => {
-              console.error('Error deleting items:', deleteErr);
-            });
-        }
-    });
+    try {
+        await dynamoDb.createTable(params).promise();
+        console.log(`Table ${tableName} created successfully.`);
+    } catch (error) {
+        console.error(`Error creating table: ${error.message}`);
+    }
+};
 
-}
-
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
+    console.log('Context:', JSON.stringify(context, null, 2));
 
     const client = new SecretsManagerClient({
         region: "us-east-2",
@@ -180,33 +169,14 @@ exports.handler = async (event) => {
     const secretObject = JSON.parse(secretString);
     const secretKey = secretObject.JWT_SECRET_KEY;
 
-    //this is just to handle AWS console test formatting
-    if (typeof event !== 'string') {
-        event = JSON.stringify(event);
-    }
-
-    // Try to parse the event.body
-    let body, auth_token;
-    try {
-        body = JSON.parse(event);
-        console.log(body);
-    } catch (error) {
-        console.error("Error parsing JSON:", error);
-        return {
-            statusCode: 400,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "*",
-            },
-            body: JSON.stringify({ message: 'Failed to parse JSON body' }),
-        };
-    }
-
+    let auth_token;
+    console.log("Headers: ", event.headers);
     //retrieve authentication token
     try{
-        auth_token = body.headers.X-Authorization;
-        alert("token: ", auth_token);
-    }catch{
+        auth_token = event.headers['x-authorization'];
+        console.log("Token: ", auth_token);
+    }catch(err){
+        console.error("Error: ", err)
         return {
             statusCode: 400,
             headers: {
@@ -228,8 +198,8 @@ exports.handler = async (event) => {
         };
     }
 
-    /*try{
-        const isAdmin = validateToken(auth_token, secretKey);
+    try{
+        const isAdmin = await validateToken(auth_token, secretKey);
         if(isAdmin == false){
             console.log('Invalid permissions');
             return {
@@ -241,19 +211,6 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: 'Invalid Permissions: requires admin' }),
             };
         }
-
-        await resetTables().promise();
-
-        console.log('Register Reset')
-
-        return {
-            statusCode: 200,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "*",
-            },
-            body: JSON.stringify({ message: 'Register Successfully Reset' }),
-        };
     }catch(authErr){
         console.error("Auth Error: ", authErr);
         return {
@@ -264,14 +221,38 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({ message: 'Validation of token failed' }),
         };
-    }*/
+    }
 
+    //reset all tables
+    try{
+        //reset auth table
+        await deleteTable(authTable);
+        await createTable(authTable, 'AuthToken');
+        //reset user table
+        await deleteTable(userTable);
+        await createTable(userTable, 'username');
+        //reset package table
+        await deleteTable(pkgTable);
+        await createTable(pkgTable, 'pkgID');
+    }catch(err){
+        console.log("Error: ", err);
+        return {
+            statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Failed to delete tables' }),
+        };
+    }
+
+    //all checks and functions passed, return success
     return {
         statusCode: 200,
         headers: {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "*",
         },
-        body: JSON.stringify({ message: 'Register Successfully Reset' }),
+        body: JSON.stringify({ message: 'Database Successfully Reset' }),
     };
 };

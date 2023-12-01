@@ -96,9 +96,11 @@ function App() {
       const responseBody = JSON.parse(response.body);
       if(responseBody){
         globalAuth = responseBody;
+        alert('Authentication token Generated');
       }
       else{
-        console.error('Authentication token not found in the response body.');
+        alert('Authentication token not Generated');
+        console.error('Authentication token not Generated');
       }
     }
 
@@ -386,12 +388,22 @@ const createPackage = async () => {
   // Function to reset the registry
   const resetRegistry = async () => {
     try {
-      const response = await API.del('phase2api', '/reset', {});
+      const response = await API.del('phase2api', '/reset', {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Authorization': globalAuth
+        },
+      });
       console.log(response);
-      alert('Registry reset successfully!');
+      if(response.statusCode === 200){
+        alert('Registry reset successfully!');
+      }
+      else{
+        alert('Registry reset failed');
+      }
     } catch (error) {
       console.error(error);
-      alert('Failed to reset registry.');
+      alert('Registry reset failed');
     }
   };
 
