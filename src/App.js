@@ -444,7 +444,7 @@ const createPackage = async () => {
       
             <label htmlFor="isAdmin">Admin Status (true/false): </label>
             <input className="textbox-width-medium" type="text" ref={isAdminInput} id="isAdmin" placeholder="Admin Status - true or false" />
-      
+            
             <button onClick={createAuthToken}>Create Auth Token</button>
           </section> 
         
