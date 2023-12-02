@@ -10,10 +10,39 @@ Amplify.configure({
   }
 });
  
- 
 
-function Modal({ isOpen, onClose, children }) {
+
+function Modal({ isOpen, onClose, children, openerRef }) {
+  useEffect(() => {
+    if (isOpen) {
+      // Set focus to the first focusable element in the modal
+      document.querySelector(".modal-content button").focus();
+    } else {
+      // Return focus to the element that opened the modal
+      if (openerRef && openerRef.current) {
+        openerRef.current.focus();
+      }
+    }
+  }, [isOpen, openerRef]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+
+    }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
+  
 
   return (
     <div className="modal">
@@ -35,6 +64,7 @@ function App() {
   const packageIdInputForRetrieval = useRef(null);
   const packageIdInputForUpdate = useRef(null);
   const packageIdInputForRating = useRef(null);
+  const modalOpenerRef = useRef(null); // Define the ref
   const packageIdInputForCreation = useRef(null);
   const packageIdInputForDeletion = useRef(null);
   const packageNameInputForRetrieval = useRef(null);
@@ -92,7 +122,7 @@ function App() {
     }); 
     console.log(response);
 
-    if(response.statusCode == 200){
+    if(response.statusCode === 200){
       const responseBody = JSON.parse(response.body);
       if(responseBody){
         globalAuth = responseBody;
@@ -401,21 +431,28 @@ const createPackage = async () => {
       {/* Authentication token creation */}
       <div>
         <h2>Create Authentication Token</h2>
-        <input type="text" ref={usernameInput} placeholder="Username" />
-        <input type="password" ref={passwordInput} placeholder="Password" />
-        <input type="text" ref={isAdminInput} placeholder="Admin Status - true or false" />
+        <label htmlFor="username">Username: </label>
+        <input type="text" ref={usernameInput} id="username" placeholder="Username" />
+  
+        <label htmlFor="password">Password: </label>
+        <input type="password" ref={passwordInput} id="password" placeholder="Password" />
+  
+        <label htmlFor="isAdmin">Admin Status (true/false): </label>
+        <input type="text" ref={isAdminInput} id="isAdmin" placeholder="Admin Status - true or false" />
+  
         <button onClick={createAuthToken}>Create Auth Token</button>
       </div>
-
-       {/* Package retrieval by ID */}
-       <div>
+  
+      {/* Package retrieval by ID */}
+      <div>
         <h2>Retrieve Package by ID</h2>
-        <input type="text" ref={packageIdInputForRetrieval} placeholder="Package ID" />
+        <label htmlFor="retrievePackageId">Package ID: </label>
+        <input type="text" ref={packageIdInputForRetrieval} id="retrievePackageId" placeholder="Package ID" />
         <button onClick={retrievePackageById}>Retrieve Package</button>
       </div>
-
-       {/* Download Button */}
-       {downloadUrl && (
+  
+      {/* Download Button */}
+      {downloadUrl && (
         <div>
           <h2>Download Package</h2>
           <a href={downloadUrl} download>
@@ -423,14 +460,13 @@ const createPackage = async () => {
           </a>
         </div>
       )}
-
-     
-       {/* Button to open the modal */}
-        <h2>View Registry</h2>
-      <button onClick={toggleModal}>View Registry</button>
-
+  
+      {/* Button to open the modal */}
+      <h2>View Registry</h2>
+      <button ref={modalOpenerRef} onClick={toggleModal}>View Registry</button>
+  
       {/* Modal for viewing packages */}
-      <Modal isOpen={isModalOpen} onClose={toggleModal}>
+      <Modal isOpen={isModalOpen} onClose={toggleModal} openerRef={modalOpenerRef}>
         <h2>Registry</h2>
         <button onClick={() => viewPackages()}>Load Packages</button>
         <div>
@@ -449,57 +485,72 @@ const createPackage = async () => {
           )}
         </div>
       </Modal>
-
-
+  
       {/* Package version update */}
       <div>
         <h2>Update Package</h2>
-        <input type="text" ref={packageIdInputForUpdate} placeholder="Package ID" />
-        <input type="text" ref={packageContentInputUpdate} placeholder="Package Content" />
+        <label htmlFor="updatePackageId">Package ID: </label>
+        <input type="text" ref={packageIdInputForUpdate} id="updatePackageId" placeholder="Package ID" />
+  
+        <label htmlFor="updatePackageContent">Package Content: </label>
+        <input type="text" ref={packageContentInputUpdate} id="updatePackageContent" placeholder="Package Content" />
+  
         <button onClick={updatePackageVersion}>Update Package Content</button>
       </div>
-
-     
-
+  
       {/* Package rating */}
       <div>
         <h2>Rate Package</h2>
-        <input type="text" ref={packageIdInputForRating} placeholder="Package ID" />
+        <label htmlFor="ratePackageId">Package ID: </label>
+        <input type="text" ref={packageIdInputForRating} id="ratePackageId" placeholder="Package ID" />
         <button onClick={ratePackage}>Rate Package</button>
       </div>
-
+  
       {/* Package ingestion */}
       <div>
         <h2>Ingest Package</h2>
-        <input type="text" ref={packageContentInputIngest} placeholder="Package Content" />
-        <input type="text" ref={packageURLInputIngest} placeholder="Package URL" />
+        <label htmlFor="ingestPackageContent">Package Content: </label>
+        <input type="text" ref={packageContentInputIngest} id="ingestPackageContent" placeholder="Package Content" />
+  
+        <label htmlFor="ingestPackageURL">Package URL: </label>
+        <input type="text" ref={packageURLInputIngest} id="ingestPackageURL" placeholder="Package URL" />
         <button onClick={ingestPackage}>Ingest Package</button>
       </div>
-
+  
       {/* Package creation */}
       <div>
         <h2>Create Package</h2>
-        <input type="text" ref={packageIdInputForCreation} placeholder="Package Name" />
-        <input type="text" ref={packageVersionInput} placeholder="Package Version" />
-        <input type="text" ref={packageContentInputCreate} placeholder="Package Content" />
-        <input type="text" ref={packageURLInputCreate} placeholder="Package URL" />
+        <label htmlFor="createPackageName">Package Name: </label>
+        <input type="text" ref={packageIdInputForCreation} id="createPackageName" placeholder="Package Name" />
+  
+        <label htmlFor="createPackageVersion">Package Version: </label>
+        <input type="text" ref={packageVersionInput} id="createPackageVersion" placeholder="Package Version" />
+  
+        <label htmlFor="createPackageContent">Package Content: </label>
+        <input type="text" ref={packageContentInputCreate} id="createPackageContent" placeholder="Package Content" />
+  
+        <label htmlFor="createPackageURL">Package URL: </label>
+        <input type="text" ref={packageURLInputCreate} id="createPackageURL" placeholder="Package URL" />
+  
         <button onClick={createPackage}>Create Package</button>
       </div>
-
+  
       {/* Package retrieval by name */}
       <div>
         <h2>Retrieve Package by Name</h2>
-        <input type="text" ref={packageNameInputForRetrieval} placeholder="Package Name" />
+        <label htmlFor="retrieveByName">Package Name: </label>
+        <input type="text" ref={packageNameInputForRetrieval} id="retrieveByName" placeholder="Package Name" />
         <button onClick={retrievePackageByName}>Retrieve Package</button>
       </div>
-
-       {/* Package retrieval by Regex */}
-       <div>
+  
+      {/* Package retrieval by Regex */}
+      <div>
         <h2>Retrieve Package by Regex</h2>
-        <input type="text" ref={packageNameRegexInputForRetrieval} placeholder="Package Name Regex" />
+        <label htmlFor="retrieveByRegex">Package Name Regex: </label>
+        <input type="text" ref={packageNameRegexInputForRetrieval} id="retrieveByRegex" placeholder="Package Name Regex" />
         <button onClick={() => retrievePackageByRegex()}>Retrieve Package</button>
       </div>
-
+  
       {/* Display Regex Search Results */}
       <div>
         <h2>Regex Search Results</h2>
@@ -516,21 +567,23 @@ const createPackage = async () => {
           <button onClick={() => retrievePackageByRegex(nextTokenRegex)}>Load More</button>
         )}
       </div>
-
+  
       {/* Delete a specific version of a package */}
       <div>
         <h2>Delete a Specific Version of a Package</h2>
-        <input type="text" ref={packageIdInputForDeletion} placeholder="Package ID" />
+        <label htmlFor="deletePackageId">Package ID: </label>
+        <input type="text" ref={packageIdInputForDeletion} id="deletePackageId" placeholder="Package ID" />
         <button onClick={deletePackageVersion}>Delete Package Version</button>
       </div>
-
+  
       {/* Delete all versions of a package by name */}
       <div>
         <h2>Delete All Versions of a Package by Name</h2>
-        <input type="text" ref={packageNameInputForDeletion} placeholder="Package Name" />
+        <label htmlFor="deleteAllByName">Package Name: </label>
+        <input type="text" ref={packageNameInputForDeletion} id="deleteAllByName" placeholder="Package Name" />
         <button onClick={deleteAllVersionsOfPackage}>Delete All Versions</button>
       </div>
-
+  
       {/* Registry reset */}
       <div>
         <h2>Reset Registry</h2>
