@@ -18,7 +18,7 @@ async function validateToken(auth_token, secret) {
         const params = {
             TableName: authTable,
             Key: {
-                "authToken": auth_token
+                "authToken": {S: auth_token}
             }
         };
 
@@ -53,15 +53,15 @@ async function validateToken(auth_token, secret) {
         updateParams = {
             TableName: authTable,
             Key: {
-                "authToken": auth_token,
+                "authToken": {S: auth_token}
             },
             UpdateExpression: "SET usages = :newUsage",
             ExpressionAttributeValues: {
-                ":newUsage": usageLeft,
+                ":newUsage": {S: usageLeft}
             },
         };
         // Perform the update operation
-        const dynamoResult = await dynamoDb.update(updateParams).promise();
+        const dynamoResult = await dynamoDb.updateItem(updateParams).promise();
         console.log('Update DynamoDB successful', dynamoResult);
 
         console.log("isAdmin: ", isAdmin);
@@ -77,15 +77,11 @@ async function validateToken(auth_token, secret) {
 const deleteTable = async (tableName) => {
     try {
         await dynamoDb.deleteTable({ TableName: tableName }).promise();
-        console.log(`Table ${tableName} deleted successfully.`);
     } catch (error) {
         console.error(`Error deleting table: ${error.message}`);
     }
-};
-  
-const createTable = async (tableName, keyName) => {
-    let tableExists = true;
 
+    let tableExists = true;
     // Check if the table still exists
     while (tableExists) {
         try {
@@ -97,18 +93,20 @@ const createTable = async (tableName, keyName) => {
 
             // If describeTable succeeds, the table still exists
             console.log(`Table ${tableName} still exists. Waiting for deletion...`);
-            await new Promise(resolve => setTimeout(resolve, 5000)); // 5 seconds delay (adjust as needed)
+            await new Promise(resolve => setTimeout(resolve, 4000));
         } catch (error) {
             // If describeTable fails, the table doesn't exist
             if (error.code === 'ResourceNotFoundException') {
-                console.log(`Table ${tableName} does not exist.`);
+                console.log(`Table ${tableName} deleted`);
                 tableExists = false;
             } else {
                 throw error;
             }
         }
     }
-
+};
+  
+const createTable = async (tableName, keyName) => {
     const params = {
         AttributeDefinitions: [
             {
@@ -129,11 +127,101 @@ const createTable = async (tableName, keyName) => {
         TableName: tableName,
     };
 
+    //create table with given parameters
     try {
         await dynamoDb.createTable(params).promise();
-        console.log(`Table ${tableName} created successfully.`);
     } catch (error) {
         console.error(`Error creating table: ${error.message}`);
+    }
+
+    // Check if the table still exists
+    while (true) {
+        try {
+          const response = await dynamoDb.describeTable({ TableName: tableName }).promise();
+          console.log('Table status:', response.Table.TableStatus);
+    
+          if (response.Table.TableStatus === 'ACTIVE') {
+            console.log(`Table ${tableName} has been created successfully.`);
+            break;
+          }
+        } catch (error) {
+          if (error.code !== 'ResourceNotFoundException') {
+            console.error('Error:', error);
+            throw error;
+          }
+        }
+    
+        console.log(`Table ${tableName} not yet created. Waiting...`);
+        await new Promise(resolve => setTimeout(resolve, 4000));
+    }
+};
+
+const createAuthTable = async () => {
+    const params = {
+        AttributeDefinitions: [
+            {
+                AttributeName: 'authToken',
+                AttributeType: 'S'
+            },
+            {
+                AttributeName: 'username',
+                AttributeType: 'S'
+            }
+        ],
+        KeySchema: [
+            {
+                AttributeName: 'authToken',
+                KeyType: 'HASH', // Partition key
+            },
+        ],
+        ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1,
+        },
+        GlobalSecondaryIndexes: [
+            {
+              IndexName: 'username-index',
+              KeySchema: [
+                { AttributeName: 'username', KeyType: 'HASH' }  // GSI Key
+              ],
+              Projection: {
+                ProjectionType: 'ALL'
+              },
+              ProvisionedThroughput: {
+                ReadCapacityUnits: 1,
+                WriteCapacityUnits: 1
+              }
+            }
+        ],
+        TableName: authTable,
+    };
+
+    //create table with given parameters
+    try {
+        await dynamoDb.createTable(params).promise();
+    } catch (error) {
+        console.error(`Error creating table: ${error.message}`);
+    }
+
+    // Check if the table still exists
+    while (true) {
+        try {
+          const response = await dynamoDb.describeTable({ TableName: authTable }).promise();
+          console.log('Table status:', response.Table.TableStatus);
+    
+          if (response.Table.TableStatus === 'ACTIVE') {
+            console.log(`Table ${authTable} has been created successfully.`);
+            break;
+          }
+        } catch (error) {
+          if (error.code !== 'ResourceNotFoundException') {
+            console.error('Error:', error);
+            throw error;
+          }
+        }
+    
+        console.log(`Table ${authTable} not yet created. Waiting...`);
+        await new Promise(resolve => setTimeout(resolve, 4000));
     }
 };
 
@@ -165,9 +253,9 @@ exports.handler = async (event, context) => {
         };
     }
 
-    const secretString = response.SecretString;
-    const secretObject = JSON.parse(secretString);
-    const secretKey = secretObject.JWT_SECRET_KEY;
+    let secretString = response.SecretString;
+    let secretObject = JSON.parse(secretString);
+    let secretKey = secretObject.JWT_SECRET_KEY;
 
     let auth_token;
     console.log("Headers: ", event.headers);
@@ -225,15 +313,17 @@ exports.handler = async (event, context) => {
 
     //reset all tables
     try{
-        //reset auth table
-        await deleteTable(authTable);
-        await createTable(authTable, 'AuthToken');
         //reset user table
         await deleteTable(userTable);
         await createTable(userTable, 'username');
         //reset package table
         await deleteTable(pkgTable);
         await createTable(pkgTable, 'pkgID');
+
+        //reset auth table
+        //await deleteTable(authTable);
+        //await createAuthTable();
+
     }catch(err){
         console.log("Error: ", err);
         return {
@@ -243,6 +333,57 @@ exports.handler = async (event, context) => {
                 "Access-Control-Allow-Headers": "*",
             },
             body: JSON.stringify({ message: 'Failed to delete tables' }),
+        };
+    }
+
+    //retrieve the default user password hash
+    try {
+        response = await client.send(
+            new GetSecretValueCommand({
+                SecretId: "DEFAULT_USER_PASSWORD"
+            })
+        );
+    } catch (error) {
+        console.error('Secrets Error:', error);
+        return {
+            statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Failed to retrieve default user password' }),
+        };
+    }
+
+    secretString = response.SecretString;
+    secretObject = JSON.parse(secretString);
+    secretKey = secretObject.DEFAULT_USER_PASSWORD;
+
+    const defaultUsername = "testAdmin";
+    const defaultIsAdmin = true;
+    const defaultPasswordHash = "cf80cd8aed482d5d1527d7dc72fceff84e6326592848447d2dc0b0e87dfc9a90";
+
+    try{
+        const params = {
+            TableName: userTable,
+            Item: {
+              'username': { S: defaultUsername },
+              'isAdmin': { BOOL: defaultIsAdmin },
+              'passHash': { S: defaultPasswordHash },
+            }
+        };
+
+        await dynamoDb.putItem(params).promise();
+
+    }catch(err){
+        console.log("Error adding default user: ", err);
+        return {
+            statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Failed to create default user' }),
         };
     }
 

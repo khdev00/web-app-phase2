@@ -37,7 +37,7 @@
       "function": {
         "auth": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/auth-64556a4e6b346d555859-build.zip"
+          "s3Key": "amplify-builds/auth-50426f4139714d4f4c62-build.zip"
         },
         "byID": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -49,7 +49,7 @@
         },
         "resetreg": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/resetreg-6e446e53697930793664-build.zip"
+          "s3Key": "amplify-builds/resetreg-377064626d6658687353-build.zip"
         },
         "byRegex": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
