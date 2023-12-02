@@ -29,14 +29,14 @@
 }
 
 .textbox-width-medium {
-  width: 31%; 
+  width: 12%; 
 }
 
 
 
 .textbox-width-large {
-  width: 20%; /* Adjust this value as needed */
-  max-width: 600px; /* Optional: set a maximum width */
+  width: 20%; 
+  max-width: 600px; 
 }
 .left { 
   margin-left: 5px;

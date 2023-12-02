@@ -45,12 +45,12 @@ function Modal({ isOpen, onClose, children, openerRef }) {
   
 
   return (
-    <div className="modal">
-      <div className="modal-content">
+    <section className="modal">
+      <section className="modal-content">
         <button onClick={onClose}>Close</button>
         {children}
-      </div>
-    </div>
+      </section>
+    </section>
   );
 }
 function App() {
@@ -428,167 +428,184 @@ const createPackage = async () => {
   // JSX rendering
   return (
     <div className="App">
-      {/* Authentication token creation */}
-      <div>
-        <h2>Create Authentication Token</h2>
-        <label htmlFor="username">Username: </label>
-        <input type="text" ref={usernameInput} id="username" placeholder="Username" />
-  
-        <label htmlFor="password">Password: </label>
-        <input type="password" ref={passwordInput} id="password" placeholder="Password" />
-  
-        <label htmlFor="isAdmin">Admin Status (true/false): </label>
-        <input type="text" ref={isAdminInput} id="isAdmin" placeholder="Admin Status - true or false" />
-  
-        <button onClick={createAuthToken}>Create Auth Token</button>
-      </div>
-  
-      {/* Package retrieval by ID */}
-      <div>
-        <h2>Retrieve Package by ID</h2>
-        <label htmlFor="retrievePackageId">Package ID: </label>
-        <input type="text" ref={packageIdInputForRetrieval} id="retrievePackageId" placeholder="Package ID" />
-        <button onClick={retrievePackageById}>Retrieve Package</button>
-      </div>
-  
-      {/* Download Button */}
-      {downloadUrl && (
-        <div>
-          <h2>Download Package</h2>
-          <a href={downloadUrl} download>
-            <button>Download</button>
-          </a>
-        </div>
-      )}
-  
-      {/* Button to open the modal */}
-      <h2>View Registry</h2>
-      <button ref={modalOpenerRef} onClick={toggleModal}>View Registry</button>
-  
-      {/* Modal for viewing packages */}
-      <Modal isOpen={isModalOpen} onClose={toggleModal} openerRef={modalOpenerRef}>
-        <h2>Registry</h2>
-        <button onClick={() => viewPackages()}>Load Packages</button>
-        <div>
-          {packages.map((pkg, index) => (
-            <div key={index}>
-              {/* Render package details */}
+      <header> 
+        <h1>Package Management System</h1>
+      </header>
+      
+      <main>
+          {/* Authentication token creation */}
+          <section aria-labelledby="auth-token-section">
+            <h2>Create Authentication Token</h2>
+            <label htmlFor="username">Username: </label>
+            <input type="text" ref={usernameInput} id="username" placeholder="Username" />
+      
+            <label htmlFor="password">Password: </label>
+            <input type="password" ref={passwordInput} id="password" placeholder="Password" />
+      
+            <label htmlFor="isAdmin">Admin Status (true/false): </label>
+            <input className="textbox-width-medium" type="text" ref={isAdminInput} id="isAdmin" placeholder="Admin Status - true or false" />
+      
+            <button onClick={createAuthToken}>Create Auth Token</button>
+          </section> 
+        
+    
+        {/* Package retrieval by ID */}
+        <section aria-labelledby='retrieve-by-id-section'> 
+          <h2>Retrieve Package by ID</h2>
+          <label htmlFor="retrievePackageId">Package ID: </label>
+          <input type="text" ref={packageIdInputForRetrieval} id="retrievePackageId" placeholder="Package ID" />
+          <button onClick={retrievePackageById}>Retrieve Package</button>
+        </section> 
+    
+        {/* Download Button */}
+        {downloadUrl && (
+          <section aria-labelledby="download-package-section">
+            <h2>Download Package</h2>
+            <a href={downloadUrl} download>
+              <button>Download</button>
+            </a>
+          </section>
+        )}
+    
+        {/* Button to open the modal */}
+        <section aria-labelledby="view-registry-section">
+          <h2>View Registry</h2>
+          <button ref={modalOpenerRef} onClick={toggleModal}>View Registry</button>
+      
+          {/* Modal for viewing packages */}
+          <Modal isOpen={isModalOpen} onClose={toggleModal} openerRef={modalOpenerRef}>
+            <h2>Registry</h2>
+            <button onClick={() => viewPackages()}>Load Packages</button>
+            <section> 
+              {packages.map((pkg, index) => (
+                <section key={index}>
+                  {/* Render package details */}
+                  <p>Package Name: {pkg.packageName}</p>
+                  <p>Package ID: {pkg.pkgID}</p>
+                  <p>Version: {pkg.Version}</p>
+                  <p>URL: {pkg.URL}</p>
+                  <p>Metric Score: {pkg.MetricScore}</p>
+                </section>
+              ))}
+              {nextToken && (
+                <button onClick={() => viewPackages(nextToken)}>Load More</button>
+              )}
+            </section>
+          </Modal>
+        </section>
+    
+        {/* Package version update */}
+        <section>
+          <h2>Update Package</h2>
+          <label htmlFor="updatePackageId">Package ID: </label>
+          <input type="text" ref={packageIdInputForUpdate} id="updatePackageId" placeholder="Package ID" />
+    
+          <label htmlFor="updatePackageContent">Package Content: </label>
+          <input type="text" ref={packageContentInputUpdate} id="updatePackageContent" placeholder="Package Content" />
+    
+          <button onClick={updatePackageVersion}>Update Package Content</button>
+        </section>
+    
+        {/* Package rating */}
+        <section>
+          <h2>Rate Package</h2>
+          <label htmlFor="ratePackageId">Package ID: </label>
+          <input type="text" ref={packageIdInputForRating} id="ratePackageId" placeholder="Package ID" />
+          <button onClick={ratePackage}>Rate Package</button>
+        </section>
+    
+        {/* Package ingestion */}
+        <section>
+          <h2>Ingest Package</h2>
+          <label htmlFor="ingestPackageContent">Package Content: </label>
+          <input type="text" ref={packageContentInputIngest} id="ingestPackageContent" placeholder="Package Content" />
+    
+          <label htmlFor="ingestPackageURL">Package URL: </label>
+          <input type="text" ref={packageURLInputIngest} id="ingestPackageURL" placeholder="Package URL" />
+          <button onClick={ingestPackage}>Ingest Package</button>
+        </section>
+    
+        {/* Package creation */}
+        <section>
+          <h2>Create Package</h2>
+          <label htmlFor="createPackageName">Package Name: </label>
+          <input type="text" ref={packageIdInputForCreation} id="createPackageName" placeholder="Package Name" />
+    
+          <label htmlFor="createPackageVersion">Package Version: </label>
+          <input type="text" ref={packageVersionInput} id="createPackageVersion" placeholder="Package Version" />
+    
+          <label htmlFor="createPackageContent">Package Content: </label>
+          <input type="text" ref={packageContentInputCreate} id="createPackageContent" placeholder="Package Content" />
+    
+          <label htmlFor="createPackageURL">Package URL: </label>
+          <input type="text" ref={packageURLInputCreate} id="createPackageURL" placeholder="Package URL" />
+    
+          <button onClick={createPackage}>Create Package</button>
+        </section>
+    
+        {/* Package retrieval by name */}
+        <section>
+          <h2>Retrieve Package by Name</h2>
+          <label htmlFor="retrieveByName">Package Name: </label>
+          <input type="text" ref={packageNameInputForRetrieval} id="retrieveByName" placeholder="Package Name" />
+          <button onClick={retrievePackageByName}>Retrieve Package</button>
+        </section>
+    
+        {/* Package retrieval by Regex */}
+        <section>
+          <h2>Retrieve Package by Regex</h2>
+          <label htmlFor="retrieveByRegex">Package Name Regex: </label>
+          <input type="text" ref={packageNameRegexInputForRetrieval} id="retrieveByRegex" placeholder="Package Name Regex" />
+          <button onClick={() => retrievePackageByRegex()}>Retrieve Package</button>
+        </section>
+    
+        {/* Display Regex Search Results */}
+        <section>
+          <h2>Regex Search Results</h2>
+          {packagesRegex.map((pkg, index) => (
+            <section key={index}>
               <p>Package Name: {pkg.packageName}</p>
               <p>Package ID: {pkg.pkgID}</p>
               <p>Version: {pkg.Version}</p>
               <p>URL: {pkg.URL}</p>
               <p>Metric Score: {pkg.MetricScore}</p>
-            </div>
+            </section>
           ))}
-          {nextToken && (
-            <button onClick={() => viewPackages(nextToken)}>Load More</button>
+          {nextTokenRegex && (
+            <button onClick={() => retrievePackageByRegex(nextTokenRegex)}>Load More</button>
           )}
-        </div>
-      </Modal>
-  
-      {/* Package version update */}
-      <div>
-        <h2>Update Package</h2>
-        <label htmlFor="updatePackageId">Package ID: </label>
-        <input type="text" ref={packageIdInputForUpdate} id="updatePackageId" placeholder="Package ID" />
-  
-        <label htmlFor="updatePackageContent">Package Content: </label>
-        <input type="text" ref={packageContentInputUpdate} id="updatePackageContent" placeholder="Package Content" />
-  
-        <button onClick={updatePackageVersion}>Update Package Content</button>
-      </div>
-  
-      {/* Package rating */}
-      <div>
-        <h2>Rate Package</h2>
-        <label htmlFor="ratePackageId">Package ID: </label>
-        <input type="text" ref={packageIdInputForRating} id="ratePackageId" placeholder="Package ID" />
-        <button onClick={ratePackage}>Rate Package</button>
-      </div>
-  
-      {/* Package ingestion */}
-      <div>
-        <h2>Ingest Package</h2>
-        <label htmlFor="ingestPackageContent">Package Content: </label>
-        <input type="text" ref={packageContentInputIngest} id="ingestPackageContent" placeholder="Package Content" />
-  
-        <label htmlFor="ingestPackageURL">Package URL: </label>
-        <input type="text" ref={packageURLInputIngest} id="ingestPackageURL" placeholder="Package URL" />
-        <button onClick={ingestPackage}>Ingest Package</button>
-      </div>
-  
-      {/* Package creation */}
-      <div>
-        <h2>Create Package</h2>
-        <label htmlFor="createPackageName">Package Name: </label>
-        <input type="text" ref={packageIdInputForCreation} id="createPackageName" placeholder="Package Name" />
-  
-        <label htmlFor="createPackageVersion">Package Version: </label>
-        <input type="text" ref={packageVersionInput} id="createPackageVersion" placeholder="Package Version" />
-  
-        <label htmlFor="createPackageContent">Package Content: </label>
-        <input type="text" ref={packageContentInputCreate} id="createPackageContent" placeholder="Package Content" />
-  
-        <label htmlFor="createPackageURL">Package URL: </label>
-        <input type="text" ref={packageURLInputCreate} id="createPackageURL" placeholder="Package URL" />
-  
-        <button onClick={createPackage}>Create Package</button>
-      </div>
-  
-      {/* Package retrieval by name */}
-      <div>
-        <h2>Retrieve Package by Name</h2>
-        <label htmlFor="retrieveByName">Package Name: </label>
-        <input type="text" ref={packageNameInputForRetrieval} id="retrieveByName" placeholder="Package Name" />
-        <button onClick={retrievePackageByName}>Retrieve Package</button>
-      </div>
-  
-      {/* Package retrieval by Regex */}
-      <div>
-        <h2>Retrieve Package by Regex</h2>
-        <label htmlFor="retrieveByRegex">Package Name Regex: </label>
-        <input type="text" ref={packageNameRegexInputForRetrieval} id="retrieveByRegex" placeholder="Package Name Regex" />
-        <button onClick={() => retrievePackageByRegex()}>Retrieve Package</button>
-      </div>
-  
-      {/* Display Regex Search Results */}
-      <div>
-        <h2>Regex Search Results</h2>
-        {packagesRegex.map((pkg, index) => (
-          <div key={index}>
-            <p>Package Name: {pkg.packageName}</p>
-            <p>Package ID: {pkg.pkgID}</p>
-            <p>Version: {pkg.Version}</p>
-            <p>URL: {pkg.URL}</p>
-            <p>Metric Score: {pkg.MetricScore}</p>
-          </div>
-        ))}
-        {nextTokenRegex && (
-          <button onClick={() => retrievePackageByRegex(nextTokenRegex)}>Load More</button>
-        )}
-      </div>
-  
-      {/* Delete a specific version of a package */}
-      <div>
-        <h2>Delete a Specific Version of a Package</h2>
-        <label htmlFor="deletePackageId">Package ID: </label>
-        <input type="text" ref={packageIdInputForDeletion} id="deletePackageId" placeholder="Package ID" />
-        <button onClick={deletePackageVersion}>Delete Package Version</button>
-      </div>
-  
-      {/* Delete all versions of a package by name */}
-      <div>
-        <h2>Delete All Versions of a Package by Name</h2>
-        <label htmlFor="deleteAllByName">Package Name: </label>
-        <input type="text" ref={packageNameInputForDeletion} id="deleteAllByName" placeholder="Package Name" />
-        <button onClick={deleteAllVersionsOfPackage}>Delete All Versions</button>
-      </div>
-  
-      {/* Registry reset */}
-      <div>
-        <h2>Reset Registry</h2>
-        <button onClick={resetRegistry}>Reset Registry</button>
-      </div>
+        </section>
+    
+        {/* Delete a specific version of a package */}
+        <section>
+          <h2>Delete a Specific Version of a Package</h2>
+          <label htmlFor="deletePackageId">Package ID: </label>
+          <input type="text" ref={packageIdInputForDeletion} id="deletePackageId" placeholder="Package ID" />
+          <button onClick={deletePackageVersion}>Delete Package Version</button>
+        </section>
+    
+        {/* Delete all versions of a package by name */}
+        <section>
+          <h2>Delete All Versions of a Package by Name</h2>
+          <label htmlFor="deleteAllByName">Package Name: </label>
+          <input type="text" ref={packageNameInputForDeletion} id="deleteAllByName" placeholder="Package Name" />
+          <button onClick={deleteAllVersionsOfPackage}>Delete All Versions</button>
+        </section>
+    
+        {/* Registry reset */}
+        <section>
+          <h2>Reset Registry</h2>
+          <button onClick={resetRegistry}>Reset Registry</button>
+        </section>
+      </main>
+      
+      <footer>
+        <p>2023 Package Management System</p>
+      </footer> 
+
+      <noscript>
+        <p>This page requires JavaScript to be enabled.</p>
+      </noscript>
     </div>
   );
 }
