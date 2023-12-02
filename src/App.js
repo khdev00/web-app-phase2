@@ -435,7 +435,7 @@ const createPackage = async () => {
       <main>
           {/* Authentication token creation */}
           <section aria-labelledby="auth-token-section">
-            <h2>Create Authentication Token</h2>
+            <h2 id="auth-token-section">Create Authentication Token</h2>
             <label htmlFor="username">Username: </label>
             <input type="text" ref={usernameInput} id="username" placeholder="Username" />
       
@@ -444,14 +444,14 @@ const createPackage = async () => {
       
             <label htmlFor="isAdmin">Admin Status (true/false): </label>
             <input className="textbox-width-medium" type="text" ref={isAdminInput} id="isAdmin" placeholder="Admin Status - true or false" />
-            
+
             <button onClick={createAuthToken}>Create Auth Token</button>
           </section> 
         
     
         {/* Package retrieval by ID */}
-        <section aria-labelledby='retrieve-by-id-section'> 
-          <h2>Retrieve Package by ID</h2>
+        <section aria-labelledby="retrieve-by-id-section"> 
+          <h2 id="retrieve-by-id-section">Retrieve Package by ID</h2>
           <label htmlFor="retrievePackageId">Package ID: </label>
           <input type="text" ref={packageIdInputForRetrieval} id="retrievePackageId" placeholder="Package ID" />
           <button onClick={retrievePackageById}>Retrieve Package</button>
@@ -460,7 +460,7 @@ const createPackage = async () => {
         {/* Download Button */}
         {downloadUrl && (
           <section aria-labelledby="download-package-section">
-            <h2>Download Package</h2>
+            <h2 id="download-package-section">Download Package</h2>
             <a href={downloadUrl} download>
               <button>Download</button>
             </a>
@@ -469,7 +469,7 @@ const createPackage = async () => {
     
         {/* Button to open the modal */}
         <section aria-labelledby="view-registry-section">
-          <h2>View Registry</h2>
+          <h2 id="view-registry-section">View Registry</h2>
           <button ref={modalOpenerRef} onClick={toggleModal}>View Registry</button>
       
           {/* Modal for viewing packages */}
@@ -495,8 +495,8 @@ const createPackage = async () => {
         </section>
     
         {/* Package version update */}
-        <section>
-          <h2>Update Package</h2>
+        <section aria-labelledby='update-package-section'>
+          <h2 id="update-package-section">Update Package</h2>
           <label htmlFor="updatePackageId">Package ID: </label>
           <input type="text" ref={packageIdInputForUpdate} id="updatePackageId" placeholder="Package ID" />
     
@@ -507,16 +507,16 @@ const createPackage = async () => {
         </section>
     
         {/* Package rating */}
-        <section>
-          <h2>Rate Package</h2>
+        <section aria-labelledby="package-rating-section">
+          <h2 id="package-rating-section">Rate Package</h2>
           <label htmlFor="ratePackageId">Package ID: </label>
           <input type="text" ref={packageIdInputForRating} id="ratePackageId" placeholder="Package ID" />
           <button onClick={ratePackage}>Rate Package</button>
         </section>
     
         {/* Package ingestion */}
-        <section>
-          <h2>Ingest Package</h2>
+        <section aria-labelledby="package-ingestion-section">
+          <h2 id="package-ingestion-section">Ingest Package</h2>
           <label htmlFor="ingestPackageContent">Package Content: </label>
           <input type="text" ref={packageContentInputIngest} id="ingestPackageContent" placeholder="Package Content" />
     
@@ -526,8 +526,8 @@ const createPackage = async () => {
         </section>
     
         {/* Package creation */}
-        <section>
-          <h2>Create Package</h2>
+        <section aria-labelledby="package-creation-section">
+          <h2 id="package-creation-section">Create Package</h2>
           <label htmlFor="createPackageName">Package Name: </label>
           <input type="text" ref={packageIdInputForCreation} id="createPackageName" placeholder="Package Name" />
     
@@ -544,24 +544,24 @@ const createPackage = async () => {
         </section>
     
         {/* Package retrieval by name */}
-        <section>
-          <h2>Retrieve Package by Name</h2>
+        <section aria-labelledby="retrieve-by-name-section">
+          <h2 id="retrieve-by-name-section">Retrieve Package by Name</h2>
           <label htmlFor="retrieveByName">Package Name: </label>
           <input type="text" ref={packageNameInputForRetrieval} id="retrieveByName" placeholder="Package Name" />
           <button onClick={retrievePackageByName}>Retrieve Package</button>
         </section>
     
         {/* Package retrieval by Regex */}
-        <section>
-          <h2>Retrieve Package by Regex</h2>
+        <section aria-labelledby="retrieve-by-regex">
+          <h2 id="retrieve-by-regex">Retrieve Package by Regex</h2>
           <label htmlFor="retrieveByRegex">Package Name Regex: </label>
           <input type="text" ref={packageNameRegexInputForRetrieval} id="retrieveByRegex" placeholder="Package Name Regex" />
           <button onClick={() => retrievePackageByRegex()}>Retrieve Package</button>
         </section>
     
         {/* Display Regex Search Results */}
-        <section>
-          <h2>Regex Search Results</h2>
+        <section aria-labelledby="regex-search-result-section">
+          <h2 id="regex-search-result-section">Regex Search Results</h2>
           {packagesRegex.map((pkg, index) => (
             <section key={index}>
               <p>Package Name: {pkg.packageName}</p>
@@ -577,24 +577,24 @@ const createPackage = async () => {
         </section>
     
         {/* Delete a specific version of a package */}
-        <section>
-          <h2>Delete a Specific Version of a Package</h2>
+        <section aria-labelledby="delete-version-section">
+          <h2 id="delete-version-section">Delete a Specific Version of a Package</h2>
           <label htmlFor="deletePackageId">Package ID: </label>
           <input type="text" ref={packageIdInputForDeletion} id="deletePackageId" placeholder="Package ID" />
           <button onClick={deletePackageVersion}>Delete Package Version</button>
         </section>
     
         {/* Delete all versions of a package by name */}
-        <section>
-          <h2>Delete All Versions of a Package by Name</h2>
+        <section aria-labelledby="delete-all-section">
+          <h2 id="delete-all-section">Delete All Versions of a Package by Name</h2>
           <label htmlFor="deleteAllByName">Package Name: </label>
           <input type="text" ref={packageNameInputForDeletion} id="deleteAllByName" placeholder="Package Name" />
           <button onClick={deleteAllVersionsOfPackage}>Delete All Versions</button>
         </section>
     
         {/* Registry reset */}
-        <section>
-          <h2>Reset Registry</h2>
+        <section aria-labelledby="reset-section">
+          <h2 id="reset-section">Reset Registry</h2>
           <button onClick={resetRegistry}>Reset Registry</button>
         </section>
       </main>
