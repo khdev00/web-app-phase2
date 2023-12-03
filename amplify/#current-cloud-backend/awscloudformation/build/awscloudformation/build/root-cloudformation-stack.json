@@ -158,7 +158,7 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/auth-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/auth-49546e72797945434932-build.zip",
+          "s3Key": "amplify-builds/auth-50426f4139714d4f4c62-build.zip",
           "env": "phasetw"
         }
       }
@@ -202,7 +202,7 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/create-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/create-33654c30496a74674b56-build.zip",
+          "s3Key": "amplify-builds/create-544b506259714a623973-build.zip",
           "env": "phasetw"
         }
       }
@@ -257,7 +257,7 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/resetreg-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/resetreg-337a552f447679442b66-build.zip",
+          "s3Key": "amplify-builds/resetreg-666e2b544c45796e6a51-build.zip",
           "env": "phasetw"
         }
       }
@@ -268,7 +268,7 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/retrieveByID-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/retrieveByID-6d4b4a74556f6e4e4c2b-build.zip",
+          "s3Key": "amplify-builds/retrieveByID-504337307966666a365a-build.zip",
           "env": "phasetw"
         }
       }
@@ -290,7 +290,7 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/updateVersion-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/updateVersion-4c50474469346e476163-build.zip",
+          "s3Key": "amplify-builds/updateVersion-7476476e2f515870634f-build.zip",
           "env": "phasetw"
         }
       }
@@ -301,7 +301,18 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/viewRegistry-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/viewRegistry-76724a7a4c4556383962-build.zip",
+          "s3Key": "amplify-builds/viewRegistry-4f4b324545373276326e-build.zip",
+          "env": "phasetw"
+        }
+      }
+    },
+    "functiongetPackageSize": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/getPackageSize-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/getPackageSize-437854456b752f547a56-build.zip",
           "env": "phasetw"
         }
       }

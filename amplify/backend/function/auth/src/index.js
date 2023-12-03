@@ -3,13 +3,12 @@ const jwt = require('jsonwebtoken');
 const AWS = require('aws-sdk');
 AWS.config.update({ region: 'us-east-2' });
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const dynamoDb = new AWS.DynamoDB();
 const tableName = 'phase2users';
 const authTable = 'AuthTokens';
 const { SecretsManagerClient, GetSecretValueCommand, } = require("@aws-sdk/client-secrets-manager");
 
 const secret_name = "JWT_SECRET_KEY";
-
 
 function generateHash(data) {
     const hash = crypto.createHash('sha256');
@@ -22,14 +21,6 @@ function generateToken(username, isAdmin, secret) {
     return token;
 }
 
-function validateToken(auth_token, secret) {
-    const payload = jwt.verify(auth_token, secret);
-    const {username, isAdmin} = payload;
-    console.log("validation data");
-    console.log('Username:', username);
-    console.log('isAdmin:', isAdmin);
-}
-
 const setTokenInDB = async (username, auth_token) => {
     try {
         const queryParams = {
@@ -37,50 +28,48 @@ const setTokenInDB = async (username, auth_token) => {
             IndexName: "username-index",
             KeyConditionExpression: 'username = :username',
             ExpressionAttributeValues: {
-              ':username': username,
+              ':username': {S: username},
             },
         };
         
-        let updateParams, deleteParams;
+        let createParams, deleteParams;
         const data = await dynamoDb.query(queryParams).promise();
         console.log('Query succeeded:', JSON.stringify(data, null, 2));
     
         // Process the query
         if (data.Items && data.Items.length > 0) {
-            data.Items.forEach(item => {
-                deleteParams = {
-                    TableName: authTable,
-                    Key: {
-                        "authToken": item.authToken,
-                    }
-                };
-            });
+            const item = data.Items[0]; // Assuming at most one item
+
+            deleteParams = {
+                TableName: authTable,
+                Key: {
+                    "authToken": {S: item.authToken.S},
+                },
+            };
         }
 
         try{
-            await dynamoDb.delete(deleteParams).promise();
-        }catch{
+            await dynamoDb.deleteItem(deleteParams).promise();
+            console.log(`Token for ${username} deleted`);
+        }catch(err){
+            console.log("Error: ", err);
             console.log("no duplicate auth token!")
         }
 
-        updateParams = {
+        createParams = {
             TableName: authTable,
-            Key: {
-                "authToken": auth_token,
-            },
-            UpdateExpression: "SET username = :username, usages = :maxUsage",
-            ExpressionAttributeValues: {
-                ":username": username,
-                ":maxUsage": 1000,
-            },
+            Item: {
+                'authToken': { S: auth_token },
+                'username': { S: username },
+                'usages': { N: '1000' },
+            }
         };
 
-        // Perform the update operation
-        const dynamoResult = await dynamoDb.update(updateParams).promise();
-        console.log('Update DynamoDB successful', dynamoResult);
+        // Perform the creation operation
+        await dynamoDb.putItem(createParams).promise();
         
     } catch (dbError) {
-        console.error('DynamoDB Update Error:', dbError);
+        console.error('DynamoDB Create Error:', dbError);
         throw new Error('Failed to set auth token in DB');
     }
 };
@@ -162,7 +151,7 @@ exports.handler = async (event) => {
             isAdmin = false;
         }
 
-    }catch{
+    }catch(err){
         return {
             statusCode: 400,
             headers: {
@@ -193,10 +182,10 @@ exports.handler = async (event) => {
         const params = {
             TableName: tableName,
             Key: {
-                "username": username
+                "username": {S: username}
             }
         };
-        const data = await dynamoDb.get(params).promise();
+        const data = await dynamoDb.getItem(params).promise();
         if(data.Item){
             packageMetadata = data.Item;
         }
@@ -222,6 +211,7 @@ exports.handler = async (event) => {
             body: JSON.stringify({ message: 'Failed to retrieve package metadata' }),
         };
     }
+
     const storedAdmin = packageMetadata.isAdmin;
 
     if(isAdmin && !storedAdmin){
@@ -235,7 +225,8 @@ exports.handler = async (event) => {
         };
     }
 
-    const storedHash = packageMetadata.passHash;
+    const storedHash = packageMetadata.passHash.S;
+
     if(storedHash != passwordHash){
         console.error('Incorrect password provided');
         return {
