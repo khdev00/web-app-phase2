@@ -38,7 +38,7 @@ async function validateToken(auth_token, secret) {
 
         //make sure the token is valid for the user
         const dbUsername = authData.username.S;
-        if(dbUsername != username){
+        if(dbUsername !== username){
             console.error('no user match');
             return false;
         }
@@ -53,7 +53,7 @@ async function validateToken(auth_token, secret) {
             return false;
         }
 
-        updateParams = {
+        const updateParams = {
             TableName: authTable,
             Key: {
                 "authToken": {S: auth_token}
@@ -170,8 +170,8 @@ const createTable = async (tableName, keyName) => {
             },
         ],
         ProvisionedThroughput: {
-        ReadCapacityUnits: 1,
-        WriteCapacityUnits: 1,
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5,
         },
         TableName: tableName,
     };

@@ -18,8 +18,15 @@ exports.handler = async (event) => {
 
         const data = await dynamoDb.scan(params).promise();
 
+        // Transform the items to match the required response format
+        const transformedItems = data.Items.map(item => ({
+            Version: item.Version,
+            Name: item.packageName, // Assuming the 'Name' field maps to 'packageName' in DynamoDB
+            ID: item.pkgID          // Assuming the 'ID' field maps to 'pkgID' in DynamoDB
+        }));
+
         const response = {
-            items: data.Items,
+            items: transformedItems,
             nextToken: data.LastEvaluatedKey ? encodeURIComponent(JSON.stringify(data.LastEvaluatedKey)) : null
         };
 
@@ -29,7 +36,7 @@ exports.handler = async (event) => {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Headers': '*'
             },
-            body: JSON.stringify(response)
+            body: JSON.stringify(response.items) // Updated to return only the items array
         };
     } catch (error) {
         return {

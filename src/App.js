@@ -323,34 +323,47 @@ const createPackage = async () => {
   const retrievePackageByRegex = async (token = null) => {
     const regexPattern = packageNameRegexInputForRetrieval.current.value;
     if (!regexPattern) {
-      alert('Please enter a regex pattern.');
-      return;
+        alert('Please enter a regex pattern.');
+        return;
     }
-    
-    // Store the current regex pattern
-    if (!token) setCurrentRegex(regexPattern);
-
+  
+    if (!token) {
+        setCurrentRegex(regexPattern);
+        setPackagesRegex([]); // Reset the list if it's a new search
+    }
+  
     try {
-      const queryParams = { regex: regexPattern };
-      if (token) {
-        queryParams.nextToken = token;
-      }
+        const queryParams = { regex: regexPattern };
+        if (token) {
+            queryParams.nextToken = token;
+        }
+  
+        const response = await API.get('phase2api', `/package/byRegEx`, {
+            queryStringParameters: queryParams
+        });
+        const data = response; 
+        const newPackages = data.items || []; // Extract items from the response
+        
+        // Append only new packages to the existing list
+        setPackagesRegex(prevPackages => {
+            const existingPackageIds = new Set(prevPackages.map(pkg => pkg.ID));
+            const uniqueNewPackages = newPackages.filter(pkg => !existingPackageIds.has(pkg.ID));
+            return [...prevPackages, ...uniqueNewPackages];
+        });
 
-      const response = await API.get('phase2api', `/package/byRegEx`, {
-        queryStringParameters: queryParams
-      });
-      const data = response;
-      
-      console.log(data.items);
-      console.log(data.nextToken);
-
-      setPackagesRegex(prevPackages => [...prevPackages, ...data.items]);
-      setNextTokenRegex(data.nextToken);
+        // Update nextToken for pagination
+        setNextTokenRegex(data.nextToken);
+        console.log('nextToken:', data.nextToken);
     } catch (error) {
-      console.error(error);
-      alert('Failed to retrieve packages.');
+        console.error(error);
+        alert('Failed to retrieve packages. Error: ' + error.response);
     }
-  };
+};
+
+
+  
+  
+
 
   // Load more button handler
   const handleLoadMoreRegexPackages = () => {
@@ -359,25 +372,32 @@ const createPackage = async () => {
 
   // Function to view packages in the registry 
   const viewPackages = async (token = null) => {
-
-    if (!token) {
-      // Clear existing packages when loading packages initially
+    // Check if the token is provided, if not, reset packages array
+    if (token === null) {
       setPackages([]);
     }
+  
     try {
       const response = await API.get('phase2api', '/view', {
         queryStringParameters: { nextToken: token }
       });
       const data = JSON.parse(response.body);
-      setPackages(prevPackages => [...prevPackages, ...data.items]);
-      setNextToken(data.nextToken);
-      console.log(data.nextToken);
+      const packagesData = Array.isArray(data) ? data : data.items;
+      const newNextToken = data.nextToken;
+      console.log('Packages:', packagesData);
+      console.log('Next Token:', newNextToken);
+  
+      // Append new data to existing packages
+      setPackages(prevPackages => [...prevPackages, ...packagesData]);
+      // Update the nextToken
+      setNextToken(newNextToken);
     } catch (error) {
       console.error('Error fetching packages:', error);
       alert('Failed to retrieve packages.');
     }
-
   };
+  
+  
 
   // Function to delete a specific version of a package
   const deletePackageVersion = async () => {
@@ -494,26 +514,23 @@ const createPackage = async () => {
           <legend>View Registry</legend>
           <h2 id="view-registry-section">View Registry</h2>
           <button ref={modalOpenerRef} onClick={toggleModal}>View Registry</button>
-      
-          {/* Modal for viewing packages */}
-          <Modal isOpen={isModalOpen} onClose={toggleModal} openerRef={modalOpenerRef}>
+
+            {/* Modal for viewing packages */}
+            <Modal isOpen={isModalOpen} onClose={toggleModal} openerRef={modalOpenerRef}>
             <h2>Registry</h2>
             <button onClick={() => viewPackages()}>Load Packages</button>
-            <section> 
-              {packages.map((pkg, index) => (
-                <section key={index}>
-                  {/* Render package details */}
-                  <p>Package Name: {pkg.packageName}</p>
-                  <p>Package ID: {pkg.pkgID}</p>
-                  <p>Version: {pkg.Version}</p>
-                  <p>URL: {pkg.URL}</p>
-                  <p>Metric Score: {pkg.MetricScore}</p>
-                </section>
-              ))}
-              {nextToken && (
-                <button onClick={() => viewPackages(nextToken)}>Load More</button>
-              )}
-            </section>
+            <div className="package-grid-container">
+            {packages.map((pkg, index) => (
+              <section className="package-section" key={index}>
+                <h3 className="package-section-header">Package Name: {pkg.Name}</h3>
+                <p className="package-details">Package ID: {pkg.ID}</p>
+                <p className="package-details">Version: {pkg.Version}</p>
+              </section>
+            ))}
+            </div>
+            {nextToken && (
+              <button onClick={() => viewPackages(nextToken)}>Load More</button>
+            )}
           </Modal>
         </fieldset>
         </section>
@@ -608,18 +625,16 @@ const createPackage = async () => {
             <h2 id="regex-search-result-section">Regex Search Results</h2>
             {packagesRegex.map((pkg, index) => (
               <section key={index}>
-                <p>Package Name: {pkg.packageName}</p>
-                <p>Package ID: {pkg.pkgID}</p>
+                <p>Package Name: {pkg.Name}</p>
                 <p>Version: {pkg.Version}</p>
-                <p>URL: {pkg.URL}</p>
-                <p>Metric Score: {pkg.MetricScore}</p>
               </section>
             ))}
             {nextTokenRegex && (
-              <button onClick={() => retrievePackageByRegex(nextTokenRegex)}>Load More</button>
+            <button onClick={() => retrievePackageByRegex(nextTokenRegex)}>Load More</button>
             )}
-        </fieldset>
+          </fieldset>
         </section>
+
     
         {/* Delete a specific version of a package */}
         <section aria-labelledby="delete-version-section">
