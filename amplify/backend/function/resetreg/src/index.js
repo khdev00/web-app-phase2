@@ -14,7 +14,7 @@ async function validateToken(auth_token, secret) {
     try{
         const payload = jwt.verify(auth_token, secret);
         const {username, isAdmin} = payload;
-        
+
         const params = {
             TableName: authTable,
             Key: {
@@ -34,14 +34,14 @@ async function validateToken(auth_token, secret) {
         }
 
         //make sure the token is valid for the user
-        const dbUsername = authData.username;
+        const dbUsername = authData.username.S;
         if(dbUsername != username){
             console.error('no user match');
             return false;
         }
 
         //make sure the token has usages left
-        let usageLeft = authData.usages;
+        let usageLeft = authData.usages.N;
         if(usageLeft > 0){
             usageLeft -= 1;
         }
@@ -57,14 +57,12 @@ async function validateToken(auth_token, secret) {
             },
             UpdateExpression: "SET usages = :newUsage",
             ExpressionAttributeValues: {
-                ":newUsage": {S: usageLeft}
+                ":newUsage": {N: usageLeft.toString()}
             },
         };
         // Perform the update operation
         const dynamoResult = await dynamoDb.updateItem(updateParams).promise();
         console.log('Update DynamoDB successful', dynamoResult);
-
-        console.log("isAdmin: ", isAdmin);
         return isAdmin;
 
     } catch (err) {
@@ -93,7 +91,7 @@ const deleteTable = async (tableName) => {
 
             // If describeTable succeeds, the table still exists
             console.log(`Table ${tableName} still exists. Waiting for deletion...`);
-            await new Promise(resolve => setTimeout(resolve, 4000));
+            await new Promise(resolve => setTimeout(resolve, 2000));
         } catch (error) {
             // If describeTable fails, the table doesn't exist
             if (error.code === 'ResourceNotFoundException') {
@@ -152,7 +150,7 @@ const createTable = async (tableName, keyName) => {
         }
     
         console.log(`Table ${tableName} not yet created. Waiting...`);
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
     }
 };
 
@@ -221,7 +219,7 @@ const createAuthTable = async () => {
         }
     
         console.log(`Table ${authTable} not yet created. Waiting...`);
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
     }
 };
 
