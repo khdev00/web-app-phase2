@@ -38,6 +38,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "getPackageSize": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "ingest": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -184,6 +189,22 @@
         {
           "category": "function",
           "resourceName": "deletePackageByIDVersion"
+        }
+      ]
+    },
+    "AMPLIFY_function_getPackageSize_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getPackageSize"
+        }
+      ]
+    },
+    "AMPLIFY_function_getPackageSize_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getPackageSize"
         }
       ]
     },

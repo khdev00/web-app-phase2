@@ -3,9 +3,12 @@ const AWS = require('aws-sdk');
 AWS.config.update({ region: 'us-east-2' });
 
 const dynamoDb = new AWS.DynamoDB();
+const s3 = new AWS.S3();
 const userTable = 'phase2users';
 const pkgTable = 'pkgmetadata';
 const authTable = 'AuthTokens';
+const bucketName = 'packageregistry';
+const folderNames = ['gradedpackages', 'nongradedpackages'];
 const { SecretsManagerClient, GetSecretValueCommand, } = require("@aws-sdk/client-secrets-manager");
 
 const secret_name = "JWT_SECRET_KEY";
@@ -70,6 +73,54 @@ async function validateToken(auth_token, secret) {
         throw new Error('Failed to validate token');
         return;
     }
+}
+
+const deleteS3 = async () => {
+    // List all objects in the subfolder
+    for (let i = 0; i < 2; i++) {
+        const listObjectsParams = {
+            Bucket: bucketName,
+            Prefix: folderNames[i],
+        };
+        
+        const data = await s3.listObjectsV2(listObjectsParams).promise();
+        console.log("S3 Data: ", data);
+        // Check if there are any objects to delete
+        if (data.Contents.length === 0) {
+            console.log('Subfolder is already empty');
+            continue;
+        }
+    
+        // Prepare an array of objects to be deleted
+        const objectsToDelete = data.Contents.map((obj) => ({
+            Key: obj.Key,
+        }));
+    
+        // Perform the deletion
+        const deleteObjectsParams = {
+            Bucket: bucketName,
+            Delete: {
+                Objects: objectsToDelete,
+                Quiet: false,
+            },
+        };
+    
+        await s3.deleteObjects(deleteObjectsParams).promise();
+    
+        console.log(`All objects in subfolder ${i} deleted successfully`);
+    
+        // Recreate the subfolder
+        const putObjectParams = {
+            Bucket: bucketName,
+            Key: folderNames[i], // This will create an empty "subfolder"
+            Body: '',
+        };
+    
+        await s3.putObject(putObjectParams).promise();
+    
+        console.log(`Subfolder ${i} recreated successfully`);
+    }
+    return;
 }
 
 const deleteTable = async (tableName) => {
@@ -318,10 +369,6 @@ exports.handler = async (event, context) => {
         await deleteTable(pkgTable);
         await createTable(pkgTable, 'pkgID');
 
-        //reset auth table
-        //await deleteTable(authTable);
-        //await createAuthTable();
-
     }catch(err){
         console.log("Error: ", err);
         return {
@@ -361,6 +408,7 @@ exports.handler = async (event, context) => {
     const defaultIsAdmin = true;
     const defaultPasswordHash = "cf80cd8aed482d5d1527d7dc72fceff84e6326592848447d2dc0b0e87dfc9a90";
 
+    //recreate the default user
     try{
         const params = {
             TableName: userTable,
@@ -382,6 +430,21 @@ exports.handler = async (event, context) => {
                 "Access-Control-Allow-Headers": "*",
             },
             body: JSON.stringify({ message: 'Failed to create default user' }),
+        };
+    }
+
+    //delete all s3 content in package bucket
+    try{
+        await deleteS3();
+    }catch(err){
+        console.log("Error deleting s3 bucket: ", err);
+        return {
+            statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Failed to delete s3 bucket' }),
         };
     }
 
