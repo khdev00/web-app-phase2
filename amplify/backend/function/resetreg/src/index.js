@@ -282,7 +282,7 @@ exports.handler = async (event, context) => {
         region: "us-east-2",
     });
 
-    //retrieve the JWT secret key for use in generating token
+    //retrieve the JWT secret key for use in validating token
     let response;
     try {
         response = await client.send(

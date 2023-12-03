@@ -448,39 +448,50 @@ const createPackage = async () => {
           {/* Authentication token creation */}
           <section aria-labelledby="auth-token-section">
             <h2 id="auth-token-section">Create Authentication Token</h2>
-            <label htmlFor="username">Username: </label>
-            <input type="text" ref={usernameInput} id="username" placeholder="Username" />
-      
-            <label htmlFor="password">Password: </label>
-            <input type="password" ref={passwordInput} id="password" placeholder="Password" />
-      
-            <label htmlFor="isAdmin">Admin Status (true/false): </label>
-            <input className="textbox-width-medium" type="text" ref={isAdminInput} id="isAdmin" placeholder="Admin Status - true or false" />
+            <fieldset>
+              <legend>Authentication Token</legend>
+              <label htmlFor="username">Username: </label>
+              <input type="text" ref={usernameInput} id="username" placeholder="Username" />
+        
+              <label htmlFor="password">Password: </label>
+              <input type="password" ref={passwordInput} id="password" placeholder="Password" />
+        
+              <label htmlFor="isAdmin">Admin Status (true/false): </label>
+              <input className="textbox-width-medium" type="text" ref={isAdminInput} id="isAdmin" placeholder="Admin Status - true or false" />
 
-            <button onClick={createAuthToken}>Create Auth Token</button>
+              <button onClick={createAuthToken}>Create Auth Token</button>
+            </fieldset>
           </section> 
         
     
         {/* Package retrieval by ID */}
         <section aria-labelledby="retrieve-by-id-section"> 
-          <h2 id="retrieve-by-id-section">Retrieve Package by ID</h2>
-          <label htmlFor="retrievePackageId">Package ID: </label>
-          <input type="text" ref={packageIdInputForRetrieval} id="retrievePackageId" placeholder="Package ID" />
-          <button onClick={retrievePackageById}>Retrieve Package</button>
+        <fieldset> 
+            <legend>Retrieve Package by ID</legend>
+            <h2 id="retrieve-by-id-section">Retrieve Package by ID</h2>
+            <label htmlFor="retrievePackageId">Package ID: </label>
+            <input type="text" ref={packageIdInputForRetrieval} id="retrievePackageId" placeholder="Package ID" />
+            <button onClick={retrievePackageById}>Retrieve Package</button>
+        </fieldset>
         </section> 
     
         {/* Download Button */}
         {downloadUrl && (
           <section aria-labelledby="download-package-section">
+          <fieldset>
+            <legend>Download Package</legend>
             <h2 id="download-package-section">Download Package</h2>
             <a href={downloadUrl} download>
               <button>Download</button>
             </a>
+          </fieldset>
           </section>
         )}
     
         {/* Button to open the modal */}
         <section aria-labelledby="view-registry-section">
+        <fieldset>
+          <legend>View Registry</legend>
           <h2 id="view-registry-section">View Registry</h2>
           <button ref={modalOpenerRef} onClick={toggleModal}>View Registry</button>
       
@@ -504,110 +515,141 @@ const createPackage = async () => {
               )}
             </section>
           </Modal>
+        </fieldset>
         </section>
     
         {/* Package version update */}
         <section aria-labelledby='update-package-section'>
-          <h2 id="update-package-section">Update Package</h2>
-          <label htmlFor="updatePackageId">Package ID: </label>
-          <input type="text" ref={packageIdInputForUpdate} id="updatePackageId" placeholder="Package ID" />
-    
-          <label htmlFor="updatePackageContent">Package Content: </label>
-          <input type="text" ref={packageContentInputUpdate} id="updatePackageContent" placeholder="Package Content" />
-    
-          <button onClick={updatePackageVersion}>Update Package Content</button>
+          <fieldset>
+            <legend>Update Package</legend>
+            <h2 id="update-package-section">Update Package</h2>
+            <label htmlFor="updatePackageId">Package ID: </label>
+            <input type="text" ref={packageIdInputForUpdate} id="updatePackageId" placeholder="Package ID" />
+      
+            <label htmlFor="updatePackageContent">Package Content: </label>
+            <input type="text" ref={packageContentInputUpdate} id="updatePackageContent" placeholder="Package Content" />
+      
+            <button onClick={updatePackageVersion}>Update Package Content</button>
+          </fieldset>
         </section>
     
         {/* Package rating */}
         <section aria-labelledby="package-rating-section">
-          <h2 id="package-rating-section">Rate Package</h2>
-          <label htmlFor="ratePackageId">Package ID: </label>
-          <input type="text" ref={packageIdInputForRating} id="ratePackageId" placeholder="Package ID" />
-          <button onClick={ratePackage}>Rate Package</button>
+          <fieldset>
+            <legend>Rate Package</legend>
+            <h2 id="package-rating-section">Rate Package</h2>
+            <label htmlFor="ratePackageId">Package ID: </label>
+            <input type="text" ref={packageIdInputForRating} id="ratePackageId" placeholder="Package ID" />
+            <button onClick={ratePackage}>Rate Package</button>
+          </fieldset>
         </section>
     
         {/* Package ingestion */}
         <section aria-labelledby="package-ingestion-section">
-          <h2 id="package-ingestion-section">Ingest Package</h2>
-          <label htmlFor="ingestPackageContent">Package Content: </label>
-          <input type="text" ref={packageContentInputIngest} id="ingestPackageContent" placeholder="Package Content" />
-    
-          <label htmlFor="ingestPackageURL">Package URL: </label>
-          <input type="text" ref={packageURLInputIngest} id="ingestPackageURL" placeholder="Package URL" />
-          <button onClick={ingestPackage}>Ingest Package</button>
+          <fieldset>
+            <legend>Ingest Package</legend>
+            <h2 id="package-ingestion-section">Ingest Package</h2>
+            <label htmlFor="ingestPackageContent">Package Content: </label>
+            <input type="text" ref={packageContentInputIngest} id="ingestPackageContent" placeholder="Package Content" />
+      
+            <label htmlFor="ingestPackageURL">Package URL: </label>
+            <input type="text" ref={packageURLInputIngest} id="ingestPackageURL" placeholder="Package URL" />
+            <button onClick={ingestPackage}>Ingest Package</button>
+          </fieldset>
         </section>
     
         {/* Package creation */}
         <section aria-labelledby="package-creation-section">
-          <h2 id="package-creation-section">Create Package</h2>
-          <label htmlFor="createPackageName">Package Name: </label>
-          <input type="text" ref={packageIdInputForCreation} id="createPackageName" placeholder="Package Name" />
-    
-          <label htmlFor="createPackageVersion">Package Version: </label>
-          <input type="text" ref={packageVersionInput} id="createPackageVersion" placeholder="Package Version" />
-    
-          <label htmlFor="createPackageContent">Package Content: </label>
-          <input type="text" ref={packageContentInputCreate} id="createPackageContent" placeholder="Package Content" />
-    
-          <label htmlFor="createPackageURL">Package URL: </label>
-          <input type="text" ref={packageURLInputCreate} id="createPackageURL" placeholder="Package URL" />
-    
-          <button onClick={createPackage}>Create Package</button>
+          <fieldset>
+            <legend>Create Package</legend>
+            <h2 id="package-creation-section">Create Package</h2>
+            <label htmlFor="createPackageName">Package Name: </label>
+            <input type="text" ref={packageIdInputForCreation} id="createPackageName" placeholder="Package Name" />
+      
+            <label htmlFor="createPackageVersion">Package Version: </label>
+            <input type="text" ref={packageVersionInput} id="createPackageVersion" placeholder="Package Version" />
+      
+            <label htmlFor="createPackageContent">Package Content: </label>
+            <input type="text" ref={packageContentInputCreate} id="createPackageContent" placeholder="Package Content" />
+      
+            <label htmlFor="createPackageURL">Package URL: </label>
+            <input type="text" ref={packageURLInputCreate} id="createPackageURL" placeholder="Package URL" />
+      
+            <button onClick={createPackage}>Create Package</button>
+          </fieldset>
         </section>
     
         {/* Package retrieval by name */}
         <section aria-labelledby="retrieve-by-name-section">
-          <h2 id="retrieve-by-name-section">Retrieve Package by Name</h2>
-          <label htmlFor="retrieveByName">Package Name: </label>
-          <input type="text" ref={packageNameInputForRetrieval} id="retrieveByName" placeholder="Package Name" />
-          <button onClick={retrievePackageByName}>Retrieve Package</button>
+          <fieldset> 
+            <legend>Retrieve Package by Name</legend>
+            <h2 id="retrieve-by-name-section">Retrieve Package by Name</h2>
+            <label htmlFor="retrieveByName">Package Name: </label>
+            <input type="text" ref={packageNameInputForRetrieval} id="retrieveByName" placeholder="Package Name" />
+            <button onClick={retrievePackageByName}>Retrieve Package</button>
+          </fieldset>
         </section>
     
         {/* Package retrieval by Regex */}
         <section aria-labelledby="retrieve-by-regex">
-          <h2 id="retrieve-by-regex">Retrieve Package by Regex</h2>
-          <label htmlFor="retrieveByRegex">Package Name Regex: </label>
-          <input type="text" ref={packageNameRegexInputForRetrieval} id="retrieveByRegex" placeholder="Package Name Regex" />
-          <button onClick={() => retrievePackageByRegex()}>Retrieve Package</button>
+          <fieldset>
+            <legend>Retrieve Package by Regex</legend>
+            <h2 id="retrieve-by-regex">Retrieve Package by Regex</h2>
+            <label htmlFor="retrieveByRegex">Package Name Regex: </label>
+            <input type="text" ref={packageNameRegexInputForRetrieval} id="retrieveByRegex" placeholder="Package Name Regex" />
+            <button onClick={() => retrievePackageByRegex()}>Retrieve Package</button>
+          </fieldset>
         </section>
     
         {/* Display Regex Search Results */}
         <section aria-labelledby="regex-search-result-section">
-          <h2 id="regex-search-result-section">Regex Search Results</h2>
-          {packagesRegex.map((pkg, index) => (
-            <section key={index}>
-              <p>Package Name: {pkg.packageName}</p>
-              <p>Package ID: {pkg.pkgID}</p>
-              <p>Version: {pkg.Version}</p>
-              <p>URL: {pkg.URL}</p>
-              <p>Metric Score: {pkg.MetricScore}</p>
-            </section>
-          ))}
-          {nextTokenRegex && (
-            <button onClick={() => retrievePackageByRegex(nextTokenRegex)}>Load More</button>
-          )}
+          <fieldset>
+            <legend>Regex Search Results</legend>
+            <h2 id="regex-search-result-section">Regex Search Results</h2>
+            {packagesRegex.map((pkg, index) => (
+              <section key={index}>
+                <p>Package Name: {pkg.packageName}</p>
+                <p>Package ID: {pkg.pkgID}</p>
+                <p>Version: {pkg.Version}</p>
+                <p>URL: {pkg.URL}</p>
+                <p>Metric Score: {pkg.MetricScore}</p>
+              </section>
+            ))}
+            {nextTokenRegex && (
+              <button onClick={() => retrievePackageByRegex(nextTokenRegex)}>Load More</button>
+            )}
+        </fieldset>
         </section>
     
         {/* Delete a specific version of a package */}
         <section aria-labelledby="delete-version-section">
-          <h2 id="delete-version-section">Delete a Specific Version of a Package</h2>
-          <label htmlFor="deletePackageId">Package ID: </label>
-          <input type="text" ref={packageIdInputForDeletion} id="deletePackageId" placeholder="Package ID" />
-          <button onClick={deletePackageVersion}>Delete Package Version</button>
+          <fieldset>
+            <legend>Delete a Specific Version of a Package</legend>
+            <h2 id="delete-version-section">Delete a Specific Version of a Package</h2>
+            <label htmlFor="deletePackageId">Package ID: </label>
+            <input type="text" ref={packageIdInputForDeletion} id="deletePackageId" placeholder="Package ID" />
+            <button onClick={deletePackageVersion}>Delete Package Version</button>
+          </fieldset>
         </section>
     
         {/* Delete all versions of a package by name */}
         <section aria-labelledby="delete-all-section">
-          <h2 id="delete-all-section">Delete All Versions of a Package by Name</h2>
-          <label htmlFor="deleteAllByName">Package Name: </label>
-          <input type="text" ref={packageNameInputForDeletion} id="deleteAllByName" placeholder="Package Name" />
-          <button onClick={deleteAllVersionsOfPackage}>Delete All Versions</button>
+          <fieldset>
+            <legend>Delete All Versions of a Package by Name</legend>
+            <h2 id="delete-all-section">Delete All Versions of a Package by Name</h2>
+            <label htmlFor="deleteAllByName">Package Name: </label>
+            <input type="text" ref={packageNameInputForDeletion} id="deleteAllByName" placeholder="Package Name" />
+            <button onClick={deleteAllVersionsOfPackage}>Delete All Versions</button>
+          </fieldset>
         </section>
     
         {/* Registry reset */}
         <section aria-labelledby="reset-section">
-          <h2 id="reset-section">Reset Registry</h2>
-          <button onClick={resetRegistry}>Reset Registry</button>
+          <fieldset> 
+            <legend>Reset Registry</legend>
+            <h2 id="reset-section">Reset Registry</h2>
+            <button onClick={resetRegistry}>Reset Registry</button>
+          </fieldset>
         </section>
       </main>
       
