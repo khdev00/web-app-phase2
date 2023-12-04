@@ -175,7 +175,7 @@ exports.handler = async (event) => {
     // Try to parse the event.body
     try {
         body = JSON.parse(event.body);
-        console.log(body);
+        //console.log(body);
     } catch (error) {
         console.error("Error parsing JSON:", error);
         return {
@@ -188,18 +188,20 @@ exports.handler = async (event) => {
         };
     }
 
-    //search for content field
+    //search for content and URL fields
     try{
         content = body.Content;
-    }catch(err){
-        console.log("No Content found")
-    }
-
-    //search for URL field
-    try{
         URL = body.URL;
     }catch(err){
-        console.log("No URL found")
+        console.log("Input Error")
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Input Error' }),
+        };
     }
 
 
@@ -214,8 +216,54 @@ exports.handler = async (event) => {
         };
     }
 
-    if(content){
-        //process content field
+    if(content !== ''){
+        try{
+            console.log("Content: ", content);
+            // 1. Decode Base64 String
+            const buffer = Buffer.from(content, 'base64');
+
+            // 2. Unzip the Repository
+            const readableStream = Readable.from(buffer);
+            const files = await readableStream.pipe(unzipper.Parse()).promise();
+
+            console.log("Files: ", files);
+
+            if (!files || typeof files[Symbol.iterator] !== 'function') {
+                throw new Error('Invalid or empty zip file.');
+            }
+
+            files.forEach((entry) => {
+                if (entry.path === 'package.json') {
+                packageJsonContent = '';
+                entry.on('data', (data) => (packageJsonContent += data.toString()));
+                }
+            });
+        
+            await new Promise((resolve) => {
+                readableStream.on('end', resolve);
+            });
+        
+            const packageJson = JSON.parse(packageJsonContent);
+        
+            // Now you can access key information about the package from package.json
+            const packageName = packageJson.name;
+            const packageVersion = packageJson.version;
+            const packageID = packageName.concat(packageVersion);
+
+            console.log(`Package Name: ${packageName}`);
+            console.log(`Package Version: ${packageVersion}`);
+            console.log(`Package ID: ${packageID}`);
+        }catch(err){
+            console.log("content parse error: ", err)
+            return {
+                statusCode: 500,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+                body: JSON.stringify({ message: 'content parse error' }),
+            };
+        }
     }else{
         //process URL field
     }
