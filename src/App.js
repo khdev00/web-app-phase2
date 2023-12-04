@@ -559,7 +559,7 @@ const createPackage = async () => {
       {isPopularityDataAvailable && (
         <section aria-labelledby="popularity-display-section">
           <fieldset>
-            <legend>Popularity Rating Display</legend>
+            <legend>Popularity Rating Results</legend>
             <h2 id="popularity-display-section">Popularity Rating</h2>
             <p>Weekly Downloads: {popularityData.weeklyDownloads}</p>
             <p>GitHub Stars: {popularityData.githubStars}</p>
