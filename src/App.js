@@ -55,6 +55,14 @@ function Modal({ isOpen, onClose, children, openerRef }) {
 }
 function App() {
   // Refs and state variables
+
+  const [popularityData, setPopularityData] = useState({
+    weeklyDownloads: 0,
+    githubStars: 0,
+    popularityScore: "TBD" // Placeholder for now
+  });
+  const [isPopularityDataAvailable, setIsPopularityDataAvailable] = useState(false);
+
   const [authToken, setAuthToken] = useState('');
   const [packages, setPackages] = useState([]);
   const [packagesRegex, setPackagesRegex] = useState([]);
@@ -78,6 +86,7 @@ function App() {
   const [downloadUrlTimeout, setDownloadUrlTimeout] = useState(null);
   const packageURLInputCreate = useRef(null);
   const packageURLInputIngest = useRef(null);
+  const packageURLInputPopularity = useRef(null);
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
   const isAdminInput = useRef(null);
@@ -187,7 +196,58 @@ function App() {
     };
   }, [downloadUrlTimeout]);
 
-
+  function calculatePopularityRating(weeklyDownloads, githubStars) {
+    // Define the maximum expected values for normalization
+    const maxDownloads = 500000000; // 500 million for downloads
+    const maxStars = 500000; // Max stars
+  
+    // Normalize the metrics to a 0-1 scale
+    const normalizedDownloads = Math.log10(weeklyDownloads + 1) / Math.log10(maxDownloads + 1);
+    const normalizedStars = Math.log10(githubStars + 1) / Math.log10(maxStars + 1);
+  
+    // Average the normalized values
+    const combinedScore = (normalizedDownloads + normalizedStars) / 2;
+  
+    // Scale to 0-5 range
+    const score = combinedScore * 5;
+    return parseFloat(score.toFixed(2));
+  }
+  
+  
+  // Function to retrieve popularity rating
+  const retrievePopularityRating = async () => {
+    const packageURL = packageURLInputPopularity.current.value;
+  
+    if (!packageURL) {
+      alert('Please enter the npmjs package URL.');
+      return;
+    }
+  
+    try {
+      const queryParams = { url: packageURL }; 
+      const response = await API.get('phase2api', '/popularity', {
+        queryStringParameters: queryParams
+      });
+  
+      // Directly access response data without JSON.parse
+      console.log('Response:', response);
+      const responseData = response;
+      const weeklyDownloads = responseData.popularityRating.weeklyDownloads;
+      const githubStars = responseData.popularityRating.githubStars;
+    
+      setPopularityData({
+        weeklyDownloads: weeklyDownloads.toLocaleString(),
+        githubStars: githubStars.toLocaleString(),
+        popularityScore: calculatePopularityRating(weeklyDownloads, githubStars)
+      });
+      setIsPopularityDataAvailable(true);
+      alert('Popularity rating retrieved successfully!');
+  
+    } catch (error) {
+      console.error('Error retrieving popularity rating:', error);
+      alert('Failed to retrieve popularity rating.');
+    }
+  };
   
 
   // Function to update a package version
@@ -483,7 +543,32 @@ const createPackage = async () => {
             </fieldset>
           </section> 
         
-    
+
+        {/* Popularity Rating Section */}
+        <section aria-labelledby="popularity-rating-section">
+          <fieldset>
+            <legend>Retrieve Popularity Rating</legend>
+            <h2 id="popularity-rating-section">Retrieve Popularity Rating</h2>
+            <label htmlFor="packageURL">npmjs Package URL: </label>
+            <input type="text" ref={packageURLInputPopularity} id="packageURL" placeholder="npmjs Package URL" />
+            <button onClick={retrievePopularityRating}>Get Popularity Rating</button>
+          </fieldset>
+        </section>
+
+         {/* Popularity Rating Display Section */}
+      {isPopularityDataAvailable && (
+        <section aria-labelledby="popularity-display-section">
+          <fieldset>
+            <legend>Popularity Rating Display</legend>
+            <h2 id="popularity-display-section">Popularity Rating</h2>
+            <p>Weekly Downloads: {popularityData.weeklyDownloads}</p>
+            <p>GitHub Stars: {popularityData.githubStars}</p>
+            <p>Popularity Score: {popularityData.popularityScore}/5</p>
+          </fieldset>
+        </section>
+      )}
+
+
         {/* Package retrieval by ID */}
         <section aria-labelledby="retrieve-by-id-section"> 
         <fieldset> 

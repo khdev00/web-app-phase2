@@ -37,6 +37,7 @@ exports.handler = async (event) => {
     const s3ObjectKey = `${folderName}/${packageName}/${packageVersion}/${packageName}-${packageVersion}.zip`;
 
     try {
+        // Retrieve package size from S3
         const s3HeadObject = await s3.headObject({ Bucket: bucketName, Key: s3ObjectKey }).promise();
         const packageSize = s3HeadObject.ContentLength;
 

@@ -5,11 +5,9 @@ import App from './App';
 describe('App Component', () => {
 
   test('renders all buttons', () => {
-    render(<App />);
-
-           
+    render(<App />);    
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(12);
+    expect(buttons).toHaveLength(13);
 });
    
 

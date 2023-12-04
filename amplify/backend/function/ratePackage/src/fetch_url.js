@@ -457,7 +457,7 @@ function fetchUrlData(url) {
                     _a.trys.push([0, 6, , 7]);
                     urls = [];
                     line = url.trim();
-                    if (!(line.startsWith('http') && (line.includes('npmjs.com') || line.includes('github.com')))) return [3 /*break*/, 4];
+                    if (!((line.startsWith('http') && line.includes('npmjs.com')) || line.includes('github.com'))) return [3 /*break*/, 4];
                     packageName = '';
                     packageOwner = '';
                     if (!line.includes('npmjs.com')) return [3 /*break*/, 2];

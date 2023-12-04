@@ -48,6 +48,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "popularityrating": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "ratePackage": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -221,6 +226,22 @@
         {
           "category": "function",
           "resourceName": "ingest"
+        }
+      ]
+    },
+    "AMPLIFY_function_popularityrating_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "popularityrating"
+        }
+      ]
+    },
+    "AMPLIFY_function_popularityrating_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "popularityrating"
         }
       ]
     },
