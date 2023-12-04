@@ -228,7 +228,7 @@ function App() {
       const response = await API.get('phase2api', '/popularity', {
         queryStringParameters: queryParams
       });
-  
+   
       // Directly access response data without JSON.parse
       console.log('Response:', response);
       const responseData = response;
@@ -360,6 +360,47 @@ const createPackage = async () => {
     alert('Failed to create package.');
   }
 };
+
+const createingest = async () => {
+  const packageContent = packageContentInputCreate.current.value;
+  const packageURL = packageURLInputCreate.current.value;
+
+  if ((packageContent && packageURL) || (!packageContent && !packageURL)) {
+    alert('Please provide either package content or a package URL, but not both.');
+    return;
+  }
+
+  let body = {};
+  let action = '';
+
+  if (packageContent) {
+    body = { packageContent };
+    action = 'Creating Package';
+  } else if (packageURL) {
+    body = { packageURL };
+    action = 'Ingesting Package';
+  }
+
+  alert(action);
+
+  try {
+    console.log('Request Body:', body);
+    const response = await API.post('phase2api', `/package`, {
+      headers: {
+        'Content-Type': 'application/json',
+        // Add auth token here if required
+      },
+      body: JSON.stringify(body)
+    });
+
+    console.log(response);
+    alert(`${action} successful!`);
+  } catch (error) {
+    console.error(error);
+    alert(`Failed to ${action.toLowerCase()}.`);
+  }
+};
+
 
 
   // Function to retrieve a package by name
@@ -647,6 +688,7 @@ const createPackage = async () => {
         </section>
     
         {/* Package ingestion */}
+        {/*
         <section aria-labelledby="package-ingestion-section">
           <fieldset>
             <legend>Ingest Package</legend>
@@ -659,25 +701,20 @@ const createPackage = async () => {
             <button onClick={ingestPackage}>Ingest Package</button>
           </fieldset>
         </section>
-    
+            */}
         {/* Package creation */}
-        <section aria-labelledby="package-creation-section">
+        <section aria-labelledby="package-creation-ingest-section">
           <fieldset>
-            <legend>Create Package</legend>
-            <h2 id="package-creation-section">Create Package</h2>
-            <label htmlFor="createPackageName">Package Name: </label>
-            <input type="text" ref={packageIdInputForCreation} id="createPackageName" placeholder="Package Name" />
-      
-            <label htmlFor="createPackageVersion">Package Version: </label>
-            <input type="text" ref={packageVersionInput} id="createPackageVersion" placeholder="Package Version" />
-      
+            <legend>Upload/Ingest Package</legend>
+            <h2 id="package-creation-section">Upload Package</h2>
+            
             <label htmlFor="createPackageContent">Package Content: </label>
             <input type="text" ref={packageContentInputCreate} id="createPackageContent" placeholder="Package Content" />
       
             <label htmlFor="createPackageURL">Package URL: </label>
             <input type="text" ref={packageURLInputCreate} id="createPackageURL" placeholder="Package URL" />
       
-            <button onClick={createPackage}>Create Package</button>
+            <button onClick={createingest}>Create/Ingest Package</button>
           </fieldset>
         </section>
     

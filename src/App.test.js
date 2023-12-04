@@ -7,7 +7,7 @@ describe('App Component', () => {
   test('renders all buttons', () => {
     render(<App />);    
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(13);
+    expect(buttons).toHaveLength(12);
 });
    
 

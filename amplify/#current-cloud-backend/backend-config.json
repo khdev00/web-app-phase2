@@ -28,6 +28,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "createinjest": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "deleteAllByName": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -167,6 +172,22 @@
         {
           "category": "function",
           "resourceName": "create"
+        }
+      ]
+    },
+    "AMPLIFY_function_createinjest_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createinjest"
+        }
+      ]
+    },
+    "AMPLIFY_function_createinjest_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createinjest"
         }
       ]
     },
