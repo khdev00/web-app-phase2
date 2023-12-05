@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const unzipper = require('unzipper'); // npm package needed for extraction
 AWS.config.update({ region: 'us-east-2' });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -13,8 +14,55 @@ const folderName = 'nongradedpackages';
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  */
 
+const streamToString = (stream) =>
+  new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on('data', (chunk) => chunks.push(chunk));
+    stream.on('error', reject);
+    stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+  });
+
+exports.processZipFile = async (fileName) => {
+  const s3Stream = s3.getObject({ Bucket: bucketName, Key: `${folderName}/${fileName}` }).createReadStream();
+  const zip = s3Stream.pipe(unzipper.Parse({ forceStream: true }));
+
+  let foundReadme = false; // Flag to indicate if README has been found
+  const readmeRegex = /\/readme\.(md|txt|markdown)$/i;
+  const npmjsURLRegex = /https?:\/\/(www\.)?npmjs\.(com|org)\/package\/[a-zA-Z0-9-_]+/g;
+
+
+  for await (const entry of zip) {
+    const fullPath = entry.path;
+    console.log('fullPath:', fullPath);
+
+    if (readmeRegex.test(fullPath.toLowerCase())) {
+      // Extract the README file content
+      const readmeContent = await streamToString(entry);
+      // Extract the npmjs URL from README content (if needed)
+      const urlMatches = readmeContent.match(npmjsURLRegex);
+      const npmjsURL = urlMatches ? urlMatches[0] : null;
+      //console.log('readmeContent:', readmeContent);
+      console.log('npmjsURL:', npmjsURL);
+      
+      // Now we will get package metadata from npmjs api and store it in dynamodb
+      
+
+      foundReadme = true;
+      break; // README found, stop searching
+    }
+
+    entry.autodrain();
+  }
+
+  if (!foundReadme) {
+    console.log('README file not found in the ZIP archive.');
+  }
+};
+
+
+
 exports.uploadHandler = async (event) => {
-    console.log('Event Body:', event.body);
+    
     let body = JSON.parse(event.body);
 
     
@@ -34,6 +82,9 @@ exports.uploadHandler = async (event) => {
     try {
         await s3.putObject(uploadParams).promise();
         console.log(`File uploaded successfully at ${folderName}/${fileName}`);
+        await exports.processZipFile(fileName);
+
+
 
         // Return a success response
         return {
@@ -48,7 +99,7 @@ exports.uploadHandler = async (event) => {
     } catch (error) {
         console.error("Error uploading to S3:", error);
         return {
-            statusCode: 500,
+            statusCode: 500, // should not happen
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
@@ -80,7 +131,7 @@ exports.ingestHandler = async (event) => {
 
 }
 exports.handler = async (event) => {
-    console.log('Event Body:', event.body);
+    
 
     // Auth handling would go here
 
@@ -119,7 +170,7 @@ exports.handler = async (event) => {
     } catch (error) {
         console.error("Error in processing:", error);
         return {
-            statusCode: 500,
+            statusCode: 500, // should not happen
             body: JSON.stringify({ message: 'Internal server error' }),
         };
     }
