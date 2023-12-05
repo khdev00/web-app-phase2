@@ -109,7 +109,7 @@ const deleteS3 = async () => {
     
         console.log(`All objects in subfolder ${i} deleted successfully`);
     
-        // Recreate the subfolder
+        /*// Recreate the subfolder
         const putObjectParams = {
             Bucket: bucketName,
             Key: folderNames[i], // This will create an empty "subfolder"
@@ -118,7 +118,7 @@ const deleteS3 = async () => {
     
         await s3.putObject(putObjectParams).promise();
     
-        console.log(`Subfolder ${i} recreated successfully`);
+        console.log(`Subfolder ${i} recreated successfully`);*/
     }
     return;
 }
