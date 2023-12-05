@@ -9,6 +9,18 @@
   },
   "dependencies": {
     "aws-sdk": "^2.1511.0",
-    "unzipper": "^0.10.14"
+    "unzipper": "^0.10.14",
+    "@octokit/core": "^5.0.1",
+    "axios": "^1.6.1",
+    "bluebird": "^3.7.2",
+    "fs-extra": "^11.1.1",
+    "octokit": "^3.1.1",
+    "winston": "^3.11.0",
+    "ndjson": "^2.0.0",
+    "tar": "^6.2.0",
+    "dotenv": "^16.3.1",
+    "isomorphic-git": "^1.24.5",
+    "@aws-sdk/client-secrets-manager": "^3.451.0",
+    "core-js": "3.33.2"
   }
 }

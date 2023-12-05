@@ -388,13 +388,24 @@ const createingest = async () => {
     const response = await API.post('phase2api', `/package`, {
       headers: {
         'Content-Type': 'application/json',
-        // Add auth token here if required
+        // Add auth token 
       },
       body: JSON.stringify(body)
     });
 
     console.log(response);
-    alert(`${action} successful!`);
+    if (response.statusCode === 201) {
+      alert(`${action} successful`);
+    } else if (response.statusCode === 409) {
+      alert(`${action} failed. Package with same package ID already exists`);
+    } else if (response.statusCode === 404) {
+      alert(`${action} failed. Could not find package metadata, no package.json exists`);
+    } else if (response.statusCode === 500) {
+      alert(`${action} failed. Error: ${response.body}`);
+    } else if (response.statusCode === 400) {
+      alert(`${action} failed. Invalid Request, please ensure that the request body is valid or that the Auth token is valid`);
+    }
+    
   } catch (error) {
     console.error(error);
     alert(`Failed to ${action.toLowerCase()}.`);
@@ -706,7 +717,7 @@ const createingest = async () => {
         <section aria-labelledby="package-creation-ingest-section">
           <fieldset>
             <legend>Upload/Ingest Package</legend>
-            <h2 id="package-creation-section">Upload Package</h2>
+            <h2 id="package-creation-section">Upload/Ingest Package</h2>
             
             <label htmlFor="createPackageContent">Package Content: </label>
             <input type="text" ref={packageContentInputCreate} id="createPackageContent" placeholder="Package Content" />
