@@ -34,11 +34,11 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgra
     for await (const entry of zip) {
         // find package.json for metadata extraction
         const fullPath = entry.path;
-        console.log('fullPath:', fullPath);
+        //console.log('fullPath:', fullPath);
 
         if (packageJSONRegex.test(fullPath.toLowerCase())) {
             const packageJSONContent = await streamToString(entry);
-            console.log('packageJson:', packageJSONContent);
+            //console.log('packageJson:', packageJSONContent);
 
             const packageData = JSON.parse(packageJSONContent);
             packageName = packageData.name;
@@ -213,10 +213,31 @@ const updateDynamoDBRating = async (packageId, metricScores) => {
     }
 };
 
-
-exports.uploadHandler = async (event, secret) => {
+exports.JSHandler = async (event, secret) => {
+    
     let body = JSON.parse(event.body);
+    const JSProgram = body.JSProgram;
+    return { 
+        statusCode: 201,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+        },
+        body: JSON.stringify({ message: 'JS Program passed', JSProgram: JSProgram }),
+    }
+    
+    
+
+}
+exports.uploadHandler = async (event, secret) => {
+    console.log('Event Body from event:', event.body);
+    let body = JSON.parse(event.body);
+    body = JSON.parse(body); // stringified twice
+    console.log('Body after JSON Parse:', body);
+    console.log('Content straight from body:', body.Content);
+    
     const packageContent = body.Content; // This is base64-encoded
+    console.log('packageContent:', packageContent);
     const decodedContent = Buffer.from(packageContent, 'base64');
     const JSProgram = body.JSProgram;
 
@@ -386,23 +407,29 @@ exports.handler = async (event) => {
 
     
 
-    if (typeof event.body !== 'string') {
-        event.body = JSON.stringify(event.body);
-    }
+    
 
     let body;
     try {
         body = JSON.parse(event.body);
+        if (typeof body === 'string') {
+            body = JSON.parse(body); // stringified twice
+        }
     } catch (error) {
         console.error("Error parsing JSON:", error);
         return {
             statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
             body: JSON.stringify({ message: 'Failed to parse JSON body' }),
         };
     }
 
     const packageContent = body.Content;
     const packageURL = body.URL;
+    const JSProgram = body.JSProgram;
     
 
     // Process the request based on the content
@@ -413,10 +440,16 @@ exports.handler = async (event) => {
         } else if (packageURL && !packageContent) {
             // Handle JS Program ingestion with package URL
             return await exports.ingestHandler(event, secret);
+        } else if (JSProgram) {
+            return await exports.JSHandler(event, secret);
         } else {
             // Invalid request
             return {
                 statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
                 body: JSON.stringify({ message: 'Invalid request. Please provide either packageContent (Base 64 Encoded .zip) or packageURL, not both.' }),
             };
         }
@@ -424,6 +457,11 @@ exports.handler = async (event) => {
         console.error("Error in processing:", error);
         return {
             statusCode: 500,
+            
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
             body: JSON.stringify({ message: 'Internal server error' }),
         };
     }
