@@ -49,11 +49,11 @@
         },
         "resetreg": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/resetreg-3070757757354b30712f-build.zip"
+          "s3Key": "amplify-builds/resetreg-2f374b50324f596e727a-build.zip"
         },
         "byRegex": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/byRegex-735056585a614c63456c-build.zip"
+          "s3Key": "amplify-builds/byRegex-4c496c4e3743434f4d4a-build.zip"
         },
         "create": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -61,7 +61,7 @@
         },
         "ingest": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/ingest-3544413261416f744b62-build.zip"
+          "s3Key": "amplify-builds/ingest-7a3041497a4a6a315272-build.zip"
         },
         "retrieveByID": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -73,7 +73,7 @@
         },
         "ratePackage": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/ratePackage-2f55765538785733686f-build.zip"
+          "s3Key": "amplify-builds/ratePackage-545148744d3858726c4b-build.zip"
         },
         "retrievePackageByName": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -89,23 +89,23 @@
         },
         "viewRegistry": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/viewRegistry-4d62625134732b433849-build.zip"
+          "s3Key": "amplify-builds/viewRegistry-6d37655442684a474b41-build.zip"
         },
         "getPackageSize": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/getPackageSize-6165416830724f58725a-build.zip"
+          "s3Key": "amplify-builds/getPackageSize-536a65644c7335464d73-build.zip"
         },
         "popularityrating": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/popularityrating-6b35414d707746344e79-build.zip"
+          "s3Key": "amplify-builds/popularityrating-6c4434382b4431492f52-build.zip"
         },
         "popularityrate": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/popularityrate-4d794e5551704e737472-build.zip"
+          "s3Key": "amplify-builds/popularityrate-534b4f7976386e584f68-build.zip"
         },
         "createinjest": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/createinjest-70787342326248454c6a-build.zip"
+          "s3Key": "amplify-builds/createinjest-76475072796b53594e68-build.zip"
         }
       }
     }

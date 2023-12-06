@@ -14,6 +14,7 @@ const folderName = 'nongradedpackages';
 const secret_name = "GITHUB_TOKEN";
 const contentfoldername = 'packagecontent'; //folder name for content, to avoid dynamo size limit. 
 
+
 const streamToString = (stream) =>
   new Promise((resolve, reject) => {
     const chunks = [];
@@ -22,7 +23,7 @@ const streamToString = (stream) =>
     stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
 });
 
-exports.processZipFile = async (fileName, packageContent, packageS3Url) => {
+exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgram) => {
     const s3Stream = s3.getObject({ Bucket: bucketName, Key: `${folderName}/${fileName}` }).createReadStream();
     const zip = s3Stream.pipe(unzipper.Parse({ forceStream: true }));
 
@@ -143,14 +144,16 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url) => {
             ID: packageID,
         },
         data: {
-            Content: packageContent
+            Content: packageContent,
+            JSProgram: JSProgram
         }
+        
     };
 };
 
 
   
-  function extractGitHubURL(repository) {
+function extractGitHubURL(repository) {
     if (!repository) {
       return null;
     }
@@ -167,8 +170,7 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url) => {
     }
   
     return null;
-  }
-  
+}
 
 const updateDynamoDBRating = async (packageId, metricScores) => {
     //Update MetricScore with net score
@@ -211,10 +213,12 @@ const updateDynamoDBRating = async (packageId, metricScores) => {
     }
 };
 
+
 exports.uploadHandler = async (event, secret) => {
     let body = JSON.parse(event.body);
-    const packageContent = body.packageContent; // This is base64-encoded
+    const packageContent = body.Content; // This is base64-encoded
     const decodedContent = Buffer.from(packageContent, 'base64');
+    const JSProgram = body.JSProgram;
 
     // Use a timestamp to create a unique file name
     const fileName = `package_${new Date().getTime()}.zip`;
@@ -229,7 +233,7 @@ exports.uploadHandler = async (event, secret) => {
     try {
         const uploadResult = await s3.upload(uploadParams).promise();
         console.log(`Package file uploaded successfully at ${uploadResult.Location}`);
-        const response = await exports.processZipFile(fileName, packageContent, uploadResult.Location);
+        const response = await exports.processZipFile(fileName, packageContent, uploadResult.Location, JSProgram);
         if (!response) {
             return {
                 statusCode: 404,
@@ -278,8 +282,7 @@ exports.uploadHandler = async (event, secret) => {
     }
 };
 
-
-exports.ingestHandler = async (event, secret) => {
+exports.ingestHandler = async (event, secret, JSProgram) => {
     // ingest just returns url to console. 
     // the event body for this looks like: 
     // Event Body: {"packageContent": "", "packageURL": "www.google.com"}
@@ -349,6 +352,7 @@ exports.ingestHandler = async (event, secret) => {
 }
 
 exports.handler = async (event) => {
+    console.log('Event:', event);
     //auth handling goes first, if we dont see auth, nothing else should run. 
 
     //setup secret manager client
@@ -397,16 +401,17 @@ exports.handler = async (event) => {
         };
     }
 
-    const packageContent = body.packageContent;
-    const packageURL = body.packageURL;
+    const packageContent = body.Content;
+    const packageURL = body.URL;
+    
 
     // Process the request based on the content
     try {
         if (packageContent && !packageURL) {
-            // Handle package upload
+            // Handle JS Program upload with package content
             return await exports.uploadHandler(event, secret);
         } else if (packageURL && !packageContent) {
-            // Handle package ingestion
+            // Handle JS Program ingestion with package URL
             return await exports.ingestHandler(event, secret);
         } else {
             // Invalid request

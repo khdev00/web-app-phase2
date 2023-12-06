@@ -362,10 +362,10 @@ const createPackage = async () => {
 };
 
 const createingest = async () => {
-  const packageContent = packageContentInputCreate.current.value;
-  const packageURL = packageURLInputCreate.current.value;
+  const Content = packageContentInputCreate.current.value;
+  const URL = packageURLInputCreate.current.value;
 
-  if ((packageContent && packageURL) || (!packageContent && !packageURL)) {
+  if ((Content && URL) || (!Content && !URL)) {
     alert('Please provide either package content or a package URL, but not both.');
     return;
   }
@@ -373,11 +373,11 @@ const createingest = async () => {
   let body = {};
   let action = '';
 
-  if (packageContent) {
-    body = { packageContent };
+  if (Content) {
+    body = { Content };
     action = 'Creating Package';
-  } else if (packageURL) {
-    body = { packageURL };
+  } else if (URL) {
+    body = { URL };
     action = 'Ingesting Package';
   }
 
