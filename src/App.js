@@ -254,34 +254,40 @@ function App() {
   const updatePackageVersion = async () => {
     const packageId = packageIdInputForUpdate.current.value;
     const packageContent = packageContentInputUpdate.current.value;
-   
-  
-    if (!packageId || !packageContent ) {
-      alert('Please enter all fields.');
-      alert('Please enter all fields.');
-      return;
+
+    if (!packageId || !packageContent) {
+        alert('Please enter all fields.');
+        return;
     }
-  
+
     try {
-      const body = {
-        packageId: packageId,
-        packageContent: packageContent
-      };
-  
-      console.log('Request Body:', body);
-      const response = await API.put('phase2api', `/package/${packageId}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      });
-      console.log(response);
-      alert('Package version updated successfully!');
+        // Construct the request body with only the necessary fields
+        const body = {
+            metadata: {
+                ID: packageId
+                // Other metadata fields are not set
+            },
+            data: {
+                Content: packageContent
+                // Other data fields are not set
+            }
+        };
+
+        console.log('Request Body:', body);
+        const response = await API.put('phase2api', `/package/${packageId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+        console.log(response);
+        alert('Package version updated successfully!');
     } catch (error) {
-      console.error(error);
-      alert('Failed to update package version.');
+        console.error(error);
+        alert('Failed to update package version.');
     }
-  };
+};
+
   
 
   // Function to rate a package

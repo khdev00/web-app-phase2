@@ -69,7 +69,7 @@
         },
         "updateVersion": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/updateVersion-4c50474469346e476163-build.zip"
+          "s3Key": "amplify-builds/updateVersion-6f307469706762782f62-build.zip"
         },
         "ratePackage": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
