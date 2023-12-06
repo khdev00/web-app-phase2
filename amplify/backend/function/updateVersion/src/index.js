@@ -5,7 +5,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const s3 = new AWS.S3();
 
 const tableName = 'pkgmetadata';
-const bucketName = 'packageregistry'; // Replace with your S3 bucket name
+const bucketName = 'packageregistry'; 
 const packageContentFolderName = 'packagecontent';
 
 exports.handler = async (event) => {

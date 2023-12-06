@@ -125,7 +125,8 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgra
             pkgVersion: packageVersion,
             pkgURL: githubURL,
             packageS3Url: packageS3Url,
-            contentS3Url: contentS3Url
+            contentS3Url: contentS3Url,
+            JSProgram: JSProgram
         },
     };
 
