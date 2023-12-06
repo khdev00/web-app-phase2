@@ -213,7 +213,7 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/createinjest-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/createinjest-77315a6b424a35754a43-build.zip",
+          "s3Key": "amplify-builds/createinjest-6345565770486c39416f-build.zip",
           "env": "phasetw"
         }
       }
@@ -334,7 +334,7 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/updateVersion-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/updateVersion-6f307469706762782f62-build.zip",
+          "s3Key": "amplify-builds/updateVersion-2b744e5736592f72546f-build.zip",
           "env": "phasetw"
         }
       }

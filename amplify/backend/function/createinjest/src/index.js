@@ -232,8 +232,12 @@ exports.JSHandler = async (event, secret) => {
 }
 exports.uploadHandler = async (event, secret) => {
     console.log('Event Body from event:', event.body);
-    let body = JSON.parse(event.body);
-    body = JSON.parse(body); // stringified twice
+    let body = JSON.parse(event.body); 
+    
+    if (typeof body === 'string') {
+        body = JSON.parse(body); // Second parse if needed
+        console.log('Second parsed body:', body);
+    }
     console.log('Body after JSON Parse:', body);
     console.log('Content straight from body:', body.Content);
     
