@@ -4,16 +4,11 @@
 //    Make sure your .env is in .gitignore
 // 3. Run ./run *path to your url file*
 
-import dotenv from 'dotenv'; // For retrieving env variables
-import axios from 'axios'; // Library to conveniantly send HTTP requests to interact with REST API
-import winston, { Logform } from 'winston'; //Logging library
-//import { getLogger } from './logger';
-
-//import * as ndjson from 'ndjson';
-import ndjson from 'ndjson';
-import fs from 'fs'; // Node.js file system module for cloning repos  
-import os from 'os'
-import path from 'path'
+const dotenv = require('dotenv'); // For retrieving env variables
+const axios = require('axios'); // Library to conveniently send HTTP requests to interact with REST API
+const ndjson = require('ndjson');
+const fs = require('fs'); // Node.js file system module for cloning repos
+const path = require('path');
 const http = require("isomorphic-git/http/node");
 
 
@@ -197,12 +192,12 @@ async function getPackageObject(owner: string, packageName: string, token: strin
     packageObj = await getContributors(packageObj, headers, owner, packageName);
 
     await axios.get(`https://api.github.com/repos/${owner}/${packageName}/license`,{headers,})
-        .then((response) => {
+        .then((response: any) => {
             if (response.status == 200) {
                 packageObj.setHasLicense(true);
             }
         })
-        .catch ((err) => {
+        .catch ((err: any) => {
             console.log(`Failed to get license status: ${err}`);
             packageObj.setHasLicense(false);
         });
@@ -358,6 +353,45 @@ export async function fetchUrlsFromFile(filePath: string) {
     catch (error) {
       console.log('Error reading file:', error);
       return [];
+    }
+}
+
+export async function fetchUrlData(url: string) {
+    try {
+        const urls: Url[] = [];
+        const line: string = url.trim();
+
+        if ((line.startsWith('http') || line.startsWith('www')) && (line.includes('npmjs.com') || line.includes('github.com'))) {
+            let packageName = '';
+            let packageOwner: string | null = '';
+
+            if (line.includes('npmjs.com')) {
+                const parts = line.split('/');
+                packageName = parts[parts.length - 1];
+                packageOwner = null;
+
+                const githubDetails = await getGithubDetailsFromNpm(line);
+                if (githubDetails) {
+                    packageOwner = githubDetails.owner;
+                    packageName = githubDetails.name;
+                }
+            } else if (line.includes('github.com')) {
+                const parts = line.split('/');
+                packageName = parts[parts.length - 1];
+                packageOwner = parts[parts.length - 2];
+            }
+
+            const urlObj = new Url(line, packageName, packageOwner);
+            urls.push(urlObj);
+        } else {
+            console.log(`Invalid URL format: ${line}`);
+        }
+
+        return urls;
+
+    } catch (error) {
+        console.log('Error reading file:', error);
+        return [];
     }
 }
 

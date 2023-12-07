@@ -141,17 +141,24 @@ exports.handler = async (event) => {
 
     //retrieve username and password
     try{
+        console.log(body.User.name, body.Secret.password, body.User.isAdmin);
+
         username = body.User.name;
         password = body.Secret.password;
-        isAdminString = body.User.isAdmin;
+        isAdminInput = body.User.isAdmin;
 
-        if (isAdminString.toLowerCase() === 'true') {
-            isAdmin = true;
-        } else if (isAdminString.toLowerCase() === 'false') {
-            isAdmin = false;
+        if(typeof isAdminInput === 'boolean'){
+            isAdmin = isAdminInput
+        }
+        else if (typeof value === 'string'){
+            isAdmin = (isAdminInput.toLowerCase() === 'true');
+        }
+        else{
+            throw new Error('Invalid isAdminInput type');
         }
 
     }catch(err){
+        console.log("Error: Invalid Input Structure error: ", err);
         return {
             statusCode: 400,
             headers: {
@@ -162,8 +169,8 @@ exports.handler = async (event) => {
         };
     }
 
-
     if (!username || !password || isAdmin === null) {
+        console.log("Input Missing")
         return {
             statusCode: 400,
             headers: {
@@ -176,8 +183,8 @@ exports.handler = async (event) => {
 
     const passwordHash = generateHash(password);
 
-    // Retrieve the package metadata from DynamoDB
-    let packageMetadata;
+    // Retrieve the user metadata from DynamoDB
+    let userMetadata, storedAdmin, storedHash;
     try {
         const params = {
             TableName: tableName,
@@ -187,7 +194,9 @@ exports.handler = async (event) => {
         };
         const data = await dynamoDb.getItem(params).promise();
         if(data.Item){
-            packageMetadata = data.Item;
+            userMetadata = data.Item;
+            storedAdmin = userMetadata.isAdmin;
+            storedHash = userMetadata.passHash.S;
         }
         else{
             console.error('Username not found');
@@ -212,9 +221,8 @@ exports.handler = async (event) => {
         };
     }
 
-    const storedAdmin = packageMetadata.isAdmin;
-
     if(isAdmin && !storedAdmin){
+        console.log('Requested admin token for non-admin user');
         return {
             statusCode: 401,
             headers: {
@@ -225,9 +233,7 @@ exports.handler = async (event) => {
         };
     }
 
-    const storedHash = packageMetadata.passHash.S;
-
-    if(storedHash != passwordHash){
+    if(storedHash !== passwordHash){
         console.error('Incorrect password provided');
         return {
             statusCode: 401,
@@ -239,8 +245,20 @@ exports.handler = async (event) => {
         };
     }
 
-    const auth_token = generateToken(username, isAdmin, secretKey);
-    //validateToken(auth_token, secretKey);
+    let auth_token;
+    try{
+        auth_token = generateToken(username, isAdmin, secretKey);
+    }catch(err){
+        console.error('Error generating token: ', err);
+        return {
+            statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Error generating token'}),
+        };
+    }
     
     // Update the DynamoDB item with the package rating
     try {

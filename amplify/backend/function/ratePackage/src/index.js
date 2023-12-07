@@ -2,7 +2,6 @@ const AWS = require('aws-sdk');
 AWS.config.update({ region: 'us-east-2' });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
-const s3 = new AWS.S3();
 const tableName = 'pkgmetadata';
 
 const {fetchUrlData, calculateAllMetrics} = require("./fetch_url")

@@ -164,7 +164,8 @@
             {
               "Effect": "Allow",
               "Action": [
-                "dynamodb:PutItem"
+                "dynamodb:PutItem",
+                "dynamodb:GetItem"
               ],
               "Resource": [
                 "arn:aws:dynamodb:us-east-2:269961640318:table/pkgmetadata"

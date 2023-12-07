@@ -37,7 +37,7 @@
       "function": {
         "auth": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/auth-517a764f337632574d55-build.zip"
+          "s3Key": "amplify-builds/auth-36704b5672364a387770-build.zip"
         },
         "byID": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -49,7 +49,7 @@
         },
         "resetreg": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/resetreg-6461344d5173684b4d33-build.zip"
+          "s3Key": "amplify-builds/resetreg-634b492b624a4e784b4c-build.zip"
         },
         "byRegex": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -69,11 +69,11 @@
         },
         "updateVersion": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/updateVersion-4c50474469346e476163-build.zip"
+          "s3Key": "amplify-builds/updateVersion-2b744e5736592f72546f-build.zip"
         },
         "ratePackage": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/ratePackage-3948666438457a6d754f-build.zip"
+          "s3Key": "amplify-builds/ratePackage-545148744d3858726c4b-build.zip"
         },
         "retrievePackageByName": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -97,7 +97,7 @@
         },
         "popularityrating": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/popularityrating-374d3569494c48727656-build.zip"
+          "s3Key": "amplify-builds/popularityrating-6c4434382b4431492f52-build.zip"
         },
         "popularityrate": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -105,7 +105,7 @@
         },
         "createinjest": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/createinjest-2b4b6e766a306f4a414b-build.zip"
+          "s3Key": "amplify-builds/createinjest-6345565770486c39416f-build.zip"
         }
       }
     }

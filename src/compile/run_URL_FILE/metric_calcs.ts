@@ -1,5 +1,3 @@
-import winston, { Logform } from 'winston'; //Logging library
-import axios from 'axios'; // Library to conveniantly send HTTP requests to interact with REST API
 import { Package } from './fetch_url'
 
 import { 

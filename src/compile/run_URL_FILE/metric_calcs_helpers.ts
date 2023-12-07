@@ -1,10 +1,8 @@
-import fs from 'fs'; // Node.js file system module for cloning repos  
-import path from 'path';
-import winston, { Logform } from 'winston'; //Logging library
-import axios from 'axios'; // Library to conveniantly send HTTP requests to interact with REST API
+const fs = require('fs'); // Node.js file system module for cloning repos
+const path = require('path');
+const axios = require('axios'); // Library to conveniently send HTTP requests to interact with REST API
+const { Octokit } = require("@octokit/core");  // Make sure to install @octokit/core via npm
 import { Package } from './fetch_url'
-import { type } from 'os';
-import { Octokit } from "@octokit/core";  // Make sure to install @octokit/core via npm
 
 export async function readReadmeFile(cloneDir: string) {
     try {
@@ -230,11 +228,9 @@ export async function getIssueResolutionTime(owner: string, packageName: string,
     }
 }
 
-
-
 export async function getContributors(packageObj: Package, headers: any, owner: string, packageName: string): Promise<Package> {
     await axios.get(`https://api.github.com/repos/${owner}/${packageName}/contributors`, { headers })
-    .then((response) => {
+    .then((response: any) => {
         const contributorsData = response.data;
         const contributorsMap = new Map<string, number>();
 
@@ -247,7 +243,7 @@ export async function getContributors(packageObj: Package, headers: any, owner: 
         packageObj.setContributors(contributorsMap);
         return packageObj;
     })
-    .catch((err) => {
+    .catch((err: any) => {
         console.log(`Error on axios.get: ${err}`);
         console.log(`Error on axios.get: ${err}`);
         packageObj.setContributors(new Map()); 

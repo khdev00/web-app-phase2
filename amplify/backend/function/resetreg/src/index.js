@@ -71,7 +71,6 @@ async function validateToken(auth_token, secret) {
     } catch (err) {
         console.error('validation error: ', err);
         throw new Error('Failed to validate token');
-        return;
     }
 }
 
@@ -404,9 +403,9 @@ exports.handler = async (event, context) => {
     secretObject = JSON.parse(secretString);
     secretKey = secretObject.DEFAULT_USER_PASSWORD;
 
-    const defaultUsername = "testAdmin";
+    const defaultUsername = "ece30861defaultadminuser";
     const defaultIsAdmin = true;
-    const defaultPasswordHash = "cf80cd8aed482d5d1527d7dc72fceff84e6326592848447d2dc0b0e87dfc9a90";
+    const defaultPasswordHash = secretKey;
 
     //recreate the default user
     try{
