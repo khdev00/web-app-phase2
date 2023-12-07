@@ -141,8 +141,8 @@ exports.handler = async (event) => {
 
     //retrieve username and password
     try{
-        console.log(body.User.name, body.Secret.password, body.User.isAdmin);
-
+        console.log("Info: ", body.User.name, body.Secret.password, body.User.isAdmin);
+        console.log("Types: ", typeof body.User.name, typeof body.Secret.password, typeof body.User.isAdmin);
         username = body.User.name;
         password = body.Secret.password;
         isAdminInput = body.User.isAdmin;
@@ -150,7 +150,7 @@ exports.handler = async (event) => {
         if(typeof isAdminInput === 'boolean'){
             isAdmin = isAdminInput
         }
-        else if (typeof value === 'string'){
+        else if (typeof isAdminInput === 'string'){
             isAdmin = (isAdminInput.toLowerCase() === 'true');
         }
         else{
