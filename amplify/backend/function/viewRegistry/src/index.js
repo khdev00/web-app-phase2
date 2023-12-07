@@ -51,7 +51,17 @@ function parseVersionRange(version) {
             maxVersion = baseVersion[0] + '.' + baseVersion[1] + '.0';
         }
     } else {
-        minVersion = maxVersion = version;
+        // Treat a specific version as a range
+        const baseVersion = version.split('.').map(Number);
+        minVersion = version;
+        if (baseVersion.length === 3) {
+            // Increment patch version for specific version
+            baseVersion[2] += 1;
+            maxVersion = baseVersion[0] + '.' + baseVersion[1] + '.' + baseVersion[2];
+        } else {
+            // If the specific version doesn't include patch version, add '.0' as the max version
+            maxVersion = version + '.0';
+        }
     }
 
     return { minVersion, maxVersion, isUpperBoundInclusive };
