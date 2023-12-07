@@ -63,6 +63,9 @@ function App() {
   });
   const [isPopularityDataAvailable, setIsPopularityDataAvailable] = useState(false);
 
+  const [packageQuery, setPackageQuery] = useState({ name: '', version: '' });
+  const [packageQueryResults, setPackageQueryResults] = useState([]);
+  const [nextQueryToken, setNextQueryToken] = useState(null);
   const [authToken, setAuthToken] = useState('');
   const [packages, setPackages] = useState([]);
   const [packagesRegex, setPackagesRegex] = useState([]);
@@ -144,6 +147,50 @@ function App() {
     }
 
   };
+
+
+const handlePackageQuery = async () => {
+  const packageName = packageQuery.name;
+  const packageVersion = packageQuery.version;
+
+  if (!packageName) {
+    alert('Please enter a package name.');
+    return;
+  }
+
+  // Constructing the query
+  const query = {
+    Name: packageName === '*' ? '*' : packageName,
+    Version: packageVersion
+  };
+  console.log('Query:', query);
+  const test_body = JSON.stringify([query]);
+  console.log('test_body:', test_body);
+
+
+  try {
+    const response = await API.post('phase2api', '/packages', {
+      body: [query], // Ensure the body is sent as a JSON object
+      headers: {
+        ...(nextQueryToken && { 'nextToken': nextQueryToken }),
+        'Content-Type': 'application/json' // Specify the content type as JSON
+      },
+    });
+
+    // Process the response here
+    console.log(response);
+    alert('Package query successful!');
+  } catch (error) {
+    console.error(error);
+    alert('Failed to query package.');
+  }
+};
+  
+  
+  // Function to update package query input
+const updatePackageQueryInput = (field, value) => {
+  setPackageQuery(prev => ({ ...prev, [field]: value }));
+};
 
   // Function to retrieve a package by ID
   const retrievePackageById = async () => {
@@ -625,7 +672,49 @@ const createingest = async () => {
           </fieldset>
         </section>
       )}
+         {/* Package Query Section */}
+          <section aria-labelledby="package-query-section">
+            <fieldset>
+              <legend>Package Query</legend>
+              <h2 id="package-query-section">Query Packages</h2>
+              <label htmlFor="packageNameQuery">Package Name: </label>
+              <input 
+                type="text" 
+                value={packageQuery.name} 
+                onChange={(e) => updatePackageQueryInput('name', e.target.value)} 
+                id="packageNameQuery" 
+                placeholder="Package Name or * for all" 
+              />
+              <label htmlFor="packageVersionQuery">Version Criteria: </label>
+              <input 
+                type="text" 
+                value={packageQuery.version} 
+                onChange={(e) => updatePackageQueryInput('version', e.target.value)} 
+                id="packageVersionQuery" 
+                placeholder="Version Criteria" 
+              />
+              <button onClick={handlePackageQuery}>Query Package</button>
+            </fieldset>
+          </section>
 
+
+          {/* Display package query results */}
+          <section aria-labelledby="package-query-results-section">
+            <fieldset>
+              <legend>Package Query Results</legend>
+              <h2 id="package-query-results-section">Query Results</h2>
+              {packageQueryResults.map((pkg, index) => (
+                <div key={index}>
+                  <p>Package Name: {pkg.name}</p>
+                  <p>Version: {pkg.version}</p>
+                  {/* Display other package details as needed */}
+                </div>
+              ))}
+              {nextQueryToken && (
+                <button onClick={() => handlePackageQuery()}>Load More</button>
+              )}
+            </fieldset>
+          </section>
 
         {/* Package retrieval by ID */}
         <section aria-labelledby="retrieve-by-id-section"> 

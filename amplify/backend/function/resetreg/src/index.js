@@ -15,6 +15,7 @@ const secret_name = "JWT_SECRET_KEY";
 
 async function validateToken(auth_token, secret) {
     try{
+        console.log("Token: ", auth_token)
         const payload = jwt.verify(auth_token, secret);
         const {username, isAdmin} = payload;
 
@@ -71,7 +72,6 @@ async function validateToken(auth_token, secret) {
     } catch (err) {
         console.error('validation error: ', err);
         throw new Error('Failed to validate token');
-        return;
     }
 }
 
@@ -205,75 +205,6 @@ const createTable = async (tableName, keyName) => {
     }
 };
 
-const createAuthTable = async () => {
-    const params = {
-        AttributeDefinitions: [
-            {
-                AttributeName: 'authToken',
-                AttributeType: 'S'
-            },
-            {
-                AttributeName: 'username',
-                AttributeType: 'S'
-            }
-        ],
-        KeySchema: [
-            {
-                AttributeName: 'authToken',
-                KeyType: 'HASH', // Partition key
-            },
-        ],
-        ProvisionedThroughput: {
-            ReadCapacityUnits: 1,
-            WriteCapacityUnits: 1,
-        },
-        GlobalSecondaryIndexes: [
-            {
-              IndexName: 'username-index',
-              KeySchema: [
-                { AttributeName: 'username', KeyType: 'HASH' }  // GSI Key
-              ],
-              Projection: {
-                ProjectionType: 'ALL'
-              },
-              ProvisionedThroughput: {
-                ReadCapacityUnits: 1,
-                WriteCapacityUnits: 1
-              }
-            }
-        ],
-        TableName: authTable,
-    };
-
-    //create table with given parameters
-    try {
-        await dynamoDb.createTable(params).promise();
-    } catch (error) {
-        console.error(`Error creating table: ${error.message}`);
-    }
-
-    // Check if the table still exists
-    while (true) {
-        try {
-          const response = await dynamoDb.describeTable({ TableName: authTable }).promise();
-          console.log('Table status:', response.Table.TableStatus);
-    
-          if (response.Table.TableStatus === 'ACTIVE') {
-            console.log(`Table ${authTable} has been created successfully.`);
-            break;
-          }
-        } catch (error) {
-          if (error.code !== 'ResourceNotFoundException') {
-            console.error('Error:', error);
-            throw error;
-          }
-        }
-    
-        console.log(`Table ${authTable} not yet created. Waiting...`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-};
-
 exports.handler = async (event, context) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
     console.log('Context:', JSON.stringify(context, null, 2));
@@ -310,8 +241,12 @@ exports.handler = async (event, context) => {
     console.log("Headers: ", event.headers);
     //retrieve authentication token
     try{
-        auth_token = event.headers['x-authorization'];
-        console.log("Token: ", auth_token);
+        if(event.headers['X-Authorization']){
+            auth_token = event.headers['X-Authorization'];
+        }
+        else if(event.headers['x-authorization']){
+            auth_token = event.headers['x-authorization'];
+        }
     }catch(err){
         console.error("Error: ", err)
         return {
@@ -404,9 +339,9 @@ exports.handler = async (event, context) => {
     secretObject = JSON.parse(secretString);
     secretKey = secretObject.DEFAULT_USER_PASSWORD;
 
-    const defaultUsername = "testAdmin";
+    const defaultUsername = "ece30861defaultadminuser";
     const defaultIsAdmin = true;
-    const defaultPasswordHash = "cf80cd8aed482d5d1527d7dc72fceff84e6326592848447d2dc0b0e87dfc9a90";
+    const defaultPasswordHash = secretKey;
 
     //recreate the default user
     try{
