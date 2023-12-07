@@ -697,24 +697,8 @@ const createingest = async () => {
             </fieldset>
           </section>
 
-
-          {/* Display package query results */}
-          <section aria-labelledby="package-query-results-section">
-            <fieldset>
-              <legend>Package Query Results</legend>
-              <h2 id="package-query-results-section">Query Results</h2>
-              {packageQueryResults.map((pkg, index) => (
-                <div key={index}>
-                  <p>Package Name: {pkg.name}</p>
-                  <p>Version: {pkg.version}</p>
-                  {/* Display other package details as needed */}
-                </div>
-              ))}
-              {nextQueryToken && (
-                <button onClick={() => handlePackageQuery()}>Load More</button>
-              )}
-            </fieldset>
-          </section>
+          {/* Package Query Results */}
+              
 
         {/* Package retrieval by ID */}
         <section aria-labelledby="retrieve-by-id-section"> 

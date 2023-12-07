@@ -20,29 +20,43 @@ function compareVersions(version1, version2) {
 function parseVersionRange(version) {
     let minVersion = '';
     let maxVersion = '';
+    let isUpperBoundInclusive = false;
 
     if (version.includes('-')) {
-        // For a bounded range like 1.4.0-1.6.0
         [minVersion, maxVersion] = version.split('-');
+        isUpperBoundInclusive = true;
     } else if (version.startsWith('^')) {
-        // For carat versions (^1.2.3)
         const baseVersion = version.substring(1).split('.').map(Number);
-        minVersion = baseVersion.join('.');
-        baseVersion[0] += 1; // Increment major version
-        maxVersion = baseVersion[0] + '.0.0';
+
+        // Special handling for versions starting with 0
+        if (baseVersion[0] === 0) {
+            minVersion = baseVersion.join('.');
+            baseVersion[1] += 1; // Increment minor version
+            maxVersion = baseVersion[0] + '.' + baseVersion[1] + '.0';
+        } else {
+            minVersion = baseVersion.join('.');
+            baseVersion[0] += 1; // Increment major version
+            maxVersion = baseVersion[0] + '.0.0';
+        }
     } else if (version.startsWith('~')) {
-        // For tilde versions (~1.2.3)
         const baseVersion = version.substring(1).split('.').map(Number);
         minVersion = baseVersion.join('.');
-        baseVersion[1] += 1; // Increment minor version
-        maxVersion = baseVersion[0] + '.' + baseVersion[1] + '.0';
+
+        // Special handling for versions starting with 0
+        if (baseVersion[0] === 0 && baseVersion[1] !== undefined) {
+            baseVersion[2] = (baseVersion[2] || 0) + 1; // Increment patch version
+            maxVersion = baseVersion[0] + '.' + baseVersion[1] + '.' + baseVersion[2];
+        } else {
+            baseVersion[1] = (baseVersion[1] || 0) + 1; // Increment minor version
+            maxVersion = baseVersion[0] + '.' + baseVersion[1] + '.0';
+        }
     } else {
-        // If no special character, treat it as a fixed version
         minVersion = maxVersion = version;
     }
 
-    return { minVersion, maxVersion };
+    return { minVersion, maxVersion, isUpperBoundInclusive };
 }
+
 
 
 exports.handler = async (event) => {
@@ -63,38 +77,50 @@ exports.handler = async (event) => {
         let filterExpression = '';
         let expressionAttributeValues = {};
         let expressionAttributeNames = {};
-        let versionRange = { minVersion: '', maxVersion: '' }; // Declare versionRange here
 
-        if (query.Name) {
+        // Apply name filter if name is provided and is not '*'
+        if (query.Name && query.Name !== '*') {
             filterExpression += ' #name = :name';
             expressionAttributeValues[':name'] = query.Name;
             expressionAttributeNames['#name'] = 'pkgName';
         }
-        if (query.Version) {
-            versionRange = parseVersionRange(query.Version); // Assign versionRange here
-            console.log(`Parsed Version Range: Min - ${versionRange.minVersion}, Max - ${versionRange.maxVersion}`);
+
+        let versionRange = { minVersion: '', maxVersion: '', isUpperBoundInclusive: false };
+        if (query.Version && query.Version !== '') {
+            versionRange = parseVersionRange(query.Version);
+            console.log(`Parsed Version Range: Min - ${versionRange.minVersion}, Max - ${versionRange.maxVersion}, Inclusive - ${versionRange.isUpperBoundInclusive}`);
         }
 
-        const params = {
+        let params = {
             TableName: tableName,
-            FilterExpression: filterExpression,
-            ExpressionAttributeValues: expressionAttributeValues,
-            ExpressionAttributeNames: expressionAttributeNames,
             Limit: 10,
         };
+
+        if (filterExpression) {
+            params.FilterExpression = filterExpression;
+            params.ExpressionAttributeValues = expressionAttributeValues;
+
+            if (Object.keys(expressionAttributeNames).length > 0) {
+                params.ExpressionAttributeNames = expressionAttributeNames;
+            }
+        }
 
         console.log('DynamoDB Query Params:', params);
         const data = await dynamoDb.scan(params).promise();
         console.log('DynamoDB Response:', data);
 
         let filteredItems = data.Items;
-        if (query.Version) {
-            filteredItems = data.Items.filter(item => {
+
+        // Apply version filter if version range is provided
+        if (query.Version && query.Version !== '') {
+            filteredItems = filteredItems.filter(item => {
                 const version = item.pkgVersion;
-                const isWithinRange = compareVersions(version, versionRange.minVersion) >= 0 &&
-                                      compareVersions(version, versionRange.maxVersion) <= 0;
-                console.log(`Version ${version} within range: ${isWithinRange}`);
-                return isWithinRange;
+                const isMinSatisfied = compareVersions(version, versionRange.minVersion) >= 0;
+                const isMaxSatisfied = versionRange.isUpperBoundInclusive
+                    ? compareVersions(version, versionRange.maxVersion) <= 0
+                    : compareVersions(version, versionRange.maxVersion) < 0;
+
+                return isMinSatisfied && isMaxSatisfied;
             });
         }
 
@@ -138,3 +164,4 @@ function generateErrorResponse(statusCode, errorMessage) {
         body: JSON.stringify({ error: errorMessage })
     };
 }
+

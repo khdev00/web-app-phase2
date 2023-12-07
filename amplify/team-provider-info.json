@@ -89,7 +89,7 @@
         },
         "viewRegistry": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/viewRegistry-39506a43645a53556c34-build.zip"
+          "s3Key": "amplify-builds/viewRegistry-4d724a74424b2b2f7041-build.zip"
         },
         "getPackageSize": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
