@@ -38,7 +38,6 @@ const updateDynamoDBItem = async (packageId, netScore, busFactor, correctness, g
     }
 };
 
-
 exports.handler = async (event) => {
     console.log(`EVENT: ${JSON.stringify(event)}`);
     
@@ -162,7 +161,6 @@ exports.handler = async (event) => {
     try {
         await updateDynamoDBItem(packageId, netScore, busFactor, correctness, goodPinningPractice, licenseScore, pullRequest, rampUp, responsiveMaintainer);
         console.log('Package metric score updated successfully')
-
 
         return {
             statusCode: 200,

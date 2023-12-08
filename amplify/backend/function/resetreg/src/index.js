@@ -15,6 +15,9 @@ const secret_name = "JWT_SECRET_KEY";
 
 async function validateToken(auth_token, secret) {
     try{
+        if(auth_token && auth_token.includes('"')){
+            auth_token = auth_token.replace(/"/g, '');
+        }
         console.log("Token: ", auth_token)
         const payload = jwt.verify(auth_token, secret);
         const {username, isAdmin} = payload;
@@ -108,17 +111,6 @@ const deleteS3 = async () => {
         await s3.deleteObjects(deleteObjectsParams).promise();
     
         console.log(`All objects in subfolder ${i} deleted successfully`);
-    
-        /*// Recreate the subfolder
-        const putObjectParams = {
-            Bucket: bucketName,
-            Key: folderNames[i], // This will create an empty "subfolder"
-            Body: '',
-        };
-    
-        await s3.putObject(putObjectParams).promise();
-    
-        console.log(`Subfolder ${i} recreated successfully`);*/
     }
     return;
 }
@@ -272,7 +264,7 @@ exports.handler = async (event, context) => {
 
     try{
         const isAdmin = await validateToken(auth_token, secretKey);
-        if(isAdmin == false){
+        if(isAdmin === false){
             console.log('Invalid permissions');
             return {
                 statusCode: 401,

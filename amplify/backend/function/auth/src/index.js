@@ -23,7 +23,7 @@ function generateToken(username, isAdmin, secret) {
 
 const setTokenInDB = async (username, auth_token) => {
     try {
-        const queryParams = {
+        /*const queryParams = {
             TableName: authTable,
             IndexName: "username-index",
             KeyConditionExpression: 'username = :username',
@@ -54,7 +54,7 @@ const setTokenInDB = async (username, auth_token) => {
         }catch(err){
             console.log("Error: ", err);
             console.log("no duplicate auth token!")
-        }
+        }*/
 
         createParams = {
             TableName: authTable,
