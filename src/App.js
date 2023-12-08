@@ -213,22 +213,8 @@ const updatePackageQueryInput = (field, value) => {
           'Content-Type': 'application/json'
         },
       });
-      const responseBody = JSON.parse(response.body);
-      setDownloadUrl(responseBody.downloadUrl); // Set the download URL
-      const timeout = setTimeout(() => {
-        setDownloadUrl('');
-      }, 60000); // Clear the download URL after 60 seconds
-      console.log(response);
-      if (response.statusCode === 200) {
-        alert('Package retrieved successfully!');
-        setDownloadUrlTimeout(timeout);
-      } else if (response.statusCode === 404) {
-        alert('Package does not exist.');
-      } else if (response.statusCode === 500) {
-        alert('Failed to retrieve package in database');
-      } else if (response.statusCode === 400) {
-        alert('There is missing field(s) in the PackageID/AuthenticationToken or it is formed improperly, or the AuthenticationToken is invalid.');
-      }
+      console.log('response:', response);
+      alert('Package retrieved successfully!');
     } catch (error) {
       console.error(error);
       alert('Failed to retrieve package.');
@@ -725,13 +711,16 @@ const createingest = async () => {
         )}
     
         {/* Button to open the modal */}
+        {/*
         <section aria-labelledby="view-registry-section">
         <fieldset>
           <legend>View Registry</legend>
           <h2 id="view-registry-section">View Registry</h2>
           <button ref={modalOpenerRef} onClick={toggleModal}>View Registry</button>
-
-            {/* Modal for viewing packages */}
+        */}
+        
+            {/* Modal for viewing packages */} 
+            {/*
             <Modal isOpen={isModalOpen} onClose={toggleModal} openerRef={modalOpenerRef}>
             <h2>Registry</h2>
             <button onClick={() => viewPackages()}>Load Packages</button>
@@ -750,6 +739,8 @@ const createingest = async () => {
           </Modal>
         </fieldset>
         </section>
+            */}
+        
     
         {/* Package version update */}
         <section aria-labelledby='update-package-section'>
