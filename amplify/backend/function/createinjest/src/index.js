@@ -230,6 +230,16 @@ exports.JSHandler = async (event, secret) => {
     
 
 }
+function isValidBase64(str) {
+    try {
+        const decoded = Buffer.from(str, 'base64').toString('binary');
+        // Additional check: validate if decoded content is a ZIP file (optional)
+        return Buffer.from(decoded, 'binary').toString('base64') === str;
+    } catch (e) {
+        return false;
+    }
+}
+
 exports.uploadHandler = async (event, secret) => {
     console.log('Event Body from event:', event.body);
     let body = JSON.parse(event.body); 
@@ -242,6 +252,17 @@ exports.uploadHandler = async (event, secret) => {
     console.log('Content straight from body:', body.Content);
     
     const packageContent = body.Content; // This is base64-encoded
+    if (!isValidBase64(packageContent)) {
+        console.error('Invalid base64 content');
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Invalid base64 content' }),
+        };
+    }
     console.log('packageContent:', packageContent);
     const decodedContent = Buffer.from(packageContent, 'base64');
     const JSProgram = body.JSProgram;
@@ -315,9 +336,31 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
      
     console.log('Event Body:', event.body);
     let body = JSON.parse(event.body);
-    const packageURL = body.packageURL;
+    const packageURL = body.URL;
 
-    try {
+    let urlData, pkgName, finalURL, pkgID;
+
+    //retrieve a package data object for the input URL
+    try{
+        urlData = await fetchUrlData(packageURL);
+        pkgName = urlData[0].packageName;
+        finalURL = urlData[0].url;
+        console.log("URL Data: ", pkgName, finalURL);
+    }catch(err){
+        console.error("Error retrieving url data:", err);
+        return {
+            statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Failed to calculate metrics' }),
+        };
+    }
+
+
+
+    /*try {
         urlData = await fetchUrlData(packageURL);
         packageData = await calculateAllMetrics(urlData, secret);
     } catch (error) {
@@ -344,26 +387,38 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
         { netScore: packageData[0].netScore }
     ];
     
-    // Iterate over the metric scores array
-    for (const score of metricScores) {
-        const key = Object.keys(score)[0]; // Extract the key from the object
-        const value = score[key]; // Extract the value from the object
-    
-        console.log(`${key}: ${value}`)
-        if (value < 0.5) {
-            console.log(`Score ${key} is less than 0.5.`);
-            return {
-                statusCode: 424,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Headers": "*",
-                },
-                body: JSON.stringify({ message: `Score ${key} is less than 0.5.`}),
-            };
+    try{
+        // Iterate over the metric scores array
+        for (const score of metricScores) {
+            const key = Object.keys(score)[0]; // Extract the key from the object
+            const value = score[key]; // Extract the value from the object
+        
+            console.log(`${key}: ${value}`)
+            if (value < 0.5) {
+                console.log(`Score ${key} is less than 0.5.`);
+                return {
+                    statusCode: 424,
+                    headers: {
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Headers": "*",
+                    },
+                    body: JSON.stringify({ message: `Score ${key} is less than 0.5.`}),
+                };
+            }
         }
-    }
-    console.log("package passed scoring check");
-
+        console.log("package passed scoring check");
+        await updateDynamoDBRating(pkgID, metricScores);
+    }catch(err){
+        console.log("Metric update error: ", err)
+        return {
+            statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: `Score ${key} is less than 0.5.`}),
+        };
+    }*/
 
 
 
@@ -373,7 +428,7 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "*",
         },
-        body: JSON.stringify({ message: 'URL passed', packageURL: packageURL }),
+        body: JSON.stringify({ message: 'URL passed', packageURL: finalURL }),
     };
 }
 
@@ -409,10 +464,6 @@ exports.handler = async (event) => {
     const secretString = response.SecretString;
     const secretObject = JSON.parse(secretString);
     const secret = secretObject.GITHUB_TOKEN;
-
-    
-
-    
 
     let body;
     try {

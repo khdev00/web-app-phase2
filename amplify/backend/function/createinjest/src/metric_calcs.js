@@ -37,7 +37,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculateNetScore = exports.calculateResponsiveMaintainer = exports.calculateCorrectness = exports.calculateBusFactor = exports.calculateRampUp = exports.calculateDependency = exports.calculateCodeReviewMetric = void 0;
-var axios = require("axios");
 var metric_calcs_helpers_1 = require("./metric_calcs_helpers");
 // This is what controlls the rounding for the metrics,
 // In class we were told to round to 5dp without padding with zeros

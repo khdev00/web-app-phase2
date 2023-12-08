@@ -498,7 +498,7 @@ const createingest = async () => {
     }
   
     try {
-        const queryParams = { regex: regexPattern };
+        const queryParams = { RegEx: regexPattern };
         if (token) {
             queryParams.nextToken = token;
         }

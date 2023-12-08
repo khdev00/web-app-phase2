@@ -38,7 +38,6 @@ const updateDynamoDBItem = async (packageId, netScore, busFactor, correctness, g
     }
 };
 
-
 exports.handler = async (event) => {
     console.log(`EVENT: ${JSON.stringify(event)}`);
     
@@ -105,7 +104,7 @@ exports.handler = async (event) => {
         };
     }
 
-    if (!packageMetadata || !packageMetadata.S3Location) {
+    if (!packageMetadata || !packageMetadata.packageS3Url) {
         console.error('S3 URL not found in package metadata:', packageMetadata);
         return {
             statusCode: 404,
@@ -117,7 +116,7 @@ exports.handler = async (event) => {
         };
     }
 
-    const url = packageMetadata.URL;
+    const url = packageMetadata.pkgURL;
     console.log("Url: ", url);
     let urlData = [];
     let packageData = [];
@@ -162,7 +161,6 @@ exports.handler = async (event) => {
     try {
         await updateDynamoDBItem(packageId, netScore, busFactor, correctness, goodPinningPractice, licenseScore, pullRequest, rampUp, responsiveMaintainer);
         console.log('Package metric score updated successfully')
-
 
         return {
             statusCode: 200,
