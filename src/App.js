@@ -122,27 +122,20 @@ function App() {
       }
     }
 
-    console.log('Request Body:', body);
-    const response = await API.put('phase2api', '/authenticate', {
-      headers: {
-        'Content-Type': 'application/json'
+    try{
+      const response = await API.put('phase2api', '/authenticate', {
+        headers: {
+          'Content-Type': 'application/json'
         },
-      body: JSON.stringify(body)
-    }); 
-    console.log(response);
-
-    if(response.statusCode === 200){
-      const responseBody = JSON.parse(response.body);
-      if(responseBody){
-        globalAuth = responseBody;
-        alert('Authentication token Generated');
-      }
-      else{
-        alert('Authentication token not Generated');
-        console.error('Authentication token not Generated');
-      }
+        body: body
+      });
+      
+      globalAuth = response;
+      alert("Token Generated!");
+    }catch(err){
+      console.error(err);
+      alert("Authentication Failed");
     }
-
   };
 
   // Function to retrieve a package by ID
@@ -538,23 +531,18 @@ const createingest = async () => {
 
   // Function to reset the registry
   const resetRegistry = async () => {
+    alert('Resetting registry.')
     try {
       const response = await API.del('phase2api', '/reset', {
         headers: {
-          'Content-Type': 'application/json',
           'X-Authorization': globalAuth
         },
       });
       console.log(response);
-      if(response.statusCode === 200){
-        alert('Registry reset successfully!');
-      }
-      else{
-        alert('Registry reset failed');
-      }
+      alert('Registry reset success!')
     } catch (error) {
       console.error(error);
-      alert('Registry reset failed');
+      alert('Registry reset failed.');
     }
   };
 

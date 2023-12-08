@@ -141,8 +141,8 @@ exports.handler = async (event) => {
 
     //retrieve username and password
     try{
-        console.log(body.User.name, body.Secret.password, body.User.isAdmin);
-
+        console.log("Info: ", body.User.name, body.Secret.password, body.User.isAdmin);
+        console.log("Types: ", typeof body.User.name, typeof body.Secret.password, typeof body.User.isAdmin);
         username = body.User.name;
         password = body.Secret.password;
         isAdminInput = body.User.isAdmin;
@@ -150,7 +150,7 @@ exports.handler = async (event) => {
         if(typeof isAdminInput === 'boolean'){
             isAdmin = isAdminInput
         }
-        else if (typeof value === 'string'){
+        else if (typeof isAdminInput === 'string'){
             isAdmin = (isAdminInput.toLowerCase() === 'true');
         }
         else{
@@ -166,18 +166,6 @@ exports.handler = async (event) => {
                 "Access-Control-Allow-Headers": "*",
             },
             body: JSON.stringify({ message: 'Invalid Input Structure' }),
-        };
-    }
-
-    if (!username || !password || isAdmin === null) {
-        console.log("Input Missing")
-        return {
-            statusCode: 400,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "*",
-            },
-            body: JSON.stringify({ message: 'Missing Inputs' }),
         };
     }
 
@@ -263,7 +251,7 @@ exports.handler = async (event) => {
     // Update the DynamoDB item with the package rating
     try {
         await setTokenInDB(username, auth_token);
-        console.log('AuthToken generated')
+        console.log('AuthToken generated: ', auth_token);
 
         return {
             statusCode: 200,

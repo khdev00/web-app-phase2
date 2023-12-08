@@ -105,7 +105,7 @@ exports.handler = async (event) => {
         };
     }
 
-    if (!packageMetadata || !packageMetadata.S3Location) {
+    if (!packageMetadata || !packageMetadata.packageS3Url) {
         console.error('S3 URL not found in package metadata:', packageMetadata);
         return {
             statusCode: 404,
@@ -117,7 +117,7 @@ exports.handler = async (event) => {
         };
     }
 
-    const url = packageMetadata.URL;
+    const url = packageMetadata.pkgURL;
     console.log("Url: ", url);
     let urlData = [];
     let packageData = [];
