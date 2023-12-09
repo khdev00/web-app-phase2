@@ -81,7 +81,7 @@
         },
         "deletePackageByIDVersion": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/deletePackageByIDVersion-4c34304d4e6577314453-build.zip"
+          "s3Key": "amplify-builds/deletePackageByIDVersion-2f796a7a343155756c50-build.zip"
         },
         "deleteAllByName": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -105,7 +105,7 @@
         },
         "createinjest": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/createinjest-7649576d43762b525468-build.zip"
+          "s3Key": "amplify-builds/createinjest-31542f59794c6b4c3350-build.zip"
         }
       }
     }

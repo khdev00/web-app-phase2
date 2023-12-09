@@ -381,6 +381,7 @@ function calculateAllMetrics(urlObjs) {
         });
     });
 }
+exports.calculateAllMetrics = calculateAllMetrics;
 // Asynchronous function to fetch URLs from a given file path.
 function fetchUrlsFromFile(filePath) {
     return __awaiter(this, void 0, void 0, function () {
