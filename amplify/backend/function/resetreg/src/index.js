@@ -13,6 +13,29 @@ const { SecretsManagerClient, GetSecretValueCommand, } = require("@aws-sdk/clien
 
 const secret_name = "JWT_SECRET_KEY";
 
+const pkgTableGSI = {
+    IndexName: 'pkgName-index',
+    KeySchema: [
+        {
+            AttributeName: 'pkgName', // Replace with the correct attribute name for GSI
+            KeyType: 'HASH', // or 'RANGE' depending on your GSI configuration
+        },
+    ],
+    Projection: {
+        ProjectionType: 'ALL', // or 'KEYS_ONLY' or 'INCLUDE' based on your needs
+    },
+    ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5,
+    },
+    AttributeDefinitions: [
+        {
+            AttributeName: 'pkgName', // Replace with the correct attribute name for GSI
+            AttributeType: 'S', // 'S' for string, 'N' for number, etc.
+        },
+    ],
+};
+
 async function validateToken(auth_token, secret) {
     try{
         if(auth_token && auth_token.includes('"')){
@@ -147,7 +170,7 @@ const deleteTable = async (tableName) => {
     }
 };
   
-const createTable = async (tableName, keyName) => {
+const createTable = async (tableName, keyName, gsi) => {
     const params = {
         AttributeDefinitions: [
             {
@@ -167,6 +190,9 @@ const createTable = async (tableName, keyName) => {
         },
         TableName: tableName,
     };
+
+    params.GlobalSecondaryIndexes = [gsi];
+    params.AttributeDefinitions.push(...gsi.AttributeDefinitions);
 
     //create table with given parameters
     try {
@@ -294,7 +320,7 @@ exports.handler = async (event, context) => {
         await createTable(userTable, 'username');
         //reset package table
         await deleteTable(pkgTable);
-        await createTable(pkgTable, 'pkgID');
+        await createTable(pkgTable, 'pkgID', pkgTableGSI);
 
     }catch(err){
         console.log("Error: ", err);

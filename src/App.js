@@ -800,6 +800,7 @@ const createingest = async () => {
         </section>
     
         {/* Package retrieval by name */}
+        {/*
         <section aria-labelledby="retrieve-by-name-section">
           <fieldset> 
             <legend>Retrieve Package by Name</legend>
@@ -809,6 +810,7 @@ const createingest = async () => {
             <button onClick={retrievePackageByName}>Retrieve Package</button>
           </fieldset>
         </section>
+        */}
     
         {/* Package retrieval by Regex */}
         <section aria-labelledby="retrieve-by-regex">
