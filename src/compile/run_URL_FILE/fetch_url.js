@@ -54,7 +54,6 @@ var axios = require('axios'); // Library to conveniently send HTTP requests to i
 var ndjson = require('ndjson');
 var fs = require('fs'); // Node.js file system module for cloning repos
 var path = require('path');
-var http = require("isomorphic-git/http/node");
 // For cloning repo
 var BlueBirdPromise = require('bluebird');
 var tar = require('tar');
@@ -466,6 +465,7 @@ function fetchUrlData(url) {
                     if (githubDetails) {
                         packageOwner = githubDetails.owner;
                         packageName = githubDetails.name;
+                        line = githubDetails.repositoryUrl;
                     }
                     return [3 /*break*/, 3];
                 case 2:
@@ -480,7 +480,7 @@ function fetchUrlData(url) {
                     urls.push(urlObj);
                     return [3 /*break*/, 5];
                 case 4:
-                    console.log("Invalid URL format: ".concat(line));
+                    console.error("Invalid URL format: ".concat(line));
                     _a.label = 5;
                 case 5: return [2 /*return*/, urls];
                 case 6:
@@ -509,7 +509,7 @@ function getGithubDetailsFromNpm(npmUrl) {
                         parts = repositoryUrl.split('/');
                         name_1 = parts[parts.length - 1].replace('.git', '');
                         owner = parts[parts.length - 2];
-                        return [2 /*return*/, { name: name_1, owner: owner }];
+                        return [2 /*return*/, { name: name_1, owner: owner, repositoryUrl: repositoryUrl }];
                     }
                     return [3 /*break*/, 3];
                 case 2:

@@ -9,8 +9,6 @@ const axios = require('axios'); // Library to conveniently send HTTP requests to
 const ndjson = require('ndjson');
 const fs = require('fs'); // Node.js file system module for cloning repos
 const path = require('path');
-const http = require("isomorphic-git/http/node");
-
 
 // For cloning repo
 const BlueBirdPromise = require('bluebird')
@@ -359,7 +357,7 @@ export async function fetchUrlsFromFile(filePath: string) {
 export async function fetchUrlData(url: string) {
     try {
         const urls: Url[] = [];
-        const line: string = url.trim();
+        let line: string = url.trim();
 
         if ((line.startsWith('http') || line.startsWith('www')) && (line.includes('npmjs.com') || line.includes('github.com'))) {
             let packageName = '';
@@ -374,6 +372,7 @@ export async function fetchUrlData(url: string) {
                 if (githubDetails) {
                     packageOwner = githubDetails.owner;
                     packageName = githubDetails.name;
+                    line = githubDetails.repositoryUrl;
                 }
             } else if (line.includes('github.com')) {
                 const parts = line.split('/');
@@ -384,7 +383,7 @@ export async function fetchUrlData(url: string) {
             const urlObj = new Url(line, packageName, packageOwner);
             urls.push(urlObj);
         } else {
-            console.log(`Invalid URL format: ${line}`);
+            console.error(`Invalid URL format: ${line}`);
         }
 
         return urls;
@@ -409,7 +408,7 @@ export async function getGithubDetailsFromNpm(npmUrl: string) {
       const parts = repositoryUrl.split('/');
       const name = parts[parts.length - 1].replace('.git', '');
       const owner = parts[parts.length - 2];
-      return { name, owner };
+      return { name, owner, repositoryUrl };
     }
   } 
   catch (error) {

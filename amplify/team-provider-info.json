@@ -37,7 +37,7 @@
       "function": {
         "auth": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/auth-554d7a73556e38504477-build.zip"
+          "s3Key": "amplify-builds/auth-33456962785832665756-build.zip"
         },
         "byID": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -49,11 +49,11 @@
         },
         "resetreg": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/resetreg-54314d32634964444e65-build.zip"
+          "s3Key": "amplify-builds/resetreg-4279346862756f545454-build.zip"
         },
         "byRegex": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/byRegex-4c496c4e3743434f4d4a-build.zip"
+          "s3Key": "amplify-builds/byRegex-764b306c6d444e433376-build.zip"
         },
         "create": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -65,7 +65,7 @@
         },
         "retrieveByID": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/retrieveByID-6d4b4a74556f6e4e4c2b-build.zip"
+          "s3Key": "amplify-builds/retrieveByID-374b476a2f70632b4d33-build.zip"
         },
         "updateVersion": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -73,7 +73,7 @@
         },
         "ratePackage": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/ratePackage-6f2b69636774457a3161-build.zip"
+          "s3Key": "amplify-builds/ratePackage-6b625a38766f314c7151-build.zip"
         },
         "retrievePackageByName": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -105,7 +105,7 @@
         },
         "createinjest": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/createinjest-6345565770486c39416f-build.zip"
+          "s3Key": "amplify-builds/createinjest-2b47735a534972636555-build.zip"
         }
       }
     }
