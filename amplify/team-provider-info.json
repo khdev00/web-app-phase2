@@ -49,7 +49,7 @@
         },
         "resetreg": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/resetreg-4279346862756f545454-build.zip"
+          "s3Key": "amplify-builds/resetreg-6e33524e685450575565-build.zip"
         },
         "byRegex": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -81,11 +81,11 @@
         },
         "deletePackageByIDVersion": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/deletePackageByIDVersion-4c34304d4e6577314453-build.zip"
+          "s3Key": "amplify-builds/deletePackageByIDVersion-2f796a7a343155756c50-build.zip"
         },
         "deleteAllByName": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/deleteAllByName-47757970774630546652-build.zip"
+          "s3Key": "amplify-builds/deleteAllByName-624d7350527764673074-build.zip"
         },
         "viewRegistry": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
@@ -105,7 +105,7 @@
         },
         "createinjest": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/createinjest-2b47735a534972636555-build.zip"
+          "s3Key": "amplify-builds/createinjest-2b4968572f522b646c74-build.zip"
         }
       }
     }

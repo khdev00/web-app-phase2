@@ -307,7 +307,7 @@ function cloneRepository(repoUrl, packageObj) {
         });
     });
 }
-function calculateAllMetrics(urlObjs) {
+function calculateAllMetrics(urlObjs, secret) {
     var _a, urlObjs_1, urlObjs_1_1;
     var _b, e_1, _c, _d;
     return __awaiter(this, void 0, void 0, function () {
@@ -325,7 +325,7 @@ function calculateAllMetrics(urlObjs) {
                                     _a = false;
                                     url = _d;
                                     packageObj = new Package;
-                                    return [4 /*yield*/, getPackageObject(url.getPackageOwner(), url.packageName, githubToken, packageObj)
+                                    return [4 /*yield*/, getPackageObject(url.getPackageOwner(), url.packageName, secret, packageObj)
                                             .then(function (returnedPackageObject) {
                                             packageObj = returnedPackageObject;
                                         })];

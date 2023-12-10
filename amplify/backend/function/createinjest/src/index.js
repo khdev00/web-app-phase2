@@ -234,9 +234,12 @@ exports.JSHandler = async (event, secret) => {
 }
 function isValidBase64(str) {
     try {
-        const decoded = Buffer.from(str, 'base64').toString('binary');
+        const decodedContent = Buffer.from(str, 'base64');
+        // print first 4 bytes of decoded content
+        console.log('First 4 bytes of decoded content:', decodedContent.slice(0, 5));
         // Additional check: validate if decoded content is a ZIP file (optional)
-        return Buffer.from(decoded, 'binary').toString('base64') === str;
+        return decodedContent.length >= 4 && decodedContent[0] === 0x50 && decodedContent[1] === 0x4B && 
+               decodedContent[2] === 0x03 && decodedContent[3] === 0x04; // PK 0x03 0x04 
     } catch (e) {
         return false;
     }
@@ -401,7 +404,7 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
     }catch(err){
         console.error("Error retrieving url data:", err);
         return {
-            statusCode: 500,
+            statusCode: 400,
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
@@ -468,8 +471,6 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
             body: JSON.stringify({ message: `Score ${key} is less than 0.5.`}),
         };
     }*/
-
-
 
     // Use a timestamp to create a unique file name
     const fileName = `package_${new Date().getTime()}.zip`;
