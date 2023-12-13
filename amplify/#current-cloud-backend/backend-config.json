@@ -28,6 +28,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "createUser": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "createinjest": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -39,6 +44,11 @@
       "service": "Lambda"
     },
     "deletePackageByIDVersion": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "deleteUser": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
@@ -159,6 +169,22 @@
         }
       ]
     },
+    "AMPLIFY_function_createUser_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createUser"
+        }
+      ]
+    },
+    "AMPLIFY_function_createUser_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createUser"
+        }
+      ]
+    },
     "AMPLIFY_function_create_deploymentBucketName": {
       "usedBy": [
         {
@@ -220,6 +246,22 @@
         {
           "category": "function",
           "resourceName": "deletePackageByIDVersion"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteUser_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteUser"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteUser_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteUser"
         }
       ]
     },

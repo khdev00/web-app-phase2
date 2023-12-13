@@ -158,7 +158,7 @@
         "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/auth-cloudformation-template.json",
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-          "s3Key": "amplify-builds/auth-33456962785832665756-build.zip",
+          "s3Key": "amplify-builds/auth-647a7a64727131716964-build.zip",
           "env": "phasetw"
         }
       }
@@ -346,6 +346,28 @@
         "Parameters": {
           "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
           "s3Key": "amplify-builds/viewRegistry-316635686c4a78554d39-build.zip",
+          "env": "phasetw"
+        }
+      }
+    },
+    "functioncreateUser": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/createUser-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/createUser-735130766f3169384936-build.zip",
+          "env": "phasetw"
+        }
+      }
+    },
+    "functiondeleteUser": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/deleteUser-cloudformation-template.json",
+        "Parameters": {
+          "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
+          "s3Key": "amplify-builds/deleteUser-764e794a5768664e6b79-build.zip",
           "env": "phasetw"
         }
       }

@@ -183,7 +183,7 @@ exports.handler = async (event) => {
         const data = await dynamoDb.getItem(params).promise();
         if(data.Item){
             userMetadata = data.Item;
-            storedAdmin = userMetadata.isAdmin;
+            storedAdmin = userMetadata.isAdmin.BOOL;
             storedHash = userMetadata.passHash.S;
         }
         else{
@@ -209,6 +209,8 @@ exports.handler = async (event) => {
         };
     }
 
+    console.log("Admin Perms: ", isAdmin, storedAdmin);
+    console.log("Admin Types: ", typeof isAdmin, typeof storedAdmin);
     if(isAdmin && !storedAdmin){
         console.log('Requested admin token for non-admin user');
         return {
