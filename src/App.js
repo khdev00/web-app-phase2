@@ -75,7 +75,12 @@ function App() {
   const packageIdInputForRetrieval = useRef(null);
   const packageIdInputForUpdate = useRef(null);
   const packageIdInputForRating = useRef(null);
-  const modalOpenerRef = useRef(null); // Define the ref
+  const modalOpenerRef = useRef(null);
+  const [downloadPackageId, setDownloadPackageId] = useState('');
+  const [isDownloadUrlAvailable, setIsDownloadUrlAvailable] = useState(false);
+  const [downloadUrlValidity, setDownloadUrlValidity] = useState(60); // URL is valid for 60 seconds
+  const [showDownloadButton, setShowDownloadButton] = useState(false);
+
   const packageIdInputForCreation = useRef(null);
   const packageIdInputForDeletion = useRef(null);
   const packageNameInputForRetrieval = useRef(null);
@@ -94,11 +99,16 @@ function App() {
   const passwordInput = useRef(null);
   const isAdminInput = useRef(null);
   const [currentRegex, setCurrentRegex] = useState('');
+  const intervalRef = useRef();
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current); // Clear interval on component unmount
+      }
+    };
+  }, []); // Empty dependency array, as useRef does not trigger re-renders
+  
   let globalAuth = null;
   // Function to create an authentication token
   const createAuthToken = async () => {
@@ -221,13 +231,7 @@ const updatePackageQueryInput = (field, value) => {
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (downloadUrlTimeout) {
-        clearTimeout(downloadUrlTimeout);
-      }
-    };
-  }, [downloadUrlTimeout]);
+  
 
   function calculatePopularityRating(weeklyDownloads, githubStars) {
     // Define the maximum expected values for normalization
@@ -245,7 +249,44 @@ const updatePackageQueryInput = (field, value) => {
     const score = combinedScore * 5;
     return parseFloat(score.toFixed(2));
   }
+ 
+  const handleDownloadRequest = async () => {
+    if (!downloadPackageId) {
+      alert('Please enter a Package ID to download.');
+      return;
+    }
   
+    try {
+      const response = await API.get('phase2api', `/download/${downloadPackageId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('Response:', response);
+
+      // Assuming response contains the download URL
+      const { downloadUrl } = response;
+      setDownloadUrl(downloadUrl);
+      setIsDownloadUrlAvailable(true);
+      setShowDownloadButton(true); // Show the download button
+
+      // Start a countdown
+      let countdown = 60;
+      intervalRef.current = setInterval(() => {
+        countdown -= 1;
+        setDownloadUrlValidity(countdown);
+        if (countdown <= 0) {
+          clearInterval(intervalRef.current);
+          setIsDownloadUrlAvailable(false);
+          setShowDownloadButton(false); // Hide the download button after timeout
+        }
+      }, 1000);
+  
+    } catch (error) {
+      console.error(error);
+      alert('Failed to retrieve download URL.');
+    }
+  };
   
   // Function to retrieve popularity rating
   const retrievePopularityRating = async () => {
@@ -341,136 +382,62 @@ const updatePackageQueryInput = (field, value) => {
   };
 
   // Function to ingest a package
-  const ingestPackage = async () => {
-    const packageContent = packageContentInputIngest.current.value;
-    const packageURL = packageURLInputIngest.current.value;
-    console.log(packageContent);
-    console.log(packageURL);
-    if (!packageURL || !packageContent) {
-      alert('Please enter all fields.');
+  
+
+  const createingest = async () => {
+    const Content = packageContentInputCreate.current.value;
+    const URL = packageURLInputCreate.current.value;
+
+    if ((Content && URL) || (!Content && !URL)) {
+      alert('Please provide either package content or a package URL, but not both.');
       return;
     }
 
+    let body = {};
+    let action = '';
+
+    if (Content) {
+      body = { Content };
+      action = 'Creating Package';
+    } else if (URL) {
+      body = { URL };
+      action = 'Ingesting Package';
+    }
+
+    alert(action);
+
     try {
-      const response = await API.put('phase2api', `/package/${packageURL}`, {});
+      console.log('Request Body:', body);
+      const response = await API.post('phase2api', `/package`, {
+        headers: {
+          'Content-Type': 'application/json',
+          // Add auth token 
+        },
+        body: JSON.stringify(body)
+      });
+
       console.log(response);
-      alert('Package ingested successfully!');
+      if (response.statusCode === 201) {
+        alert(`${action} successful`);
+      } else if (response.statusCode === 409) {
+        alert(`${action} failed. Package with same package ID already exists`);
+      } else if (response.statusCode === 404) {
+        alert(`${action} failed. Could not find package metadata, no package.json exists`);
+      } else if (response.statusCode === 500) {
+        alert(`${action} failed. Error: ${response.body}`);
+      } else if (response.statusCode === 400) {
+        alert(`${action} failed. Invalid Request, please ensure that the request body is valid or that the Auth token is valid`);
+      }
+      
     } catch (error) {
       console.error(error);
-      alert('Failed to ingest package.');
+      alert(`Failed to ${action.toLowerCase()}.`);
     }
   };
+
+
 
   
- // Function to create a package
-const createPackage = async () => {
-  const packageName = packageIdInputForCreation.current.value;
-  const packageVersion = packageVersionInput.current.value;
-  const packageContent = packageContentInputCreate.current.value;
-  const packageURL = packageURLInputCreate.current.value;
-
-  if (!packageName || !packageVersion || !packageContent || !packageURL) {
-    alert('Please enter all fields.');
-    return;
-  }
-
-  try {
-    const body = {
-      packageName: packageName,
-      packageVersion: packageVersion,
-      packageContent: packageContent,
-      packageURL: packageURL,
-      packageScore: "0"
-    };
-
-    console.log('Request Body:', body);
-    const response = await API.post('phase2api', `/package/${packageName}`, {
-
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      
-      body: JSON.stringify(body)
-    });
-    console.log(response);
-    alert('Package created successfully!');
-  } catch (error) {
-    console.error(error);
-    alert('Failed to create package.');
-  }
-};
-
-const createingest = async () => {
-  const Content = packageContentInputCreate.current.value;
-  const URL = packageURLInputCreate.current.value;
-
-  if ((Content && URL) || (!Content && !URL)) {
-    alert('Please provide either package content or a package URL, but not both.');
-    return;
-  }
-
-  let body = {};
-  let action = '';
-
-  if (Content) {
-    body = { Content };
-    action = 'Creating Package';
-  } else if (URL) {
-    body = { URL };
-    action = 'Ingesting Package';
-  }
-
-  alert(action);
-
-  try {
-    console.log('Request Body:', body);
-    const response = await API.post('phase2api', `/package`, {
-      headers: {
-        'Content-Type': 'application/json',
-        // Add auth token 
-      },
-      body: JSON.stringify(body)
-    });
-
-    console.log(response);
-    if (response.statusCode === 201) {
-      alert(`${action} successful`);
-    } else if (response.statusCode === 409) {
-      alert(`${action} failed. Package with same package ID already exists`);
-    } else if (response.statusCode === 404) {
-      alert(`${action} failed. Could not find package metadata, no package.json exists`);
-    } else if (response.statusCode === 500) {
-      alert(`${action} failed. Error: ${response.body}`);
-    } else if (response.statusCode === 400) {
-      alert(`${action} failed. Invalid Request, please ensure that the request body is valid or that the Auth token is valid`);
-    }
-    
-  } catch (error) {
-    console.error(error);
-    alert(`Failed to ${action.toLowerCase()}.`);
-  }
-};
-
-
-
-  // Function to retrieve a package by name
-  const retrievePackageByName = async () => {
-    const packageName = packageNameInputForRetrieval.current.value;
-    if (!packageName) {
-      alert('Please enter a Package Name.');
-      return;
-    }
-
-    try {
-      const response = await API.get('phase2api', `/package/byName/${packageName}`, {});
-      console.log(response);
-      alert('Package retrieved successfully!');
-    } catch (error) {
-      console.error(error);
-      alert('Failed to retrieve package.');
-    }
-  };
-
   const retrievePackageByRegex = async (token = null) => {
     const regexPattern = packageNameRegexInputForRetrieval.current.value;
     if (!regexPattern) {
@@ -512,43 +479,11 @@ const createingest = async () => {
 };
 
 
-  
-  
-
 
   // Load more button handler
   const handleLoadMoreRegexPackages = () => {
     retrievePackageByRegex(nextTokenRegex);
   };
-
-  // Function to view packages in the registry 
-  const viewPackages = async (token = null) => {
-    // Check if the token is provided, if not, reset packages array
-    if (token === null) {
-      setPackages([]);
-    }
-  
-    try {
-      const response = await API.get('phase2api', '/view', {
-        queryStringParameters: { nextToken: token }
-      });
-      const data = JSON.parse(response.body);
-      const packagesData = Array.isArray(data) ? data : data.items;
-      const newNextToken = data.nextToken;
-      console.log('Packages:', packagesData);
-      console.log('Next Token:', newNextToken);
-  
-      // Append new data to existing packages
-      setPackages(prevPackages => [...prevPackages, ...packagesData]);
-      // Update the nextToken
-      setNextToken(newNextToken);
-    } catch (error) {
-      console.error('Error fetching packages:', error);
-      alert('Failed to retrieve packages.');
-    }
-  };
-  
-  
 
   // Function to delete a specific version of a package
   const deletePackageVersion = async () => {
@@ -607,6 +542,9 @@ const createingest = async () => {
       alert('Registry reset failed');
     }
   };
+
+
+  
 
   // JSX rendering
   return (
@@ -697,51 +635,6 @@ const createingest = async () => {
         </fieldset>
         </section> 
     
-        {/* Download Button */}
-        {downloadUrl && (
-          <section aria-labelledby="download-package-section">
-          <fieldset>
-            <legend>Download Package</legend>
-            <h2 id="download-package-section">Download Package</h2>
-            <a href={downloadUrl} download>
-              <button>Download</button>
-            </a>
-          </fieldset>
-          </section>
-        )}
-    
-        {/* Button to open the modal */}
-        {/*
-        <section aria-labelledby="view-registry-section">
-        <fieldset>
-          <legend>View Registry</legend>
-          <h2 id="view-registry-section">View Registry</h2>
-          <button ref={modalOpenerRef} onClick={toggleModal}>View Registry</button>
-        */}
-        
-            {/* Modal for viewing packages */} 
-            {/*
-            <Modal isOpen={isModalOpen} onClose={toggleModal} openerRef={modalOpenerRef}>
-            <h2>Registry</h2>
-            <button onClick={() => viewPackages()}>Load Packages</button>
-            <div className="package-grid-container">
-            {packages.map((pkg, index) => (
-              <section className="package-section" key={index}>
-                <h3 className="package-section-header">Package Name: {pkg.Name}</h3>
-                <p className="package-details">Package ID: {pkg.ID}</p>
-                <p className="package-details">Version: {pkg.Version}</p>
-              </section>
-            ))}
-            </div>
-            {nextToken && (
-              <button onClick={() => viewPackages(nextToken)}>Load More</button>
-            )}
-          </Modal>
-        </fieldset>
-        </section>
-            */}
-        
-    
         {/* Package version update */}
         <section aria-labelledby='update-package-section'>
           <fieldset>
@@ -756,6 +649,20 @@ const createingest = async () => {
             <button onClick={updatePackageVersion}>Update Package Content</button>
           </fieldset>
         </section>
+
+
+        <section aria-labelledby="download-package-section">
+        <fieldset>
+          <legend>Download Package</legend>
+          <h2 id="download-package-section">Download Package</h2>
+          <label htmlFor="downloadPackageId">Package ID: </label>
+          <input type="text" value={downloadPackageId} onChange={(e) => setDownloadPackageId(e.target.value)} id="downloadPackageId" placeholder="Package ID" />
+          <button onClick={handleDownloadRequest}>Get Download Link</button>
+          {showDownloadButton && (
+            <button onClick={() => window.open(downloadUrl, "_blank")}>Download</button>
+          )}
+        </fieldset>
+      </section>
     
         {/* Package rating */}
         <section aria-labelledby="package-rating-section">
@@ -768,21 +675,7 @@ const createingest = async () => {
           </fieldset>
         </section>
     
-        {/* Package ingestion */}
-        {/*
-        <section aria-labelledby="package-ingestion-section">
-          <fieldset>
-            <legend>Ingest Package</legend>
-            <h2 id="package-ingestion-section">Ingest Package</h2>
-            <label htmlFor="ingestPackageContent">Package Content: </label>
-            <input type="text" ref={packageContentInputIngest} id="ingestPackageContent" placeholder="Package Content" />
-      
-            <label htmlFor="ingestPackageURL">Package URL: </label>
-            <input type="text" ref={packageURLInputIngest} id="ingestPackageURL" placeholder="Package URL" />
-            <button onClick={ingestPackage}>Ingest Package</button>
-          </fieldset>
-        </section>
-            */}
+        
         {/* Package creation */}
         <section aria-labelledby="package-creation-ingest-section">
           <fieldset>
@@ -799,18 +692,7 @@ const createingest = async () => {
           </fieldset>
         </section>
     
-        {/* Package retrieval by name */}
-        {/*
-        <section aria-labelledby="retrieve-by-name-section">
-          <fieldset> 
-            <legend>Retrieve Package by Name</legend>
-            <h2 id="retrieve-by-name-section">Retrieve Package by Name</h2>
-            <label htmlFor="retrieveByName">Package Name: </label>
-            <input type="text" ref={packageNameInputForRetrieval} id="retrieveByName" placeholder="Package Name" />
-            <button onClick={retrievePackageByName}>Retrieve Package</button>
-          </fieldset>
-        </section>
-        */}
+        
     
         {/* Package retrieval by Regex */}
         <section aria-labelledby="retrieve-by-regex">

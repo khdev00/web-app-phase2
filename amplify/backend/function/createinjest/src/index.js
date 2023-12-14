@@ -132,6 +132,12 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgra
         },
     };
 
+    // now we need to rate the package to see if it passes our checks.
+    // we need to get the package data from the url, and then calculate the metrics.
+    // we then need to update the dynamoDB with the metrics.
+    let urldata = await fetchUrlData(githubURL);
+    console.log("URL Data: ", urldata);
+
     try {
         await dynamoDb.put(dynamoParams).promise();
         console.log('DynamoDB update successful');
@@ -404,7 +410,7 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
     }catch(err){
         console.error("Error retrieving url data:", err);
         return {
-            statusCode: 500,
+            statusCode: 400,
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",

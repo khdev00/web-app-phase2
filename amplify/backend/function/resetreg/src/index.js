@@ -8,33 +8,10 @@ const userTable = 'phase2users';
 const pkgTable = 'pkgmetadata';
 const authTable = 'AuthTokens';
 const bucketName = 'packageregistry';
-const folderNames = ['gradedpackages', 'nongradedpackages'];
+const folderNames = ['packagecontent', 'gradedpackages', 'nongradedpackages'];
 const { SecretsManagerClient, GetSecretValueCommand, } = require("@aws-sdk/client-secrets-manager");
 
 const secret_name = "JWT_SECRET_KEY";
-
-const pkgTableGSI = {
-    IndexName: 'pkgName-index',
-    KeySchema: [
-        {
-            AttributeName: 'pkgName', // Replace with the correct attribute name for GSI
-            KeyType: 'HASH', // or 'RANGE' depending on your GSI configuration
-        },
-    ],
-    Projection: {
-        ProjectionType: 'ALL', // or 'KEYS_ONLY' or 'INCLUDE' based on your needs
-    },
-    ProvisionedThroughput: {
-        ReadCapacityUnits: 5,
-        WriteCapacityUnits: 5,
-    },
-    AttributeDefinitions: [
-        {
-            AttributeName: 'pkgName', // Replace with the correct attribute name for GSI
-            AttributeType: 'S', // 'S' for string, 'N' for number, etc.
-        },
-    ],
-};
 
 async function validateToken(auth_token, secret) {
     try{
@@ -103,7 +80,7 @@ async function validateToken(auth_token, secret) {
 
 const deleteS3 = async () => {
     // List all objects in the subfolder
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
         const listObjectsParams = {
             Bucket: bucketName,
             Prefix: folderNames[i],
@@ -157,7 +134,7 @@ const deleteTable = async (tableName) => {
 
             // If describeTable succeeds, the table still exists
             console.log(`Table ${tableName} still exists. Waiting for deletion...`);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
             // If describeTable fails, the table doesn't exist
             if (error.code === 'ResourceNotFoundException') {
@@ -170,7 +147,7 @@ const deleteTable = async (tableName) => {
     }
 };
   
-const createTable = async (tableName, keyName, gsi) => {
+const createTable = async (tableName, keyName) => {
     const params = {
         AttributeDefinitions: [
             {
@@ -191,8 +168,74 @@ const createTable = async (tableName, keyName, gsi) => {
         TableName: tableName,
     };
 
-    params.GlobalSecondaryIndexes = [gsi];
-    params.AttributeDefinitions.push(...gsi.AttributeDefinitions);
+    //create table with given parameters
+    try {
+        await dynamoDb.createTable(params).promise();
+    } catch (error) {
+        console.error(`Error creating table: ${error.message}`);
+    }
+
+    /*// Check if the table still exists
+    while (true) {
+        try {
+          const response = await dynamoDb.describeTable({ TableName: tableName }).promise();
+          console.log('Table status:', response.Table.TableStatus);
+    
+          if (response.Table.TableStatus === 'ACTIVE') {
+            console.log(`Table ${tableName} has been created successfully.`);
+            break;
+          }
+        } catch (error) {
+          if (error.code !== 'ResourceNotFoundException') {
+            console.error('Error:', error);
+            throw error;
+          }
+        }
+    
+        console.log(`Table ${tableName} not yet created. Waiting...`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }*/
+};
+
+const createTableWithGSI = async (tableName, keyName, gsiIndexName, gsiAttributeName) => {
+    const params = {
+        AttributeDefinitions: [
+            {
+                AttributeName: keyName,
+                AttributeType: 'S', // Assuming a string key, adjust if needed
+            },
+            {
+                AttributeName: gsiAttributeName,
+                AttributeType: 'S', // Assuming a string key, adjust if needed
+            },
+        ],
+        KeySchema: [
+            {
+                AttributeName: keyName,
+                KeyType: 'HASH', // Partition key
+            },
+        ],
+        ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5,
+        },
+        TableName: tableName,
+        GlobalSecondaryIndexes: [
+            {
+              IndexName: gsiIndexName,
+              KeySchema: [
+                { AttributeName: gsiAttributeName, KeyType: 'HASH' }, // HASH type for the GSI key
+              ],
+              Projection: {
+                ProjectionType: 'ALL', // adjust based on your projection needs
+              },
+              ProvisionedThroughput: {
+                ReadCapacityUnits: 5, // adjust based on your GSI read capacity needs
+                WriteCapacityUnits: 5, // adjust based on your GSI write capacity needs
+              },
+            },
+          ],
+    };
 
     //create table with given parameters
     try {
@@ -219,7 +262,7 @@ const createTable = async (tableName, keyName, gsi) => {
         }
     
         console.log(`Table ${tableName} not yet created. Waiting...`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 };
 
@@ -320,7 +363,7 @@ exports.handler = async (event, context) => {
         await createTable(userTable, 'username');
         //reset package table
         await deleteTable(pkgTable);
-        await createTable(pkgTable, 'pkgID', pkgTableGSI);
+        await createTableWithGSI(pkgTable, 'pkgID', 'pkgName-Index', 'pkgName');
 
     }catch(err){
         console.log("Error: ", err);
