@@ -9,7 +9,12 @@ const bucketName = 'packageregistry';
 const packageContentFolderName = 'packagecontent';
 
 exports.handler = async (event) => {
-    console.log('Event Body:', event.body);
+    //console.log('Event Body:', event.body);
+    console.log('Event Path Parameters:', event.pathParameters);
+    //console.log('Event Query String Parameters:', event.queryStringParameters);
+    console.log('Event Headers:', event.headers);
+    console.log('event id:', event.pathParameters.id); 
+
     
 
     if (!event.body) {
@@ -41,15 +46,16 @@ exports.handler = async (event) => {
             body: JSON.stringify({ message: 'Failed to parse JSON body' }),
         };
     }
-
+    const idfrombody = event.pathParameters.id; // added this recently
     const packageID = body.metadata.ID;
     const newContent = body.data.Content; // This is base64-encoded
+    
     console.log('Package ID:', packageID);
     console.log('New content:', newContent);
 
     const getParams = {
         TableName: tableName,
-        Key: { "pkgID": packageID }
+        Key: { "pkgID": idfrombody }
     };
 
     try {
@@ -62,6 +68,17 @@ exports.handler = async (event) => {
                     "Access-Control-Allow-Headers": "*",
                 },
                 body: JSON.stringify({ message: 'Package not found' }),
+            };
+        }
+
+        if (idfrombody !== `${body.metadata.Name}_${body.metadata.Version}`) { // changed packageID to idfrombody
+            return {
+                statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+                body: JSON.stringify({ message: 'Package ID and name_version do not match' }),
             };
         }
 

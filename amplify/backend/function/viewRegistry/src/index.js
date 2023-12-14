@@ -141,6 +141,9 @@ exports.handler = async (event) => {
         }));
 
         console.log('Filtered and Transformed Items:', transformedItems);
+        if (transformedItems.length > 10) {
+            return generateErrorResponse(413, 'Too many results. Please refine your search.');
+        }
         return generateSuccessResponse(transformedItems, data);
     } catch (error) {
         console.error('Error:', error);
@@ -149,18 +152,19 @@ exports.handler = async (event) => {
 };
 
 function generateSuccessResponse(items, data) {
-    const response = {
-        items: items,
-        nextToken: data.LastEvaluatedKey ? encodeURIComponent(JSON.stringify(data.LastEvaluatedKey)) : null
-    };
+    
+    let offset = data.LastEvaluatedKey ? encodeURIComponent(JSON.stringify(data.LastEvaluatedKey)) : null
+    let headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': '*',
+    }
+    if (offset) {
+        headers['offset'] = offset; 
+    }
     return {
         statusCode: 200,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': '*',
-            ...(response.nextToken && { 'nextToken': response.nextToken })
-        },
-        body: JSON.stringify(response)
+        headers: headers,
+        body: JSON.stringify(items)
     };
 }
 

@@ -182,7 +182,7 @@ const handlePackageQuery = async () => {
     const response = await API.post('phase2api', '/packages', {
       body: [query], // Ensure the body is sent as a JSON object
       headers: {
-        ...(nextQueryToken && { 'nextToken': nextQueryToken }),
+        ...(nextQueryToken && { 'offset': nextQueryToken }),
         'Content-Type': 'application/json' // Specify the content type as JSON
       },
     });
@@ -338,6 +338,8 @@ const updatePackageQueryInput = (field, value) => {
         // Construct the request body with only the necessary fields
         const body = {
             metadata: {
+                Name: packageId.split('_')[0],
+                Version: packageId.split('_')[1],
                 ID: packageId
                 // Other metadata fields are not set
             },

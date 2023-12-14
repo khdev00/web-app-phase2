@@ -68,26 +68,7 @@ async function validateToken(auth_token, secret) {
         const dynamoResult = await dynamoDb.updateItem(updateParams).promise();
         console.log('Update DynamoDB successful', dynamoResult);
 
-        const userLookup = {
-            TableName: userTable,
-            Key: {
-                "username": {S: dbUsername}
-            }
-        };
-
-        //attempt to find user data in database
-        let userData;
-        const userResponse = await dynamoDb.getItem(params).promise();
-        if(data.Item){
-            userData = {
-
-            }
-        }
-        else {
-            throw new Error('User Not Found');
-        }
-
-        return isAdmin;
+        return [isAdmin, dbUsername];
 
     } catch (err) {
         console.error('validation error: ', err);
@@ -97,8 +78,7 @@ async function validateToken(auth_token, secret) {
 
 exports.handler = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 2));
-    console.log('Context:', JSON.stringify(context, null, 2));
-
+    
     const client = new SecretsManagerClient({
         region: "us-east-2",
     });
@@ -149,7 +129,7 @@ exports.handler = async (event) => {
         };
     }
 
-    if (auth_token == null) {
+    if (auth_token === '' || auth_token === null) {
         return {
             statusCode: 400,
             headers: {
@@ -160,19 +140,9 @@ exports.handler = async (event) => {
         };
     }
 
+    let isAdmin, tokenUser;
     try{
-        const isAdmin = await validateToken(auth_token, secretKey);
-        if(isAdmin === false){
-            console.log('Invalid permissions');
-            return {
-                statusCode: 401,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Headers": "*",
-                },
-                body: JSON.stringify({ message: 'Invalid Permissions: requires admin' }),
-            };
-        }
+        [isAdmin, tokenUser] = await validateToken(auth_token, secretKey);
     }catch(authErr){
         console.error("Auth Error: ", authErr);
         return {
@@ -185,5 +155,118 @@ exports.handler = async (event) => {
         };
     }
 
+    if (!event.body) {
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Missing request body' }),
+        };
+    }
 
+    //this is just to handle AWS console test formatting
+    if (typeof event.body !== 'string') {
+        event.body = JSON.stringify(event.body);
+    }
+
+    // Try to parse the event.body
+    let body, username;
+    try {
+        body = JSON.parse(event.body);
+        console.log(body);
+    } catch (error) {
+        console.error("Error parsing JSON:", error);
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Failed to parse JSON body' }),
+        };
+    }
+
+    //retrieve username and password
+    try{
+        username = body.User.name;
+
+        if(!isAdmin && (username !== tokenUser)){
+            console.log("Error: Invalid permissions to delete user");
+            return {
+                statusCode: 401,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+                body: JSON.stringify({ message: 'Invalid permissions to delete user' }),
+            };
+        }
+    }catch(err){
+        console.log("Error: Invalid Input Structure error: ", err);
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Invalid Input Structure' }),
+        };
+    }
+
+    try{
+        // Check if the user exists before attempting to delete
+        const queryParams = {
+            TableName: userTable,
+            Key: {
+                "username": { S: username }
+            }
+        };
+
+        const queryResult = await dynamoDb.getItem(queryParams).promise();
+        if (!queryResult.Item) {
+            console.log("User Not Found");
+            return {
+                statusCode: 409,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+                body: JSON.stringify({ message: 'User Not Found' }),
+            };
+        }
+
+        //assign user parameters for deletion
+        const deleteParams = {
+            TableName: userTable,
+            Key: {
+                "username": {S: username}
+            }
+        };
+        // Perform the update operation
+        const dynamoResult = await dynamoDb.deleteItem(deleteParams).promise();
+        console.log('Delete User successful', dynamoResult);
+
+        //all checks and functions passed, return success
+        return {
+            statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'User Successfully Deleted' }),
+        };
+
+    }catch(err){
+        console.log("Error: could not delete user: ", err);
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Error deleting user' }),
+        };
+    }
 };
