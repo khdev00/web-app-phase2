@@ -26,7 +26,7 @@
         "Name": "auth-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole457d363c-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.092Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.665Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/auth-cloudformation-template.json",
         "logicalId": "functionauth"
@@ -35,9 +35,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/auth-46666968686a66456878-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:56:51.443Z",
+      "lastBuildTimeStamp": "2023-12-15T04:05:51.496Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:56:57.476Z",
+      "lastPackageTimeStamp": "2023-12-15T04:05:57.076Z",
       "distZipFilename": "auth-46666968686a66456878-build.zip",
       "lastPushDirHash": "jI6K8u70AZYdjlIAcurlmOaimr8="
     },
@@ -52,7 +52,7 @@
         "Name": "byID-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole8e635850-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.102Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.674Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/byID-cloudformation-template.json",
         "logicalId": "functionbyID"
@@ -61,9 +61,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/byID-5a724e5253314c4c364c-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:56:58.868Z",
+      "lastBuildTimeStamp": "2023-12-15T04:05:58.272Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:56:58.885Z",
+      "lastPackageTimeStamp": "2023-12-15T04:05:58.288Z",
       "distZipFilename": "byID-5a724e5253314c4c364c-build.zip",
       "lastPushDirHash": "V46N3U4GCQQF5/h0dB0OxBXL5JQ="
     },
@@ -78,7 +78,7 @@
         "Name": "byName-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole57e93709-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.118Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.687Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/byName-cloudformation-template.json",
         "logicalId": "functionbyName"
@@ -87,9 +87,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/byName-664b726e4b6a6b705039-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:56:59.384Z",
+      "lastBuildTimeStamp": "2023-12-15T04:05:58.773Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:56:59.397Z",
+      "lastPackageTimeStamp": "2023-12-15T04:05:58.785Z",
       "distZipFilename": "byName-664b726e4b6a6b705039-build.zip",
       "lastPushDirHash": "k7vOE8yqV2O876ea+JO0IzUc7Qo="
     },
@@ -105,7 +105,7 @@
         "Name": "byRegex-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRoleb805d7bd-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.136Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.699Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/byRegex-cloudformation-template.json",
         "logicalId": "functionbyRegex"
@@ -114,9 +114,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/byRegex-5772546d4c3759346b2b-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T07:27:34.755Z",
+      "lastBuildTimeStamp": "2023-12-15T04:06:00.355Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T07:27:46.866Z",
+      "lastPackageTimeStamp": "2023-12-15T04:06:02.341Z",
       "distZipFilename": "byRegex-5772546d4c3759346b2b-build.zip",
       "lastPushDirHash": "PIpC+F5jBdctfOXV9wEtqAT+Iwc="
     },
@@ -131,7 +131,7 @@
         "Name": "create-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRolee260f6f4-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.152Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.711Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/create-cloudformation-template.json",
         "logicalId": "functioncreate"
@@ -140,9 +140,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/create-33654c30496a74674b56-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:57:06.481Z",
+      "lastBuildTimeStamp": "2023-12-15T04:06:05.200Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:57:08.597Z",
+      "lastPackageTimeStamp": "2023-12-15T04:06:07.139Z",
       "distZipFilename": "create-33654c30496a74674b56-build.zip",
       "lastPushDirHash": "VhROCpZw0/guaHYDj8xBQclZGCM="
     },
@@ -157,7 +157,7 @@
         "Name": "createUser-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole332d4325-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.167Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.724Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/createUser-cloudformation-template.json",
         "logicalId": "functioncreateUser"
@@ -166,9 +166,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/createUser-594d654a4c7746746269-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T06:58:38.975Z",
+      "lastBuildTimeStamp": "2023-12-15T04:06:10.574Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T06:59:08.699Z",
+      "lastPackageTimeStamp": "2023-12-15T04:06:14.073Z",
       "distZipFilename": "createUser-594d654a4c7746746269-build.zip",
       "lastPushDirHash": "MIKOB1TDMua9lknuzPjxQMHNSjY="
     },
@@ -183,20 +183,20 @@
         "Name": "createinjest-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRoleec4a43c5-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.182Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:24.159Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/createinjest-cloudformation-template.json",
         "logicalId": "functioncreateinjest"
       },
+      "lastBuildTimeStamp": "2023-12-15T04:18:11.031Z",
+      "lastBuildType": "PROD",
+      "lastPackageTimeStamp": "2023-12-15T04:19:12.985Z",
+      "distZipFilename": "createinjest-6854696c63394a51566f-build.zip",
       "s3Bucket": {
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-        "s3Key": "amplify-builds/createinjest-78666f565a746a6d3134-build.zip"
+        "s3Key": "amplify-builds/createinjest-6854696c63394a51566f-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:57:23.829Z",
-      "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:57:31.041Z",
-      "distZipFilename": "createinjest-78666f565a746a6d3134-build.zip",
-      "lastPushDirHash": "hqyOBkpouZjG1sjaqnAfqy1v5bg="
+      "lastPushDirHash": "05iC/kdkz9rFB1BVCyJoFnwARlg="
     },
     "deleteAllByName": {
       "build": true,
@@ -209,7 +209,7 @@
         "Name": "deleteAllByName-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole3622f66d-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.197Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.748Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/deleteAllByName-cloudformation-template.json",
         "logicalId": "functiondeleteAllByName"
@@ -218,9 +218,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/deleteAllByName-624d7350527764673074-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:57:34.446Z",
+      "lastBuildTimeStamp": "2023-12-15T04:06:30.474Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:57:36.495Z",
+      "lastPackageTimeStamp": "2023-12-15T04:06:32.435Z",
       "distZipFilename": "deleteAllByName-624d7350527764673074-build.zip",
       "lastPushDirHash": "2eKt8D/vDlEtI0IHJTmo/ZnJtvg="
     },
@@ -235,7 +235,7 @@
         "Name": "deletePackageByIDVersion-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRoleb3db96bd-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.212Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.760Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/deletePackageByIDVersion-cloudformation-template.json",
         "logicalId": "functiondeletePackageByIDVersion"
@@ -244,9 +244,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/deletePackageByIDVersion-2f796a7a343155756c50-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:57:37.991Z",
+      "lastBuildTimeStamp": "2023-12-15T04:06:34.020Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:57:40.058Z",
+      "lastPackageTimeStamp": "2023-12-15T04:06:36.003Z",
       "distZipFilename": "deletePackageByIDVersion-2f796a7a343155756c50-build.zip",
       "lastPushDirHash": "/KqxZL8PAJAFEYepQ25nB4/aIqQ="
     },
@@ -261,7 +261,7 @@
         "Name": "deleteUser-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole46fabdd2-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.228Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.772Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/deleteUser-cloudformation-template.json",
         "logicalId": "functiondeleteUser"
@@ -270,9 +270,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/deleteUser-527a707a574545417136-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T06:43:34.287Z",
+      "lastBuildTimeStamp": "2023-12-15T04:06:39.543Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T06:43:40.701Z",
+      "lastPackageTimeStamp": "2023-12-15T04:06:44.614Z",
       "distZipFilename": "deleteUser-527a707a574545417136-build.zip",
       "lastPushDirHash": "YkaF8iCagoJEpEK4uXHzc79J8hI="
     },
@@ -287,7 +287,7 @@
         "Name": "downloadviaID-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole0554c21a-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.241Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.783Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/downloadviaID-cloudformation-template.json",
         "logicalId": "functiondownloadviaID"
@@ -296,9 +296,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/downloadviaID-5256564a767473693861-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:57:52.218Z",
+      "lastBuildTimeStamp": "2023-12-15T04:06:47.584Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:57:54.413Z",
+      "lastPackageTimeStamp": "2023-12-15T04:06:49.637Z",
       "distZipFilename": "downloadviaID-5256564a767473693861-build.zip",
       "lastPushDirHash": "6iNm6m3pUb7pg/v9wyB+NBEwyqQ="
     },
@@ -313,20 +313,20 @@
         "Name": "getPackageSize-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole2e6a7eb8-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.256Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.794Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/getPackageSize-cloudformation-template.json",
         "logicalId": "functiongetPackageSize"
       },
+      "lastBuildTimeStamp": "2023-12-15T04:06:51.289Z",
+      "lastBuildType": "PROD",
+      "lastPackageTimeStamp": "2023-12-15T04:06:51.585Z",
+      "distZipFilename": "getPackageSize-5173755a694235776b72-build.zip",
       "s3Bucket": {
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
-        "s3Key": "amplify-builds/getPackageSize-536a65644c7335464d73-build.zip"
+        "s3Key": "amplify-builds/getPackageSize-5173755a694235776b72-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:57:55.696Z",
-      "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:57:55.990Z",
-      "distZipFilename": "getPackageSize-536a65644c7335464d73-build.zip",
-      "lastPushDirHash": "e6NsmaYrHoBMxhiXdVhBbcjblfU="
+      "lastPushDirHash": "JHVGdaSqiuX7xf38HYLXpEj6VHQ="
     },
     "ingest": {
       "build": true,
@@ -339,7 +339,7 @@
         "Name": "ingest-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole358278fd-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.273Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.804Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/ingest-cloudformation-template.json",
         "logicalId": "functioningest"
@@ -348,9 +348,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/ingest-7a3041497a4a6a315272-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:57:59.651Z",
+      "lastBuildTimeStamp": "2023-12-15T04:06:54.993Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:58:03.995Z",
+      "lastPackageTimeStamp": "2023-12-15T04:06:58.727Z",
       "distZipFilename": "ingest-7a3041497a4a6a315272-build.zip",
       "lastPushDirHash": "FX0mvr5LA0eFanUN88LmIIQYvms="
     },
@@ -365,7 +365,7 @@
         "Name": "popularityrate-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole1d0d6098-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.288Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.815Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/popularityrate-cloudformation-template.json",
         "logicalId": "functionpopularityrate"
@@ -374,9 +374,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/popularityrate-534b4f7976386e584f68-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:58:05.069Z",
+      "lastBuildTimeStamp": "2023-12-15T04:06:59.775Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:58:05.187Z",
+      "lastPackageTimeStamp": "2023-12-15T04:06:59.883Z",
       "distZipFilename": "popularityrate-534b4f7976386e584f68-build.zip",
       "lastPushDirHash": "7QlsShiHRGUq6kjrWHIEiDo2YAc="
     },
@@ -391,7 +391,7 @@
         "Name": "popularityrating-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole58e649e3-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.302Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.826Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/popularityrating-cloudformation-template.json",
         "logicalId": "functionpopularityrating"
@@ -400,9 +400,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/popularityrating-6c4434382b4431492f52-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:58:05.818Z",
+      "lastBuildTimeStamp": "2023-12-15T04:07:00.547Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:58:05.930Z",
+      "lastPackageTimeStamp": "2023-12-15T04:07:00.654Z",
       "distZipFilename": "popularityrating-6c4434382b4431492f52-build.zip",
       "lastPushDirHash": "Wckkp522sk8AW3t6lZ3ONkCiI54="
     },
@@ -417,7 +417,7 @@
         "Name": "ratePackage-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole2f862361-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.315Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.837Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/ratePackage-cloudformation-template.json",
         "logicalId": "functionratePackage"
@@ -426,9 +426,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/ratePackage-6b625a38766f314c7151-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:58:11.360Z",
+      "lastBuildTimeStamp": "2023-12-15T04:07:05.570Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:58:17.885Z",
+      "lastPackageTimeStamp": "2023-12-15T04:07:11.763Z",
       "distZipFilename": "ratePackage-6b625a38766f314c7151-build.zip",
       "lastPushDirHash": "iKvSdl9koTrsZ+ILUzw0rrwWqFI="
     },
@@ -443,7 +443,7 @@
         "Name": "resetreg-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole9d38a699-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.327Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.848Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/resetreg-cloudformation-template.json",
         "logicalId": "functionresetreg"
@@ -452,9 +452,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/resetreg-4f554a70646952662f79-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:58:20.944Z",
+      "lastBuildTimeStamp": "2023-12-15T04:07:14.026Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:58:24.662Z",
+      "lastPackageTimeStamp": "2023-12-15T04:07:17.623Z",
       "distZipFilename": "resetreg-4f554a70646952662f79-build.zip",
       "lastPushDirHash": "2LqhtSPXtQl9lxW2wECuuDRHgy8="
     },
@@ -469,7 +469,7 @@
         "Name": "retrieveByID-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRolecdd8f79c-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.614Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.858Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/retrieveByID-cloudformation-template.json",
         "logicalId": "functionretrieveByID"
@@ -478,9 +478,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/retrieveByID-6c376d704d634b72326c-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T10:13:29.048Z",
+      "lastBuildTimeStamp": "2023-12-15T04:07:19.004Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T10:13:43.310Z",
+      "lastPackageTimeStamp": "2023-12-15T04:07:20.875Z",
       "distZipFilename": "retrieveByID-6c376d704d634b72326c-build.zip",
       "lastPushDirHash": "CZ0NyLv2UEtHsVIulidtvvtK5qs="
     },
@@ -495,7 +495,7 @@
         "Name": "retrievePackageByName-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole22865a85-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.351Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.869Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/retrievePackageByName-cloudformation-template.json",
         "logicalId": "functionretrievePackageByName"
@@ -504,9 +504,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/retrievePackageByName-502f437751736b65746c-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T02:58:29.183Z",
+      "lastBuildTimeStamp": "2023-12-15T04:07:21.913Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T02:58:29.196Z",
+      "lastPackageTimeStamp": "2023-12-15T04:07:21.924Z",
       "distZipFilename": "retrievePackageByName-502f437751736b65746c-build.zip",
       "lastPushDirHash": "S3VSifZuufIJcRrqMGHlpr87EJY="
     },
@@ -521,7 +521,7 @@
         "Name": "updateVersion-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole107b062d-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.364Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.879Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/updateVersion-cloudformation-template.json",
         "logicalId": "functionupdateVersion"
@@ -530,9 +530,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/updateVersion-6c796979635934525854-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T09:24:26.145Z",
+      "lastBuildTimeStamp": "2023-12-15T04:07:22.975Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T09:24:28.329Z",
+      "lastPackageTimeStamp": "2023-12-15T04:07:24.844Z",
       "distZipFilename": "updateVersion-6c796979635934525854-build.zip",
       "lastPushDirHash": "2SWn4Hd7JqVsmQVFXOJupgRbfHY="
     },
@@ -547,7 +547,7 @@
         "Name": "viewRegistry-phasetw",
         "LambdaExecutionRole": "phasetwoLambdaRole4c1a967b-phasetw"
       },
-      "lastPushTimeStamp": "2023-12-14T10:14:48.376Z",
+      "lastPushTimeStamp": "2023-12-15T04:20:23.890Z",
       "providerMetadata": {
         "s3TemplateURL": "https://s3.amazonaws.com/amplify-phasetwo-phasetw-132459-deployment/amplify-cfn-templates/function/viewRegistry-cloudformation-template.json",
         "logicalId": "functionviewRegistry"
@@ -556,9 +556,9 @@
         "deploymentBucketName": "amplify-phasetwo-phasetw-132459-deployment",
         "s3Key": "amplify-builds/viewRegistry-5a2b7747627436314838-build.zip"
       },
-      "lastBuildTimeStamp": "2023-12-14T07:25:22.890Z",
+      "lastBuildTimeStamp": "2023-12-15T04:07:27.827Z",
       "lastBuildType": "PROD",
-      "lastPackageTimeStamp": "2023-12-14T07:25:35.699Z",
+      "lastPackageTimeStamp": "2023-12-15T04:07:29.751Z",
       "distZipFilename": "viewRegistry-5a2b7747627436314838-build.zip",
       "lastPushDirHash": "GFA1Scp1oeyFLFKMu/qBQhEN9dM="
     }
