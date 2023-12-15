@@ -8,6 +8,8 @@
     "@types/aws-lambda": "^8.10.92"
   },
   "dependencies": {
-    "aws-sdk": "^2.1494.0"
+    "@aws-sdk/client-secrets-manager": "^3.451.0",
+    "aws-sdk": "^2.1511.0",
+    "jsonwebtoken": "^9.0.2"
   }
 }

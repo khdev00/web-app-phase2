@@ -417,6 +417,17 @@ exports.handler = async (event, context) => {
 
         await dynamoDb.putItem(params).promise();
 
+        const params2 = {
+            TableName: userTable,
+            Item: {
+              'username': { S: "TestUser1" },
+              'isAdmin': { BOOL: true },
+              'passHash': { S: "c669ebcc10ad2fdc08b5f688d0638f07905040d49e3fbfdc498775b3a2ea67f4" },
+            }
+        };
+
+        await dynamoDb.putItem(params2).promise();
+
     }catch(err){
         console.log("Error adding default user: ", err);
         return {

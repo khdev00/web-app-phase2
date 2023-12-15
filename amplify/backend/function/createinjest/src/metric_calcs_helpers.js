@@ -43,22 +43,28 @@ var axios = require('axios'); // Library to conveniently send HTTP requests to i
 var Octokit = require("@octokit/core").Octokit; // Make sure to install @octokit/core via npm
 function readReadmeFile(cloneDir) {
     return __awaiter(this, void 0, void 0, function () {
-        var readmePath, readmeContent;
+        var readmePath, readmePath2, readmeContent;
         return __generator(this, function (_a) {
             try {
-                readmePath = path.join(cloneDir, 'README.md');
+                readmePath = path.join(cloneDir, 'Readme.md');
+                readmePath2 = path.join(cloneDir, 'README.md');
                 if (fs.existsSync(readmePath)) {
                     readmeContent = fs.readFileSync(readmePath, 'utf-8');
-                    //console.log(`README Content:\n${readmeContent}`);
+                    //console.log("README Content: ".concat(readmeContent));
+                    return [2 /*return*/, readmeContent];
+                }
+                else if(fs.existsSync(readmePath2)){
+                    readmeContent = fs.readFileSync(readmePath2, 'utf-8');
+                    //console.log("README Content: ".concat(readmeContent));
                     return [2 /*return*/, readmeContent];
                 }
                 else {
-                    //console.log('README file not found in the repository.');
+                    console.log('README file not found in the repository.');
                     return [2 /*return*/, ''];
                 }
             }
             catch (error) {
-                //console.error('Error reading README file:', error);
+                console.log('Error reading README file: ', error);
                 return [2 /*return*/, ''];
             }
             return [2 /*return*/];

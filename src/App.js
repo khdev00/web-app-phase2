@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './App.css';
-import { Amplify, API } from 'aws-amplify';
+import { Amplify, API, Auth } from 'aws-amplify';
 import awsconfig from './aws-exports';
 import apiConfig from './apiconfig';
 Amplify.configure({
@@ -66,7 +66,7 @@ function App() {
   const [packageQuery, setPackageQuery] = useState({ name: '', version: '' });
   const [packageQueryResults, setPackageQueryResults] = useState([]);
   const [nextQueryToken, setNextQueryToken] = useState(null);
-  const [authToken, setAuthToken] = useState('');
+  
   const [packages, setPackages] = useState([]);
   const [packagesRegex, setPackagesRegex] = useState([]);
   const [nextToken, setNextToken] = useState(null);
@@ -101,6 +101,8 @@ function App() {
   const [currentRegex, setCurrentRegex] = useState('');
   const intervalRef = useRef();
 
+  const [authToken, setAuthToken] = useState(null); // Store the token in state
+
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
@@ -109,18 +111,22 @@ function App() {
     };
   }, []); // Empty dependency array, as useRef does not trigger re-renders
   
-  let globalAuth = null;
+ 
   // Function to create an authentication token
   const createAuthToken = async () => {
     const username = usernameInput.current.value;
     const password = passwordInput.current.value;
-    const isAdmin = isAdminInput.current.value;
-    if (!username || !password || !isAdmin) {
+    const isAdminString = isAdminInput.current.value.toLowerCase();
+    
+    // Check if isAdminString is either 'true' or 'false' and convert to boolean
+    const isAdmin = isAdminString === 'true';
+
+    if (!username || !password || isAdminString === '') {
       alert('Please enter a username, password, and admin status');
       return;
     }
 
-    if(isAdmin.toLowerCase() !== "true" && isAdmin.toLowerCase() !== "false"){
+    if(isAdminString !== "true" && isAdminString !== "false"){
       alert('Please enter valid admin status: true or false');
       return;
     }
@@ -128,35 +134,37 @@ function App() {
     const body = {
       User: {
         name: username,
-        isAdmin: isAdmin
+        isAdmin: isAdmin // Using boolean value directly
       },
       Secret: {
         password: password
       }
     }
 
-    console.log('Request Body:', body);
-    const response = await API.put('phase2api', '/authenticate', {
-      headers: {
-        'Content-Type': 'application/json'
+    const test_body = JSON.stringify(body);
+    console.log('test_body:', test_body);
+
+    console.log('body:', body);
+    console.log('password:', password);
+    
+
+    try {
+      const response = await API.put('phase2api', '/authenticate', {
+        headers: {
+          'Content-Type': 'application/json'
         },
-      body: JSON.stringify(body)
-    }); 
-    console.log(response);
-
-    if(response.statusCode === 200){
-      const responseBody = JSON.parse(response.body);
-      if(responseBody){
-        globalAuth = responseBody;
-        alert('Authentication token Generated');
-      }
-      else{
-        alert('Authentication token not Generated');
-        console.error('Authentication token not Generated');
-      }
+        body: body // Ensure proper JSON encoding
+      });
+      
+      
+      setAuthToken(response);
+      alert("Token Generated!");
+    } catch(err) {
+      console.error(err);
+      alert("Authentication Failed");
     }
-
   };
+
 
 
 const handlePackageQuery = async () => {
@@ -183,16 +191,17 @@ const handlePackageQuery = async () => {
       body: [query], // Ensure the body is sent as a JSON object
       headers: {
         ...(nextQueryToken && { 'offset': nextQueryToken }),
-        'Content-Type': 'application/json' // Specify the content type as JSON
+        'Content-Type': 'application/json', // Specify the content type as JSON
+        'X-Authorization': authToken
       },
     });
 
     // Process the response here
     console.log(response);
-    alert('Package query successful!');
+    alert('Package query successful! View Network for details');
   } catch (error) {
     console.error(error);
-    alert('Failed to query package.');
+    alert('Package query failed, please check the network for more details.');
   }
 };
   
@@ -220,7 +229,8 @@ const updatePackageQueryInput = (field, value) => {
     try {
       const response = await API.get('phase2api', `/package/${packageId}`, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Authorization': authToken
         },
       });
       console.log('response:', response);
@@ -352,7 +362,8 @@ const updatePackageQueryInput = (field, value) => {
         console.log('Request Body:', body);
         const response = await API.put('phase2api', `/package/${packageId}`, {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-Authorization': authToken
             },
             body: JSON.stringify(body)
         });
@@ -374,7 +385,12 @@ const updatePackageQueryInput = (field, value) => {
       return;
     }
     try {
-      const response = await API.get('phase2api', `/package/${packageId}/rate`, {});
+      const response = await API.get('phase2api', `/package/${packageId}/rate`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Authorization': authToken
+        },
+      });
       console.log(response);
       alert('Package rated successfully!');
     } catch (error) {
@@ -383,7 +399,7 @@ const updatePackageQueryInput = (field, value) => {
     }
   };
 
-  // Function to ingest a package
+  // Function to upload/ingest a package
   
 
   const createingest = async () => {
@@ -396,44 +412,43 @@ const updatePackageQueryInput = (field, value) => {
     }
 
     let body = {};
-    let action = '';
-
     if (Content) {
-      body = { Content };
-      action = 'Creating Package';
-    } else if (URL) {
-      body = { URL };
-      action = 'Ingesting Package';
+      body = {
+        Content: Content
+      };
+    } else {
+      body = {
+        URL: URL
+      };
     }
-
-    alert(action);
 
     try {
       console.log('Request Body:', body);
       const response = await API.post('phase2api', `/package`, {
         headers: {
           'Content-Type': 'application/json',
+          'X-Authorization': authToken
           // Add auth token 
         },
-        body: JSON.stringify(body)
+        body: body
       });
 
       console.log(response);
       if (response.statusCode === 201) {
-        alert(`${action} successful`);
+        alert(`successful`);
       } else if (response.statusCode === 409) {
-        alert(`${action} failed. Package with same package ID already exists`);
+        alert(`failed. Package with same package ID already exists`);
       } else if (response.statusCode === 404) {
-        alert(`${action} failed. Could not find package metadata, no package.json exists`);
+        alert(` failed. Could not find package metadata, no package.json exists`);
       } else if (response.statusCode === 500) {
-        alert(`${action} failed. Error: ${response.body}`);
+        alert(` failed. Error: ${response.body}`);
       } else if (response.statusCode === 400) {
-        alert(`${action} failed. Invalid Request, please ensure that the request body is valid or that the Auth token is valid`);
+        alert(` failed. Invalid Request, please ensure that the request body is valid or that the Auth token is valid`);
       }
       
     } catch (error) {
       console.error(error);
-      alert(`Failed to ${action.toLowerCase()}.`);
+      alert(`Failed to upload/ingest package.`);
     }
   };
 
@@ -457,12 +472,21 @@ const updatePackageQueryInput = (field, value) => {
         if (token) {
             queryParams.nextToken = token;
         }
+        let body = {
+          RegEx: regexPattern
+        }
   
-        const response = await API.get('phase2api', `/package/byRegEx`, {
-            queryStringParameters: queryParams
+        const response = await API.post('phase2api', `/package/byRegEx`, {
+           
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Authorization': authToken
+            },
+            body : body
         });
         const data = response; 
-        const newPackages = data.items || []; // Extract items from the response
+        console.log('Response:', data);
+        const newPackages = data || []; // Extract items from the response
         
         // Append only new packages to the existing list
         setPackagesRegex(prevPackages => {
@@ -473,19 +497,13 @@ const updatePackageQueryInput = (field, value) => {
 
         // Update nextToken for pagination
         setNextTokenRegex(data.nextToken);
-        console.log('nextToken:', data.nextToken);
+        
     } catch (error) {
         console.error(error);
-        alert('Failed to retrieve packages. Error: ' + error.response);
+        alert('Failed to retrieve packages.');
     }
 };
 
-
-
-  // Load more button handler
-  const handleLoadMoreRegexPackages = () => {
-    retrievePackageByRegex(nextTokenRegex);
-  };
 
   // Function to delete a specific version of a package
   const deletePackageVersion = async () => {
@@ -496,7 +514,11 @@ const updatePackageQueryInput = (field, value) => {
     }
 
     try {
-      const response = await API.del('phase2api', `/package/${packageId}`, {});
+      const response = await API.del('phase2api', `/package/${packageId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
       console.log(response);
       alert('Package version deleted successfully!');
     } catch (error) {
@@ -529,7 +551,7 @@ const updatePackageQueryInput = (field, value) => {
       const response = await API.del('phase2api', '/reset', {
         headers: {
           'Content-Type': 'application/json',
-          'X-Authorization': globalAuth
+          'X-Authorization': authToken
         },
       });
       console.log(response);

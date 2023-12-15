@@ -6,7 +6,7 @@ const s3 = new AWS.S3();
 
 const tableName = 'pkgmetadata';
 const bucketName = 'packageregistry';
-const indexName = 'pkgName-index';
+const indexName = 'pkgName-Index';
 
 exports.handler = async (event) => {
     console.log(`EVENT: ${JSON.stringify(event)}`);
