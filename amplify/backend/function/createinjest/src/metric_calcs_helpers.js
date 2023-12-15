@@ -49,16 +49,16 @@ function readReadmeFile(cloneDir) {
                 readmePath = path.join(cloneDir, 'README.md');
                 if (fs.existsSync(readmePath)) {
                     readmeContent = fs.readFileSync(readmePath, 'utf-8');
-                    //console.log(`README Content:\n${readmeContent}`);
+                    console.log(`README Content:\n${readmeContent}`);
                     return [2 /*return*/, readmeContent];
                 }
                 else {
-                    //console.log('README file not found in the repository.');
+                    console.log('README file not found in the repository.');
                     return [2 /*return*/, ''];
                 }
             }
             catch (error) {
-                //console.error('Error reading README file:', error);
+                console.log('Error reading README file: ',error);
                 return [2 /*return*/, ''];
             }
             return [2 /*return*/];

@@ -12,14 +12,14 @@ export async function readReadmeFile(cloneDir: string) {
         if (fs.existsSync(readmePath)) {
             // Read the README file content
             const readmeContent = fs.readFileSync(readmePath, 'utf-8');
-            //console.log(`README Content:\n${readmeContent}`);
+            console.log(`README Content: ${readmeContent}`);
             return readmeContent;
         } else {
-            //console.log('README file not found in the repository.');
+            console.log('README file not found in the repository.');
             return '';
         }
     } catch (error) {
-        //console.error('Error reading README file:', error);
+        console.log('Error reading README file: ',error);
         return '';
     }
 }

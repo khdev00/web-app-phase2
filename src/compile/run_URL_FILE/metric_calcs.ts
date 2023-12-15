@@ -180,7 +180,7 @@ export async function calculateResponsiveMaintainer(owner: string, packageName: 
 }
 
 export function calculateNetScore(packageObj: Package) {
-    let netScore = (0.4 * packageObj.responsiveMaintainer + 0.3 * packageObj.rampUp + 0.15 * packageObj.correctness + 0.1 * packageObj.busFactor + (0.025 * Number((packageObj.dependencies).toFixed(5))) + (0.025 * Number((packageObj.codeReview).toFixed(5)))) * Number(packageObj.hasLicense);
+    let netScore = (0.4 * packageObj.responsiveMaintainer + 0.3 * packageObj.rampUp + 0.15 * packageObj.correctness + 0.1 * packageObj.busFactor) * Number(packageObj.hasLicense);
     let roundedNetScore = Math.round(netScore * (10 ** rf)) / (10 ** rf);
 
     console.log(`Calculated net-score: ${roundedNetScore}, for package with URL: ${packageObj.url}`)

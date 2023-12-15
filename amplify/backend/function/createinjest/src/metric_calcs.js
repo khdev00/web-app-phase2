@@ -169,7 +169,8 @@ function calculateBusFactor(readmeLength, contributors) {
     }
     contributorsVal = (contributorsNum / 20 * 100) / 3 + 2 * contributorsVal / 3;
     // Bus factor is average of readmeVal and contributorVal
-    busFactorVal = ((readmeVal + contributorsVal) / 2) / 100;
+    console.log("ReadmeVal/ContributorsVal: ", readmeLength, contributors);
+    busFactorVal = ((readmeVal + 2*contributorsVal) / 3) / 100;
     // Rounds to rf decimal places without padding with 0s (rf defined globally)
     busFactorVal = Math.round(busFactorVal * (Math.pow(10, rf))) / (Math.pow(10, rf));
     console.log("Calculated bus factor of: ".concat(busFactorVal));
@@ -238,7 +239,7 @@ function calculateResponsiveMaintainer(owner, packageName, token) {
 }
 exports.calculateResponsiveMaintainer = calculateResponsiveMaintainer;
 function calculateNetScore(packageObj) {
-    var netScore = (0.4 * packageObj.responsiveMaintainer + 0.3 * packageObj.rampUp + 0.15 * packageObj.correctness + 0.1 * packageObj.busFactor + (0.025 * Number((packageObj.dependencies).toFixed(5))) + (0.025 * Number((packageObj.codeReview).toFixed(5)))) * Number(packageObj.hasLicense);
+    var netScore = (0.4 * packageObj.responsiveMaintainer + 0.3 * packageObj.rampUp + 0.15 * packageObj.correctness + 0.15 * packageObj.busFactor) * Number(packageObj.hasLicense);
     var roundedNetScore = Math.round(netScore * (Math.pow(10, rf))) / (Math.pow(10, rf));
     console.log("Calculated net-score: ".concat(roundedNetScore, ", for package with URL: ").concat(packageObj.url));
     return roundedNetScore;

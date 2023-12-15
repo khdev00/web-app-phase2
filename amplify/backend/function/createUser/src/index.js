@@ -8,6 +8,7 @@ const s3 = new AWS.S3();
 const userTable = 'phase2users';
 const authTable = 'AuthTokens';
 const { SecretsManagerClient, GetSecretValueCommand, } = require("@aws-sdk/client-secrets-manager");
+const { error } = require('console');
 
 const secret_name = "JWT_SECRET_KEY";
 
@@ -45,9 +46,9 @@ async function isStrongPassword(password) {
     }
   
     // Check if the password contains at least one special character or number
-  if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]|[0-9]/.test(password)) {
-    return false;
-  }
+    if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]|[0-9]/.test(password)) {
+        return false;
+    }
   
     // If all criteria are met, return true
     return true;
@@ -252,9 +253,13 @@ exports.handler = async (event) => {
         downloadAllow = await validateType(body.Permissions.download);
         searchAllow = await validateType(body.Permissions.search);
 
+        if(username === '' || password === ''){
+            throw new Error("username or password fields empty");
+        }
+
         //if the password is not strong, return "invalid" password
-        strongPassword = isStrongPassword(password);
-        if(!strongPassword || username == ''){
+        strongPassword = await isStrongPassword(password);
+        if(!strongPassword){
             console.log("Error: password is not strong enough, must be 8+ characters, contain a capital letter, and a special character/number");
             return {
                 statusCode: 401,
@@ -281,6 +286,27 @@ exports.handler = async (event) => {
     try{
         //get a hashed value for password
         const passwordHash = await generateHash(password);
+
+        // Check if the user exists before attempting to create
+        const queryParams = {
+            TableName: userTable,
+            Key: {
+                "username": { S: username }
+            }
+        };
+
+        const queryResult = await dynamoDb.getItem(queryParams).promise();
+        if (queryResult.Item) {
+            console.log("User already exists!");
+            return {
+                statusCode: 409,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+                body: JSON.stringify({ message: 'User already exists' }),
+            };
+        }
 
         //assign user parameters to upload
         const userParams = {

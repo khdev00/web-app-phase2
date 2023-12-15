@@ -186,7 +186,7 @@ function retrieveGithubKey() {
 // https://docs.github.com/en/rest/overview/endpoints-available-for-github-app-installation-access-tokens?apiVersion=2022-11-28
 function getPackageObject(owner, packageName, token, packageObj) {
     return __awaiter(this, void 0, void 0, function () {
-        var headers, responsiveMaintainer, dependencies, codeReview;
+        var headers, responsiveMaintainer;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -224,14 +224,6 @@ function getPackageObject(owner, packageName, token, packageObj) {
                 case 4:
                     responsiveMaintainer = _a.sent();
                     packageObj.setResponsiveMaintainer(responsiveMaintainer);
-                    return [4 /*yield*/, (0, metric_calcs_1.calculateDependency)(owner, packageName, token)];
-                case 5:
-                    dependencies = _a.sent();
-                    packageObj.setDependencies(dependencies); // <-- Add this line
-                    return [4 /*yield*/, (0, metric_calcs_1.calculateCodeReviewMetric)(owner, packageName, token)];
-                case 6:
-                    codeReview = _a.sent();
-                    packageObj.setCodeReview(codeReview);
                     return [2 /*return*/, packageObj];
             }
         });
@@ -307,7 +299,7 @@ function cloneRepository(repoUrl, packageObj) {
         });
     });
 }
-function calculateAllMetrics(urlObjs) {
+function calculateAllMetrics(urlObjs, secret) {
     var _a, urlObjs_1, urlObjs_1_1;
     var _b, e_1, _c, _d;
     return __awaiter(this, void 0, void 0, function () {
@@ -325,7 +317,7 @@ function calculateAllMetrics(urlObjs) {
                                     _a = false;
                                     url = _d;
                                     packageObj = new Package;
-                                    return [4 /*yield*/, getPackageObject(url.getPackageOwner(), url.packageName, githubToken, packageObj)
+                                    return [4 /*yield*/, getPackageObject(url.getPackageOwner(), url.packageName, secret, packageObj)
                                             .then(function (returnedPackageObject) {
                                             packageObj = returnedPackageObject;
                                         })];
@@ -522,26 +514,6 @@ function getGithubDetailsFromNpm(npmUrl) {
     });
 }
 exports.getGithubDetailsFromNpm = getGithubDetailsFromNpm;
-function printAllMetrics(packages) {
-    for (var _i = 0, packages_1 = packages; _i < packages_1.length; _i++) {
-        var packageObj = packages_1[_i];
-        packageObj.printMetrics();
-    }
-}
-// Usage example
-var githubToken = retrieveGithubKey();
-// const exampleUrl = new Url("https://github.com/cloudinary/cloudinary_npm", "cloudinary_npm", "cloudinary");
-// const exampleUrl = new Url("https://github.com/mghera02/461Group2", "461Group2", "mghera02");
-// const exampleUrl = new Url("https://github.com/vishnumaiea/ptScheduler", "ptScheduler", "vishnumaiea");
-// let urlsFile = "./run_URL_FILE/urls.txt";
-var urlsFile = process.argv[2];
-var urlObjs = [];
-fetchUrlsFromFile(urlsFile).then(function (urls) {
-    urlObjs = urls;
-    calculateAllMetrics(urlObjs).then(function () {
-        printAllMetrics(packageObjs);
-    });
-});
 module.exports = {
     retrieveGithubKey: retrieveGithubKey,
     getPackageObject: getPackageObject,
@@ -552,4 +524,5 @@ module.exports = {
     getGithubDetailsFromNpm: getGithubDetailsFromNpm,
     calculateAllMetrics: calculateAllMetrics,
     fetchUrlsFromFile: fetchUrlsFromFile,
+    fetchUrlData: fetchUrlData
 };

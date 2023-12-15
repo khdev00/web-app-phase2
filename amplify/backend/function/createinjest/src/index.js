@@ -43,6 +43,7 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgra
             //console.log('packageJson:', packageJSONContent);
 
             const packageData = JSON.parse(packageJSONContent);
+            console.log("package.json: ",packageData)
             packageName = packageData.name;
             packageVersion = packageData.version;
             packageID = `${packageName}_${packageVersion}`;
@@ -131,6 +132,12 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgra
             JSProgram: JSProgram
         },
     };
+
+    // now we need to rate the package to see if it passes our checks.
+    // we need to get the package data from the url, and then calculate the metrics.
+    // we then need to update the dynamoDB with the metrics.
+    let urldata = await fetchUrlData(githubURL);
+    console.log("URL Data: ", urldata);
 
     try {
         await dynamoDb.put(dynamoParams).promise();
@@ -260,11 +267,12 @@ async function downloadAndEncodeRepoZip(repoUrlObj, secret) {
         //const response = await axios.get(`${repoUrl}/archive/master.zip`, { responseType: 'arraybuffer' , headers: {Authorization: `Bearer ${secret}`}});
         const owner = repoUrlObj.packageOwner;
         const repo = repoUrlObj.packageName;
-
-        const response = await octokit.repos.downloadZipballArchive({
-            owner,
-            repo,
-            ref: 'master',
+        const response = await octokit.request('GET /repos/{owner}/{repo}/zipball', {
+            owner: owner,
+            repo: repo,
+            mediaType: {
+                format: 'zipball',
+            },
         });
     
         const zipData = response.data;
@@ -274,7 +282,6 @@ async function downloadAndEncodeRepoZip(repoUrlObj, secret) {
 
         // Encode the Buffer to base64
         const base64Encoded = zipBuffer.toString('base64');
-        console.log('Base64 encoded content:', base64Encoded);
 
         if (!isValidBase64(base64Encoded)) {
             console.error('Invalid base64 content');
@@ -290,7 +297,7 @@ async function downloadAndEncodeRepoZip(repoUrlObj, secret) {
 
         return base64Encoded;
     } catch (error) {
-        console.error(error.message);
+        console.error("DownloadEncodeError: ",error);
     }
 }
 
@@ -389,6 +396,9 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
     // Event Body: {"packageContent": "", "packageURL": "www.google.com"}
      
     console.log('Event Body:', event.body);
+    if(typeof event.body !== 'string'){
+        event.body = JSON.stringify(event.body);
+    }
     let body = JSON.parse(event.body);
     const packageURL = body.URL;
 
@@ -402,7 +412,7 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
         packageContent = await downloadAndEncodeRepoZip(urlData[0], secret);
         decodedContent = Buffer.from(packageContent, 'base64');
     }catch(err){
-        console.error("Error retrieving url data:", err);
+        console.log("Error retrieving url data: ", err);
         return {
             statusCode: 400,
             headers: {
@@ -413,7 +423,7 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
         };
     }
 
-    /*try {
+    try {
         packageData = await calculateAllMetrics(urlData, secret);
     } catch (error) {
         console.error("Error calculating metrics:", error);
@@ -423,7 +433,7 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
             },
-            body: JSON.stringify({ message: 'Failed to calculate metrics' }),
+            body: JSON.stringify({ message: 'Failed to calculate metrics' })
         };
     }
 
@@ -434,9 +444,6 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
         { rampUp: packageData[0].rampUp },
         { responsiveMaintainer: packageData[0].responsiveMaintainer },
         { licenseScore: +packageData[0].hasLicense },
-        { goodPinningPractice: packageData[0].dependencies },
-        { pullRequest: packageData[0].codeReview },
-        { netScore: packageData[0].netScore }
     ];
     
     try{
@@ -459,7 +466,6 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
             }
         }
         console.log("package passed scoring check");
-        await updateDynamoDBRating(pkgID, metricScores);
     }catch(err){
         console.log("Metric update error: ", err)
         return {
@@ -470,9 +476,7 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
             },
             body: JSON.stringify({ message: `Score ${key} is less than 0.5.`}),
         };
-    }*/
-
-
+    }
 
     // Use a timestamp to create a unique file name
     const fileName = `package_${new Date().getTime()}.zip`;
@@ -571,10 +575,13 @@ exports.handler = async (event) => {
 
     let body;
     try {
-        body = JSON.parse(event.body);
-        if (typeof body === 'string') {
-            body = JSON.parse(body); // stringified twice
+        console.log("Body: ", event.body);
+
+        if (typeof event.body !== 'string') {
+            event.body = JSON.stringify(event.body); // stringified twice
         }
+
+        body = JSON.parse(event.body);
     } catch (error) {
         console.error("Error parsing JSON:", error);
         return {

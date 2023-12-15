@@ -53,6 +53,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "downloadviaID": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getPackageSize": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -262,6 +267,22 @@
         {
           "category": "function",
           "resourceName": "deleteUser"
+        }
+      ]
+    },
+    "AMPLIFY_function_downloadviaID_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "downloadviaID"
+        }
+      ]
+    },
+    "AMPLIFY_function_downloadviaID_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "downloadviaID"
         }
       ]
     },

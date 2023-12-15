@@ -32,7 +32,20 @@ exports.handler = async (event) => {
         };
         const data = await dynamoDb.get(params).promise();
         packageMetadata = data.Item;
+        console.log('Package metadata:', packageMetadata);
+        if (!packageMetadata) {
+            return {
+                statusCode: 404,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+                body: JSON.stringify({ message: 'Package metadata does not exist' }),
+            };
+        }
+
     } catch (dbError) {
+    
         console.error('DynamoDB Error:', dbError);
         return {
             statusCode: 500,
@@ -44,7 +57,7 @@ exports.handler = async (event) => {
         };
     }
 
-    if (!packageMetadata || !packageMetadata.contentS3Url) {
+    if (!packageMetadata.contentS3Url) {
         console.error('Content URL not found in package metadata:', packageMetadata);
         return {
             statusCode: 404,

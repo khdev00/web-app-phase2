@@ -214,12 +214,6 @@ async function getPackageObject(owner: string, packageName: string, token: strin
     const responsiveMaintainer = await calculateResponsiveMaintainer(owner, packageName, token);
     packageObj.setResponsiveMaintainer(responsiveMaintainer);
 
-    const dependencies = await calculateDependency(owner, packageName, token);  // <-- Add this line
-    packageObj.setDependencies(dependencies);  // <-- Add this line
-    
-    const codeReview = await calculateCodeReviewMetric(owner, packageName, token);
-    packageObj.setCodeReview(codeReview); 
-
     return packageObj;
 }
 
@@ -281,10 +275,10 @@ async function cloneRepository(repoUrl: string, packageObj: Package) {
     return packageObj;
 }
 
-async function calculateAllMetrics(urlObjs: Url[]) {
+async function calculateAllMetrics(urlObjs: Url[], secret: string) {
     for await(let url of urlObjs) {
         let packageObj = new Package;
-        await getPackageObject(url.getPackageOwner(), url.packageName, githubToken, packageObj)
+        await getPackageObject(url.getPackageOwner(), url.packageName, secret, packageObj)
             .then((returnedPackageObject) => {
                 packageObj = returnedPackageObject;
             })
@@ -376,6 +370,7 @@ export async function fetchUrlData(url: string) {
                 }
             } else if (line.includes('github.com')) {
                 const parts = line.split('/');
+                console.log("Parts: ", parts);
                 packageName = parts[parts.length - 1];
                 packageOwner = parts[parts.length - 2];
             }
@@ -417,31 +412,6 @@ export async function getGithubDetailsFromNpm(npmUrl: string) {
   }
 }
 
-function printAllMetrics(packages: Package[]) {
-    for (const packageObj of packages) {
-        packageObj.printMetrics();
-    }
-}
-  
-  
-// Usage example
-const  githubToken = retrieveGithubKey();
-// const exampleUrl = new Url("https://github.com/cloudinary/cloudinary_npm", "cloudinary_npm", "cloudinary");
-// const exampleUrl = new Url("https://github.com/mghera02/461Group2", "461Group2", "mghera02");
-// const exampleUrl = new Url("https://github.com/vishnumaiea/ptScheduler", "ptScheduler", "vishnumaiea");
-
-// let urlsFile = "./run_URL_FILE/urls.txt";
-let urlsFile = process.argv[2];
-let urlObjs : Url[] = [];
-
-fetchUrlsFromFile(urlsFile).then((urls) => {
-    urlObjs = urls
-    calculateAllMetrics(urlObjs).then (() => {
-        printAllMetrics(packageObjs);
-        
-    });
-});
-
 module.exports = {
     retrieveGithubKey,
     getPackageObject,
@@ -452,4 +422,5 @@ module.exports = {
     getGithubDetailsFromNpm,
     calculateAllMetrics,
     fetchUrlsFromFile,
+    fetchUrlData
 };

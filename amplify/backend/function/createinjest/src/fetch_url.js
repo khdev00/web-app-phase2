@@ -89,6 +89,7 @@ var Package = /** @class */ (function () {
         this.codeReview = codeReview;
     };
     Package.prototype.setReadmeLength = function (readmeLength) {
+        console.log("Length: ", readmeLength);
         this.readmeLength = readmeLength;
     };
     Package.prototype.setDependencies = function (dependencies) {
@@ -186,7 +187,7 @@ function retrieveGithubKey() {
 // https://docs.github.com/en/rest/overview/endpoints-available-for-github-app-installation-access-tokens?apiVersion=2022-11-28
 function getPackageObject(owner, packageName, token, packageObj) {
     return __awaiter(this, void 0, void 0, function () {
-        var headers, responsiveMaintainer, dependencies, codeReview;
+        var headers, responsiveMaintainer;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -224,14 +225,6 @@ function getPackageObject(owner, packageName, token, packageObj) {
                 case 4:
                     responsiveMaintainer = _a.sent();
                     packageObj.setResponsiveMaintainer(responsiveMaintainer);
-                    return [4 /*yield*/, (0, metric_calcs_1.calculateDependency)(owner, packageName, token)];
-                case 5:
-                    dependencies = _a.sent();
-                    packageObj.setDependencies(dependencies); // <-- Add this line
-                    return [4 /*yield*/, (0, metric_calcs_1.calculateCodeReviewMetric)(owner, packageName, token)];
-                case 6:
-                    codeReview = _a.sent();
-                    packageObj.setCodeReview(codeReview);
                     return [2 /*return*/, packageObj];
             }
         });
@@ -381,7 +374,6 @@ function calculateAllMetrics(urlObjs, secret) {
         });
     });
 }
-exports.calculateAllMetrics = calculateAllMetrics;
 // Asynchronous function to fetch URLs from a given file path.
 function fetchUrlsFromFile(filePath) {
     return __awaiter(this, void 0, void 0, function () {
@@ -454,6 +446,7 @@ function fetchUrlData(url) {
                     urls = [];
                     line = url.trim();
                     if (!((line.startsWith('http') || line.startsWith('www')) && (line.includes('npmjs.com') || line.includes('github.com')))) return [3 /*break*/, 4];
+                    console.log("Valid URL");
                     packageName = '';
                     packageOwner = '';
                     if (!line.includes('npmjs.com')) return [3 /*break*/, 2];
@@ -466,12 +459,16 @@ function fetchUrlData(url) {
                     if (githubDetails) {
                         packageOwner = githubDetails.owner;
                         packageName = githubDetails.name;
-                        line = githubDetails.repositoryUrl.replace(/^git\+/, '').replace(/\.git$/, '');
+                        line = githubDetails.repositoryUrl;
                     }
                     return [3 /*break*/, 3];
                 case 2:
                     if (line.includes('github.com')) {
                         parts = line.split('/');
+                        // Check if the last element is an empty string and remove it
+                        if (parts[parts.length - 1] === '') {
+                            parts.pop();
+                        }
                         packageName = parts[parts.length - 1];
                         packageOwner = parts[parts.length - 2];
                     }
@@ -523,12 +520,6 @@ function getGithubDetailsFromNpm(npmUrl) {
     });
 }
 exports.getGithubDetailsFromNpm = getGithubDetailsFromNpm;
-function printAllMetrics(packages) {
-    for (var _i = 0, packages_1 = packages; _i < packages_1.length; _i++) {
-        var packageObj = packages_1[_i];
-        packageObj.printMetrics();
-    }
-}
 module.exports = {
     retrieveGithubKey: retrieveGithubKey,
     getPackageObject: getPackageObject,
@@ -539,5 +530,5 @@ module.exports = {
     getGithubDetailsFromNpm: getGithubDetailsFromNpm,
     calculateAllMetrics: calculateAllMetrics,
     fetchUrlsFromFile: fetchUrlsFromFile,
-    fetchUrlData: fetchUrlData,
+    fetchUrlData: fetchUrlData
 };
