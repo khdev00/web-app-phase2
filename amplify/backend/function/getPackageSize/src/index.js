@@ -5,6 +5,10 @@ const s3 = new AWS.S3();
 const bucketName = 'packageregistry';
 const folderName = 'nongradedpackages';
 
+
+
+
+
 exports.handler = async (event) => {
     if (!event.body || typeof event.body !== 'string') {
         return {
@@ -17,7 +21,7 @@ exports.handler = async (event) => {
         };
     }
 
-    
+
     let body;
     try {
         body = JSON.parse(event.body);
@@ -32,10 +36,18 @@ exports.handler = async (event) => {
         };
     }
 
+
+
+
+    
     const packageName = body.packageName;
     const packageVersion = body.packageVersion;
     const packageID = packageName + packageVersion;
     const s3ObjectKey = `${folderName}/${packageName}/${packageVersion}/${packageName}-${packageVersion}.zip`;
+
+
+
+
 
     try {
         // Retrieve package size from S3
@@ -55,6 +67,7 @@ exports.handler = async (event) => {
     } catch (error) {
         console.error('Error:', error);
 
+
         return {
             statusCode: 500,
             headers: {
@@ -64,4 +77,5 @@ exports.handler = async (event) => {
             body: JSON.stringify({ message: 'Failed to retrieve package size' }),
         };
     }
+
 };
