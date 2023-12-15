@@ -49,7 +49,7 @@ function readReadmeFile(cloneDir) {
                 readmePath = path.join(cloneDir, 'README.md');
                 if (fs.existsSync(readmePath)) {
                     readmeContent = fs.readFileSync(readmePath, 'utf-8');
-                    console.log(`README Content:\n${readmeContent}`);
+                    console.log("README Content: ".concat(readmeContent));
                     return [2 /*return*/, readmeContent];
                 }
                 else {
@@ -58,7 +58,7 @@ function readReadmeFile(cloneDir) {
                 }
             }
             catch (error) {
-                console.log('Error reading README file: ',error);
+                console.log('Error reading README file: ', error);
                 return [2 /*return*/, ''];
             }
             return [2 /*return*/];

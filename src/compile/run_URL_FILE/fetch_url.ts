@@ -9,6 +9,7 @@ const axios = require('axios'); // Library to conveniently send HTTP requests to
 const ndjson = require('ndjson');
 const fs = require('fs'); // Node.js file system module for cloning repos
 const path = require('path');
+const { Octokit } = require("@octokit/core");  // Make sure to install @octokit/core via npm
 
 // For cloning repo
 const BlueBirdPromise = require('bluebird')
@@ -226,10 +227,31 @@ async function extractTarball(tarballPath: string, targetDir: string): Promise<v
     });
 }
 
-async function cloneRepository(repoUrl: string, packageObj: Package) {
+async function cloneRepository(repoUrl: string, packageObj: Package, secret: string, repo: string, owner: string) {
     packageObj.setURL(repoUrl);
     
-    try {
+    const octokit = new Octokit({
+        auth: `token ${secret}`, // Replace with your GitHub token
+    });
+
+    try{
+        // Fetch the README file from the GitHub repository
+        const response = await octokit.repos.getContent({
+            owner,
+            repo,
+            path: 'README.md', // assuming the README file is named README.md
+            headers: {
+            accept: 'application/vnd.github.v3.raw', // request raw content
+            },
+        });
+
+        // Calculate the character length
+        const characterLength = response.data.length;
+        packageObj.readmeLength = characterLength;
+    }catch(err){
+        console.log("README Error: ", err);
+    }
+    /*try {
         // Create a directory to clone the repository into
         const cloneDir = path.join(__dirname, 'temp');
         if (!fs.existsSync(cloneDir)) {
@@ -266,7 +288,7 @@ async function cloneRepository(repoUrl: string, packageObj: Package) {
     
     } catch (error) {
         //console.error('Error cloning repository:', error);
-    }
+    }*/
     
     packageObj.setBusFactor(calculateBusFactor(packageObj.readmeLength, packageObj.contributors));
     packageObj.setRampUp(calculateRampUp(packageObj.readmeLength));
@@ -290,7 +312,7 @@ async function calculateAllMetrics(urlObjs: Url[], secret: string) {
         let repoUrl = `https://github.com/${url.getPackageOwner()}/${url.packageName}`;
         let packageObj = packageObjs[idx++];
         return new Promise(resolve => {
-          cloneRepository(repoUrl, packageObj)
+          cloneRepository(repoUrl, packageObj, secret, url.getPackageName(), url.getPackageOwner())
           .then((response) => {
             resolve(response);
            });

@@ -12,9 +12,11 @@ const { Octokit } = require('@octokit/rest');
 const { SecretsManagerClient, GetSecretValueCommand, } = require("@aws-sdk/client-secrets-manager");
 
 const tableName = 'pkgmetadata';
+const userTable = 'phase2users';
 const bucketName = 'packageregistry';
 const folderName = 'nongradedpackages';
 const secret_name = "GITHUB_TOKEN";
+const jwt_secret = "JWT_SECRET_KEY"
 const contentfoldername = 'packagecontent'; //folder name for content, to avoid dynamo size limit. 
 
 const streamToString = (stream) =>
@@ -161,7 +163,71 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgra
     };
 };
 
+async function validateToken(auth_token, secret) {
+    try{
+        if(auth_token && auth_token.includes('"')){
+            auth_token = auth_token.replace(/"/g, '');
+        }
+        console.log("Token: ", auth_token)
+        const payload = jwt.verify(auth_token, secret);
+        const {username, isAdmin} = payload;
 
+        const params = {
+            TableName: authTable,
+            Key: {
+                "authToken": {S: auth_token}
+            }
+        };
+
+        //attempt to find token in database
+        let authData;
+        const data = await dynamoDb.getItem(params).promise();
+        if(data.Item){
+            authData = data.Item;
+        }
+        else {
+            console.error('token not found');
+            return false;
+        }
+
+        //make sure the token is valid for the user
+        const dbUsername = authData.username.S;
+        if(dbUsername !== username){
+            console.error('no user match');
+            return false;
+        }
+
+        //make sure the token has usages left
+        let usageLeft = authData.usages.N;
+        if(usageLeft > 0){
+            usageLeft -= 1;
+        }
+        else {
+            console.error('no API usage left');
+            return false;
+        }
+
+        const updateParams = {
+            TableName: authTable,
+            Key: {
+                "authToken": {S: auth_token}
+            },
+            UpdateExpression: "SET usages = :newUsage",
+            ExpressionAttributeValues: {
+                ":newUsage": {N: usageLeft.toString()}
+            },
+        };
+        // Perform the update operation
+        const dynamoResult = await dynamoDb.updateItem(updateParams).promise();
+        console.log('Update DynamoDB successful', dynamoResult);
+
+        return [isAdmin, username];
+
+    } catch (err) {
+        console.error('validation error: ', err);
+        throw new Error('Failed to validate token');
+    }
+}
   
 function extractGitHubURL(repository) {
     if (!repository) {
@@ -560,7 +626,7 @@ exports.handler = async (event) => {
     } catch (error) {
         console.error('Secrets Error:', error);
         return {
-            statusCode: 500,
+            statusCode: 400,
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
@@ -572,6 +638,98 @@ exports.handler = async (event) => {
     const secretString = response.SecretString;
     const secretObject = JSON.parse(secretString);
     const secret = secretObject.GITHUB_TOKEN;
+
+    //get JWT secret
+    try {
+        response = await client.send(
+            new GetSecretValueCommand({
+                SecretId: jwt_secret
+            })
+        );
+    } catch (error) {
+        console.error('Secrets Error:', error);
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Failed to retrieve JWT key' }),
+        };
+    }
+
+    const jwtString = response.SecretString;
+    const jwtObject = JSON.parse(jwtString);
+    const jwt_token = jwtObject.GITHUB_TOKEN;
+
+    let auth_token;
+    console.log("Headers: ", event.headers);
+    //retrieve authentication token
+    try{
+        if(event.headers['X-Authorization']){
+            auth_token = event.headers['X-Authorization'];
+        }
+        else if(event.headers['x-authorization']){
+            auth_token = event.headers['x-authorization'];
+        }
+    }catch(err){
+        console.error("Error: ", err)
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Invalid Authentication Token' }),
+        };
+    }
+
+    if (auth_token === '' || auth_token === null) {
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Authentication Token not provided' }),
+        };
+    }
+
+    let isAdmin, username;
+    try{
+        [isAdmin, username] = await validateToken(auth_token, secretKey);
+
+        const params = {
+            TableName: userTable,
+            Key: {
+                "username": {S: username}
+            }
+        };
+
+        const data = await dynamoDb.getItem(params).promise();
+        console.log("UserData: ", data);
+        if(isAdmin === false || data.uploadAllow === false){
+            console.log('Invalid permissions to create user');
+            return {
+                statusCode: 401,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+                body: JSON.stringify({ message: 'Invalid Permissions for user creation: requires admin' }),
+            };
+        }
+    }catch(authErr){
+        console.error("Auth Error: ", authErr);
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Validation of token failed' }),
+        };
+    }
 
     let body;
     try {
