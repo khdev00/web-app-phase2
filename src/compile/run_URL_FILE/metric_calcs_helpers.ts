@@ -7,8 +7,8 @@ import { Package } from './fetch_url'
 export async function readReadmeFile(cloneDir: string) {
     try {
         // Check if the README file exists in the cloned repository
-        const readmePath = path.join(cloneDir, 'README.md');
-
+        const readmePath = path.join(cloneDir, 'Readme.md');
+        console.log("Path: ",readmePath);
         if (fs.existsSync(readmePath)) {
             // Read the README file content
             const readmeContent = fs.readFileSync(readmePath, 'utf-8');
@@ -28,7 +28,7 @@ export async function calculateReviewedCodeFraction(owner: string, repo: string,
     const octokit = new Octokit({ auth: token });  
     try {
         const searchQuery = `repo:${owner}/${repo} is:pr is:merged`;
-        const searchUrl = `https://api.github.com/search/issues?q=${encodeURIComponent(searchQuery)}&per_page=100`;
+        const searchUrl = `https://api.github.com/search/issues?q=${encodeURIComponent(searchQuery)}&per_page=30`;
         const prData = await getAllPages(searchUrl, { Authorization: `Bearer ${token}` });
         let reviewedLOC = 0;
         let totalLOC = 0;
@@ -84,6 +84,9 @@ async function getAllPages(url: string, headers: any): Promise<any[]> {
         const linkHeader = response.headers.link;
         if (linkHeader && linkHeader.includes('rel="next"')) {
             page++;
+            if(page >= 2){
+                break;
+            }
         } else {
             break;
         }

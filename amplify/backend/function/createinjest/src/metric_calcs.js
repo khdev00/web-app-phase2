@@ -169,7 +169,7 @@ function calculateBusFactor(readmeLength, contributors) {
     }
     contributorsVal = (contributorsNum / 20 * 100) / 3 + 2 * contributorsVal / 3;
     // Bus factor is average of readmeVal and contributorVal
-    busFactorVal = ((readmeVal + 2*contributorsVal) / 3) / 100;
+    busFactorVal = ((readmeVal + contributorsVal) / 2) / 100;
     // Rounds to rf decimal places without padding with 0s (rf defined globally)
     busFactorVal = Math.round(busFactorVal * (Math.pow(10, rf))) / (Math.pow(10, rf));
     console.log("Calculated bus factor of: ".concat(busFactorVal));

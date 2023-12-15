@@ -215,6 +215,12 @@ async function getPackageObject(owner: string, packageName: string, token: strin
     const responsiveMaintainer = await calculateResponsiveMaintainer(owner, packageName, token);
     packageObj.setResponsiveMaintainer(responsiveMaintainer);
 
+    const dependencies = await calculateDependency(owner, packageName, token);  // <-- Add this line
+    packageObj.setDependencies(dependencies);  // <-- Add this line
+    
+    const codeReview = await calculateCodeReviewMetric(owner, packageName, token);
+    packageObj.setCodeReview(codeReview);
+
     return packageObj;
 }
 
@@ -230,7 +236,7 @@ async function extractTarball(tarballPath: string, targetDir: string): Promise<v
 async function cloneRepository(repoUrl: string, packageObj: Package, secret: string, repo: string, owner: string) {
     packageObj.setURL(repoUrl);
     
-    const octokit = new Octokit({
+    /*const octokit = new Octokit({
         auth: `token ${secret}`, // Replace with your GitHub token
     });
 
@@ -250,11 +256,12 @@ async function cloneRepository(repoUrl: string, packageObj: Package, secret: str
         packageObj.readmeLength = characterLength;
     }catch(err){
         console.log("README Error: ", err);
-    }
-    /*try {
+    }*/
+    try {
         // Create a directory to clone the repository into
-        const cloneDir = path.join(__dirname, 'temp');
+        const cloneDir = '/tmp';
         if (!fs.existsSync(cloneDir)) {
+            console.log("Created cloneDir");
             fs.mkdirSync(cloneDir);
         }
     
@@ -262,7 +269,7 @@ async function cloneRepository(repoUrl: string, packageObj: Package, secret: str
         const tarballUrl = `${repoUrl}/archive/master.tar.gz`;
     
         // Download the tarball to a temporary file
-        const tarballPath = path.join(__dirname, 'temp.tar.gz');
+        const tarballPath = path.join('/tmp', 'temp.tar.gz');
         const response = await axios.get(tarballUrl, { responseType: 'stream' });
         response.data.pipe(fs.createWriteStream(tarballPath));
     
@@ -280,15 +287,15 @@ async function cloneRepository(repoUrl: string, packageObj: Package, secret: str
         await readReadmeFile(cloneDir).then ((response) => {
             packageObj.setReadmeLength(String(response).length);
         });
-    
+        
+        console.log('Listing contents of /tmp:', fs.readdirSync('/tmp'));
+
         // Clean up the temporary tarball file
         fs.unlinkSync(tarballPath);
-
-        await fsExtra.remove(cloneDir);
     
     } catch (error) {
-        //console.error('Error cloning repository:', error);
-    }*/
+        console.error('Error cloning repository:', error);
+    }
     
     packageObj.setBusFactor(calculateBusFactor(packageObj.readmeLength, packageObj.contributors));
     packageObj.setRampUp(calculateRampUp(packageObj.readmeLength));

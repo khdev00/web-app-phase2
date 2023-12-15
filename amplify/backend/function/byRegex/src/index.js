@@ -75,7 +75,7 @@ exports.handler = async (event) => {
             console.log('Received data:', JSON.stringify(data));
 
             const filteredPackages = data.Items.filter(pkg => pkg.pkgName && regex.test(pkg.pkgName))
-                                               .map(pkg => ({ Name: pkg.pkgName, Version: pkg.pkgVersion, ID: pkg.pkgID }));
+                                               .map(pkg => ({ Name: pkg.pkgName, Version: pkg.pkgVersion }));
 
             matchedPackages = matchedPackages.concat(filteredPackages);
             console.log('Matched packages so far:', JSON.stringify(matchedPackages));
@@ -86,11 +86,21 @@ exports.handler = async (event) => {
             }
             params.ExclusiveStartKey = data.LastEvaluatedKey;
         } while (true);
-
+        const transformedresponse = matchedPackages.map(pkg => ({ Name: pkg.Name, Version: pkg.Version }));
+        if (transformedresponse.length === 0) {
+            return {
+                statusCode: 404,
+                headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*"},
+                body: JSON.stringify({ message: 'No packages found' })
+            };
+        }
+        console.log('Transformed response:', JSON.stringify(transformedresponse));
+        /*
         const response = {
             items: matchedPackages.slice(0, 10),
             nextToken: params.ExclusiveStartKey ? encodeURIComponent(JSON.stringify(params.ExclusiveStartKey)) : null
         };
+
         if (matchedPackages.length === 0) {
             return {
                 statusCode: 404,
@@ -100,10 +110,11 @@ exports.handler = async (event) => {
         }
 
         console.log('Response:', JSON.stringify(response));
+        */
         return {
             statusCode: 200,
             headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "*"},
-            body: JSON.stringify(response)
+            body: JSON.stringify(transformedresponse)
         };
     } catch (error) {
         console.error('Error occurred:', error);

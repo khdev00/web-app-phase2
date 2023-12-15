@@ -49,20 +49,19 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getGithubDetailsFromNpm = exports.fetchUrlData = exports.fetchUrlsFromFile = exports.Url = exports.Package = void 0;
-var axios = require("axios");
-//import { getLogger } from './logger';
-//import * as ndjson from 'ndjson';
-var ndjson = require("ndjson");
-var fs = require("fs");
-var path = require("path");
-var http = require("isomorphic-git/http/node");
+var dotenv = require('dotenv'); // For retrieving env variables
+var axios = require('axios'); // Library to conveniently send HTTP requests to interact with REST API
+var ndjson = require('ndjson');
+var fs = require('fs'); // Node.js file system module for cloning repos
+var path = require('path');
+var Octokit = require("@octokit/core").Octokit; // Make sure to install @octokit/core via npm
 // For cloning repo
 var BlueBirdPromise = require('bluebird');
 var tar = require('tar');
-var fsExtra = require("fs-extra");
 var packageObjs = [];
 var metric_calcs_1 = require("./metric_calcs");
 var metric_calcs_helpers_1 = require("./metric_calcs_helpers");
+dotenv.config();
 // This is what controlls the rounding for the metrics,
 // In class we were told to round to 5dp without padding with zeros
 // If that number changes, change this value. 
@@ -172,7 +171,7 @@ var Url = /** @class */ (function () {
 }());
 exports.Url = Url;
 function retrieveGithubKey() {
-    var githubApiKey = '';
+    var githubApiKey = "";
     if (!githubApiKey) {
         var error = new Error("GitHub API key not found in environment variables.");
         console.log(error);
@@ -250,7 +249,7 @@ function extractTarball(tarballPath, targetDir) {
         });
     });
 }
-function cloneRepository(repoUrl, packageObj) {
+function cloneRepository(repoUrl, packageObj, secret, repo, owner) {
     return __awaiter(this, void 0, void 0, function () {
         var cloneDir, tarballUrl, tarballPath, response_1, error_1;
         return __generator(this, function (_a) {
@@ -259,13 +258,14 @@ function cloneRepository(repoUrl, packageObj) {
                     packageObj.setURL(repoUrl);
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 7, , 8]);
-                    cloneDir = path.join(__dirname, 'temp');
+                    _a.trys.push([1, 6, , 7]);
+                    cloneDir = '/tmp';
                     if (!fs.existsSync(cloneDir)) {
+                        console.log("Created cloneDir");
                         fs.mkdirSync(cloneDir);
                     }
                     tarballUrl = "".concat(repoUrl, "/archive/master.tar.gz");
-                    tarballPath = path.join(__dirname, 'temp.tar.gz');
+                    tarballPath = path.join('/tmp', 'temp.tar.gz');
                     return [4 /*yield*/, axios.get(tarballUrl, { responseType: 'stream' })];
                 case 2:
                     response_1 = _a.sent();
@@ -290,16 +290,15 @@ function cloneRepository(repoUrl, packageObj) {
                     // Read and display the README file
                     // Get readme length
                     _a.sent();
+                    console.log('Listing contents of /tmp:', fs.readdirSync('/tmp'));
                     // Clean up the temporary tarball file
                     fs.unlinkSync(tarballPath);
-                    return [4 /*yield*/, fsExtra.remove(cloneDir)];
+                    return [3 /*break*/, 7];
                 case 6:
-                    _a.sent();
-                    return [3 /*break*/, 8];
-                case 7:
                     error_1 = _a.sent();
-                    return [3 /*break*/, 8];
-                case 8:
+                    console.error('Error cloning repository:', error_1);
+                    return [3 /*break*/, 7];
+                case 7:
                     packageObj.setBusFactor((0, metric_calcs_1.calculateBusFactor)(packageObj.readmeLength, packageObj.contributors));
                     packageObj.setRampUp((0, metric_calcs_1.calculateRampUp)(packageObj.readmeLength));
                     packageObj.setNetScore((0, metric_calcs_1.calculateNetScore)(packageObj));
@@ -308,18 +307,15 @@ function cloneRepository(repoUrl, packageObj) {
         });
     });
 }
-function calculateAllMetrics(urlObjs, githubToken) {
+function calculateAllMetrics(urlObjs, secret) {
     var _a, urlObjs_1, urlObjs_1_1;
     var _b, e_1, _c, _d;
     return __awaiter(this, void 0, void 0, function () {
-        var packageList, _loop_1, e_1_1, idx;
+        var _loop_1, e_1_1, idx;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
-                    packageList = [];
-                    _e.label = 1;
-                case 1:
-                    _e.trys.push([1, 7, 8, 13]);
+                    _e.trys.push([0, 6, 7, 12]);
                     _loop_1 = function () {
                         var url, packageObj;
                         return __generator(this, function (_f) {
@@ -329,53 +325,53 @@ function calculateAllMetrics(urlObjs, githubToken) {
                                     _a = false;
                                     url = _d;
                                     packageObj = new Package;
-                                    return [4 /*yield*/, getPackageObject(url.getPackageOwner(), url.packageName, githubToken, packageObj)
+                                    return [4 /*yield*/, getPackageObject(url.getPackageOwner(), url.packageName, secret, packageObj)
                                             .then(function (returnedPackageObject) {
                                             packageObj = returnedPackageObject;
                                         })];
                                 case 1:
                                     _f.sent();
-                                    packageList.push(packageObj);
+                                    packageObjs.push(packageObj);
                                     return [2 /*return*/];
                             }
                         });
                     };
                     _a = true, urlObjs_1 = __asyncValues(urlObjs);
-                    _e.label = 2;
-                case 2: return [4 /*yield*/, urlObjs_1.next()];
-                case 3:
-                    if (!(urlObjs_1_1 = _e.sent(), _b = urlObjs_1_1.done, !_b)) return [3 /*break*/, 6];
+                    _e.label = 1;
+                case 1: return [4 /*yield*/, urlObjs_1.next()];
+                case 2:
+                    if (!(urlObjs_1_1 = _e.sent(), _b = urlObjs_1_1.done, !_b)) return [3 /*break*/, 5];
                     return [5 /*yield**/, _loop_1()];
-                case 4:
+                case 3:
                     _e.sent();
-                    _e.label = 5;
-                case 5:
+                    _e.label = 4;
+                case 4:
                     _a = true;
-                    return [3 /*break*/, 2];
-                case 6: return [3 /*break*/, 13];
-                case 7:
+                    return [3 /*break*/, 1];
+                case 5: return [3 /*break*/, 12];
+                case 6:
                     e_1_1 = _e.sent();
                     e_1 = { error: e_1_1 };
-                    return [3 /*break*/, 13];
-                case 8:
-                    _e.trys.push([8, , 11, 12]);
-                    if (!(!_a && !_b && (_c = urlObjs_1.return))) return [3 /*break*/, 10];
+                    return [3 /*break*/, 12];
+                case 7:
+                    _e.trys.push([7, , 10, 11]);
+                    if (!(!_a && !_b && (_c = urlObjs_1.return))) return [3 /*break*/, 9];
                     return [4 /*yield*/, _c.call(urlObjs_1)];
-                case 9:
+                case 8:
                     _e.sent();
-                    _e.label = 10;
-                case 10: return [3 /*break*/, 12];
-                case 11:
+                    _e.label = 9;
+                case 9: return [3 /*break*/, 11];
+                case 10:
                     if (e_1) throw e_1.error;
                     return [7 /*endfinally*/];
-                case 12: return [7 /*endfinally*/];
-                case 13:
+                case 11: return [7 /*endfinally*/];
+                case 12:
                     idx = 0;
                     return [2 /*return*/, BlueBirdPromise.map(urlObjs, function (url) {
                             var repoUrl = "https://github.com/".concat(url.getPackageOwner(), "/").concat(url.packageName);
-                            var packageObj = packageList[idx++];
+                            var packageObj = packageObjs[idx++];
                             return new Promise(function (resolve) {
-                                cloneRepository(repoUrl, packageObj)
+                                cloneRepository(repoUrl, packageObj, secret, url.getPackageName(), url.getPackageOwner())
                                     .then(function (response) {
                                     resolve(response);
                                 });
@@ -447,7 +443,6 @@ function fetchUrlsFromFile(filePath) {
     });
 }
 exports.fetchUrlsFromFile = fetchUrlsFromFile;
-// Asynchronous function to fetch URLs from a given file path.
 function fetchUrlData(url) {
     return __awaiter(this, void 0, void 0, function () {
         var urls, line, packageName, packageOwner, parts, githubDetails, parts, urlObj, error_3;
@@ -470,11 +465,13 @@ function fetchUrlData(url) {
                     if (githubDetails) {
                         packageOwner = githubDetails.owner;
                         packageName = githubDetails.name;
+                        line = githubDetails.repositoryUrl;
                     }
                     return [3 /*break*/, 3];
                 case 2:
                     if (line.includes('github.com')) {
                         parts = line.split('/');
+                        console.log("Parts: ", parts);
                         packageName = parts[parts.length - 1];
                         packageOwner = parts[parts.length - 2];
                     }
@@ -484,7 +481,7 @@ function fetchUrlData(url) {
                     urls.push(urlObj);
                     return [3 /*break*/, 5];
                 case 4:
-                    console.log("Invalid URL format: ".concat(line));
+                    console.error("Invalid URL format: ".concat(line));
                     _a.label = 5;
                 case 5: return [2 /*return*/, urls];
                 case 6:
@@ -513,7 +510,7 @@ function getGithubDetailsFromNpm(npmUrl) {
                         parts = repositoryUrl.split('/');
                         name_1 = parts[parts.length - 1].replace('.git', '');
                         owner = parts[parts.length - 2];
-                        return [2 /*return*/, { name: name_1, owner: owner }];
+                        return [2 /*return*/, { name: name_1, owner: owner, repositoryUrl: repositoryUrl }];
                     }
                     return [3 /*break*/, 3];
                 case 2:
@@ -526,35 +523,15 @@ function getGithubDetailsFromNpm(npmUrl) {
     });
 }
 exports.getGithubDetailsFromNpm = getGithubDetailsFromNpm;
-function printAllMetrics(packages) {
-    for (var _i = 0, packages_1 = packages; _i < packages_1.length; _i++) {
-        var packageObj = packages_1[_i];
-        packageObj.printMetrics();
-    }
-}
-// Usage example
-//const  githubToken = retrieveGithubKey();
-// const exampleUrl = new Url("https://github.com/cloudinary/cloudinary_npm", "cloudinary_npm", "cloudinary");
-// const exampleUrl = new Url("https://github.com/mghera02/461Group2", "461Group2", "mghera02");
-// const exampleUrl = new Url("https://github.com/vishnumaiea/ptScheduler", "ptScheduler", "vishnumaiea");
-// let urlsFile = "./run_URL_FILE/urls.txt";
-var urlsFile = process.argv[2];
-var urlObjs = [];
-var sampleUrl = 'https://www.npmjs.com/package/express';
-/*fetchUrlData(sampleUrl).then((urls) => {
-    urlObjs = urls
-    calculateAllMetrics(urlObjs).then (result => {
-        printAllMetrics(result);
-    });
-});*/
 module.exports = {
     retrieveGithubKey: retrieveGithubKey,
     getPackageObject: getPackageObject,
     cloneRepository: cloneRepository,
+    //logger,
     Package: Package,
     Url: Url,
     getGithubDetailsFromNpm: getGithubDetailsFromNpm,
     calculateAllMetrics: calculateAllMetrics,
     fetchUrlsFromFile: fetchUrlsFromFile,
-    fetchUrlData: fetchUrlData,
+    fetchUrlData: fetchUrlData
 };

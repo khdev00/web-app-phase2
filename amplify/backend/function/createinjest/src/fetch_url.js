@@ -54,7 +54,7 @@ var axios = require('axios'); // Library to conveniently send HTTP requests to i
 var ndjson = require('ndjson');
 var fs = require('fs'); // Node.js file system module for cloning repos
 var path = require('path');
-var Octokit = require("@octokit/rest").Octokit; // Make sure to install @octokit/core via npm
+var Octokit = require("@octokit/core").Octokit; // Make sure to install @octokit/core via npm
 // For cloning repo
 var BlueBirdPromise = require('bluebird');
 var tar = require('tar');
@@ -224,6 +224,11 @@ function getPackageObject(owner, packageName, token, packageObj) {
                 case 4:
                     responsiveMaintainer = _a.sent();
                     packageObj.setResponsiveMaintainer(responsiveMaintainer);
+                    /*const dependencies = await calculateDependency(owner, packageName, token);  // <-- Add this line
+                    packageObj.setDependencies(dependencies);  // <-- Add this line
+                    
+                    const codeReview = await calculateCodeReviewMetric(owner, packageName, token);
+                    packageObj.setCodeReview(codeReview);*/
                     return [2 /*return*/, packageObj];
             }
         });
@@ -243,73 +248,53 @@ function extractTarball(tarballPath, targetDir) {
 }
 function cloneRepository(repoUrl, packageObj, secret, repo, owner) {
     return __awaiter(this, void 0, void 0, function () {
-        var octokit, response, characterLength, err_1;
+        var cloneDir, tarballUrl, tarballPath, response_1, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     packageObj.setURL(repoUrl);
-                    octokit = new Octokit({
-                        auth: "token ".concat(secret), // Replace with your GitHub token
-                    });
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, octokit.repos.getContent({
-                            owner: owner,
-                            repo: repo,
-                            path: 'README.md',
-                            headers: {
-                                accept: 'application/vnd.github.v3.raw', // request raw content
-                            },
-                        })];
+                    _a.trys.push([1, 6, , 7]);
+                    cloneDir = '/tmp';
+                    if (!fs.existsSync(cloneDir)) {
+                        console.log("Created cloneDir");
+                        fs.mkdirSync(cloneDir);
+                    }
+                    tarballUrl = "".concat(repoUrl, "/archive/master.tar.gz");
+                    tarballPath = path.join('/tmp', 'temp.tar.gz');
+                    return [4 /*yield*/, axios.get(tarballUrl, { responseType: 'stream' })];
                 case 2:
-                    response = _a.sent();
-                    characterLength = response.data.length;
-                    packageObj.readmeLength = characterLength;
-                    return [3 /*break*/, 4];
+                    response_1 = _a.sent();
+                    response_1.data.pipe(fs.createWriteStream(tarballPath));
+                    return [4 /*yield*/, new Promise(function (resolve, reject) {
+                            response_1.data.on('end', resolve);
+                            response_1.data.on('error', reject);
+                        })];
                 case 3:
-                    err_1 = _a.sent();
-                    console.log("README Error: ", err_1);
-                    return [3 /*break*/, 4];
+                    _a.sent();
+                    // Extract the tarball using the tar library
+                    return [4 /*yield*/, extractTarball(tarballPath, cloneDir)];
                 case 4:
-                    /*try {
-                        // Create a directory to clone the repository into
-                        const cloneDir = path.join(__dirname, 'temp');
-                        if (!fs.existsSync(cloneDir)) {
-                            fs.mkdirSync(cloneDir);
-                        }
-                    
-                        // Fetch the GitHub repository's tarball URL
-                        const tarballUrl = `${repoUrl}/archive/master.tar.gz`;
-                    
-                        // Download the tarball to a temporary file
-                        const tarballPath = path.join(__dirname, 'temp.tar.gz');
-                        const response = await axios.get(tarballUrl, { responseType: 'stream' });
-                        response.data.pipe(fs.createWriteStream(tarballPath));
-                    
-                        await new Promise((resolve, reject) => {
-                            response.data.on('end', resolve);
-                            response.data.on('error', reject);
-                        });
-                    
-                        // Extract the tarball using the tar library
-                        await extractTarball(tarballPath, cloneDir);
-                    
-                
-                        // Read and display the README file
-                        // Get readme length
-                        await readReadmeFile(cloneDir).then ((response) => {
+                    // Extract the tarball using the tar library
+                    _a.sent();
+                    // Read and display the README file
+                    // Get readme length
+                    return [4 /*yield*/, (0, metric_calcs_helpers_1.readReadmeFile)(cloneDir).then(function (response) {
                             packageObj.setReadmeLength(String(response).length);
-                        });
-                    
-                        // Clean up the temporary tarball file
-                        fs.unlinkSync(tarballPath);
-                
-                        await fsExtra.remove(cloneDir);
-                    
-                    } catch (error) {
-                        //console.error('Error cloning repository:', error);
-                    }*/
+                        })];
+                case 5:
+                    // Read and display the README file
+                    // Get readme length
+                    _a.sent();
+                    // Clean up the temporary tarball file
+                    fs.unlinkSync(tarballPath);
+                    return [3 /*break*/, 7];
+                case 6:
+                    error_1 = _a.sent();
+                    console.error('Error cloning repository:', error_1);
+                    return [3 /*break*/, 7];
+                case 7:
                     packageObj.setBusFactor((0, metric_calcs_1.calculateBusFactor)(packageObj.readmeLength, packageObj.contributors));
                     packageObj.setRampUp((0, metric_calcs_1.calculateRampUp)(packageObj.readmeLength));
                     packageObj.setNetScore((0, metric_calcs_1.calculateNetScore)(packageObj));
@@ -395,7 +380,7 @@ function calculateAllMetrics(urlObjs, secret) {
 // Asynchronous function to fetch URLs from a given file path.
 function fetchUrlsFromFile(filePath) {
     return __awaiter(this, void 0, void 0, function () {
-        var data, lines, urls, _i, lines_1, line, packageName, packageOwner, parts, githubDetails, parts, urlObj, error_1;
+        var data, lines, urls, _i, lines_1, line, packageName, packageOwner, parts, githubDetails, parts, urlObj, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -445,8 +430,8 @@ function fetchUrlsFromFile(filePath) {
                     return [3 /*break*/, 2];
                 case 8: return [2 /*return*/, urls];
                 case 9:
-                    error_1 = _a.sent();
-                    console.log('Error reading file:', error_1);
+                    error_2 = _a.sent();
+                    console.log('Error reading file:', error_2);
                     return [2 /*return*/, []];
                 case 10: return [2 /*return*/];
             }
@@ -456,7 +441,7 @@ function fetchUrlsFromFile(filePath) {
 exports.fetchUrlsFromFile = fetchUrlsFromFile;
 function fetchUrlData(url) {
     return __awaiter(this, void 0, void 0, function () {
-        var urls, line, packageName, packageOwner, parts, githubDetails, parts, urlObj, error_2;
+        var urls, line, packageName, packageOwner, parts, githubDetails, parts, urlObj, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -496,8 +481,8 @@ function fetchUrlData(url) {
                     _a.label = 5;
                 case 5: return [2 /*return*/, urls];
                 case 6:
-                    error_2 = _a.sent();
-                    console.log('Error reading file:', error_2);
+                    error_3 = _a.sent();
+                    console.log('Error reading file:', error_3);
                     return [2 /*return*/, []];
                 case 7: return [2 /*return*/];
             }
@@ -507,7 +492,7 @@ function fetchUrlData(url) {
 exports.fetchUrlData = fetchUrlData;
 function getGithubDetailsFromNpm(npmUrl) {
     return __awaiter(this, void 0, void 0, function () {
-        var packageName, res, repositoryUrl, parts, name_1, owner, error_3;
+        var packageName, res, repositoryUrl, parts, name_1, owner, error_4;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -525,8 +510,8 @@ function getGithubDetailsFromNpm(npmUrl) {
                     }
                     return [3 /*break*/, 3];
                 case 2:
-                    error_3 = _a.sent();
-                    console.log('Error fetching npm package data:', error_3);
+                    error_4 = _a.sent();
+                    console.log('Error fetching npm package data:', error_4);
                     return [2 /*return*/, null];
                 case 3: return [2 /*return*/];
             }

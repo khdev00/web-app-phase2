@@ -46,7 +46,8 @@ function readReadmeFile(cloneDir) {
         var readmePath, readmeContent;
         return __generator(this, function (_a) {
             try {
-                readmePath = path.join(cloneDir, 'README.md');
+                readmePath = path.join(cloneDir, 'Readme.md');
+                console.log("Path: ", readmePath);
                 if (fs.existsSync(readmePath)) {
                     readmeContent = fs.readFileSync(readmePath, 'utf-8');
                     console.log("README Content: ".concat(readmeContent));
@@ -77,7 +78,7 @@ function calculateReviewedCodeFraction(owner, repo, token) {
                 case 1:
                     _b.trys.push([1, 10, , 11]);
                     searchQuery = "repo:".concat(owner, "/").concat(repo, " is:pr is:merged");
-                    searchUrl = "https://api.github.com/search/issues?q=".concat(encodeURIComponent(searchQuery), "&per_page=100");
+                    searchUrl = "https://api.github.com/search/issues?q=".concat(encodeURIComponent(searchQuery), "&per_page=30");
                     return [4 /*yield*/, getAllPages(searchUrl, { Authorization: "Bearer ".concat(token) })];
                 case 2:
                     prData = _b.sent();
@@ -161,6 +162,9 @@ function getAllPages(url, headers) {
                     linkHeader = response.headers.link;
                     if (linkHeader && linkHeader.includes('rel="next"')) {
                         page++;
+                        if (page >= 2) {
+                            return [3 /*break*/, 3];
+                        }
                     }
                     else {
                         return [3 /*break*/, 3];
