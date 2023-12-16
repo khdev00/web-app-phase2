@@ -262,7 +262,7 @@ exports.handler = async (event) => {
         if(!strongPassword){
             console.log("Error: password is not strong enough, must be 8+ characters, contain a capital letter, and a special character/number");
             return {
-                statusCode: 401,
+                statusCode: 402,
                 headers: {
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Headers": "*",

@@ -37,7 +37,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.calculateNetScore = exports.calculateResponsiveMaintainer = exports.calculateCorrectness = exports.calculateBusFactor = exports.calculateRampUp = exports.calculateDependency = exports.calculateCodeReviewMetric = void 0;
-var axios = require("axios");
 var metric_calcs_helpers_1 = require("./metric_calcs_helpers");
 // This is what controlls the rounding for the metrics,
 // In class we were told to round to 5dp without padding with zeros
@@ -239,7 +238,7 @@ function calculateResponsiveMaintainer(owner, packageName, token) {
 }
 exports.calculateResponsiveMaintainer = calculateResponsiveMaintainer;
 function calculateNetScore(packageObj) {
-    var netScore = (0.4 * packageObj.responsiveMaintainer + 0.3 * packageObj.rampUp + 0.15 * packageObj.correctness + 0.1 * packageObj.busFactor + (0.025 * Number((packageObj.dependencies).toFixed(5))) + (0.025 * Number((packageObj.codeReview).toFixed(5)))) * Number(packageObj.hasLicense);
+    var netScore = (0.4 * packageObj.responsiveMaintainer + 0.3 * packageObj.rampUp + 0.15 * packageObj.correctness + 0.1 * packageObj.busFactor) * Number(packageObj.hasLicense);
     var roundedNetScore = Math.round(netScore * (Math.pow(10, rf))) / (Math.pow(10, rf));
     console.log("Calculated net-score: ".concat(roundedNetScore, ", for package with URL: ").concat(packageObj.url));
     return roundedNetScore;

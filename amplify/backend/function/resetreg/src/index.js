@@ -416,7 +416,6 @@ exports.handler = async (event, context) => {
         };
 
         await dynamoDb.putItem(params).promise();
-
     }catch(err){
         console.log("Error adding default user: ", err);
         return {

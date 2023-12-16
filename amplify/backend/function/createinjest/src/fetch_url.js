@@ -54,10 +54,10 @@ var axios = require('axios'); // Library to conveniently send HTTP requests to i
 var ndjson = require('ndjson');
 var fs = require('fs'); // Node.js file system module for cloning repos
 var path = require('path');
+var Octokit = require("@octokit/core").Octokit; // Make sure to install @octokit/core via npm
 // For cloning repo
 var BlueBirdPromise = require('bluebird');
 var tar = require('tar');
-var fsExtra = require("fs-extra");
 var packageObjs = [];
 var metric_calcs_1 = require("./metric_calcs");
 var metric_calcs_helpers_1 = require("./metric_calcs_helpers");
@@ -186,7 +186,7 @@ function retrieveGithubKey() {
 // https://docs.github.com/en/rest/overview/endpoints-available-for-github-app-installation-access-tokens?apiVersion=2022-11-28
 function getPackageObject(owner, packageName, token, packageObj) {
     return __awaiter(this, void 0, void 0, function () {
-        var headers, responsiveMaintainer, dependencies, codeReview;
+        var headers, responsiveMaintainer;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -224,14 +224,11 @@ function getPackageObject(owner, packageName, token, packageObj) {
                 case 4:
                     responsiveMaintainer = _a.sent();
                     packageObj.setResponsiveMaintainer(responsiveMaintainer);
-                    return [4 /*yield*/, (0, metric_calcs_1.calculateDependency)(owner, packageName, token)];
-                case 5:
-                    dependencies = _a.sent();
-                    packageObj.setDependencies(dependencies); // <-- Add this line
-                    return [4 /*yield*/, (0, metric_calcs_1.calculateCodeReviewMetric)(owner, packageName, token)];
-                case 6:
-                    codeReview = _a.sent();
-                    packageObj.setCodeReview(codeReview);
+                    /*const dependencies = await calculateDependency(owner, packageName, token);  // <-- Add this line
+                    packageObj.setDependencies(dependencies);  // <-- Add this line
+                    
+                    const codeReview = await calculateCodeReviewMetric(owner, packageName, token);
+                    packageObj.setCodeReview(codeReview);*/
                     return [2 /*return*/, packageObj];
             }
         });
@@ -249,7 +246,7 @@ function extractTarball(tarballPath, targetDir) {
         });
     });
 }
-function cloneRepository(repoUrl, packageObj) {
+function cloneRepository(repoUrl, packageObj, secret, repo, owner) {
     return __awaiter(this, void 0, void 0, function () {
         var cloneDir, tarballUrl, tarballPath, response_1, error_1;
         return __generator(this, function (_a) {
@@ -258,13 +255,14 @@ function cloneRepository(repoUrl, packageObj) {
                     packageObj.setURL(repoUrl);
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 7, , 8]);
-                    cloneDir = path.join(__dirname, 'temp');
+                    _a.trys.push([1, 6, , 7]);
+                    cloneDir = '/tmp';
                     if (!fs.existsSync(cloneDir)) {
+                        console.log("Created cloneDir");
                         fs.mkdirSync(cloneDir);
                     }
                     tarballUrl = "".concat(repoUrl, "/archive/master.tar.gz");
-                    tarballPath = path.join(__dirname, 'temp.tar.gz');
+                    tarballPath = path.join('/tmp', 'temp.tar.gz');
                     return [4 /*yield*/, axios.get(tarballUrl, { responseType: 'stream' })];
                 case 2:
                     response_1 = _a.sent();
@@ -291,14 +289,12 @@ function cloneRepository(repoUrl, packageObj) {
                     _a.sent();
                     // Clean up the temporary tarball file
                     fs.unlinkSync(tarballPath);
-                    return [4 /*yield*/, fsExtra.remove(cloneDir)];
+                    return [3 /*break*/, 7];
                 case 6:
-                    _a.sent();
-                    return [3 /*break*/, 8];
-                case 7:
                     error_1 = _a.sent();
-                    return [3 /*break*/, 8];
-                case 8:
+                    console.error('Error cloning repository:', error_1);
+                    return [3 /*break*/, 7];
+                case 7:
                     packageObj.setBusFactor((0, metric_calcs_1.calculateBusFactor)(packageObj.readmeLength, packageObj.contributors));
                     packageObj.setRampUp((0, metric_calcs_1.calculateRampUp)(packageObj.readmeLength));
                     packageObj.setNetScore((0, metric_calcs_1.calculateNetScore)(packageObj));
@@ -371,7 +367,7 @@ function calculateAllMetrics(urlObjs, secret) {
                             var repoUrl = "https://github.com/".concat(url.getPackageOwner(), "/").concat(url.packageName);
                             var packageObj = packageObjs[idx++];
                             return new Promise(function (resolve) {
-                                cloneRepository(repoUrl, packageObj)
+                                cloneRepository(repoUrl, packageObj, secret, url.getPackageName(), url.getPackageOwner())
                                     .then(function (response) {
                                     resolve(response);
                                 });
@@ -381,7 +377,6 @@ function calculateAllMetrics(urlObjs, secret) {
         });
     });
 }
-exports.calculateAllMetrics = calculateAllMetrics;
 // Asynchronous function to fetch URLs from a given file path.
 function fetchUrlsFromFile(filePath) {
     return __awaiter(this, void 0, void 0, function () {
@@ -466,12 +461,13 @@ function fetchUrlData(url) {
                     if (githubDetails) {
                         packageOwner = githubDetails.owner;
                         packageName = githubDetails.name;
-                        line = githubDetails.repositoryUrl.replace(/^git\+/, '').replace(/\.git$/, '');
+                        line = githubDetails.repositoryUrl;
                     }
                     return [3 /*break*/, 3];
                 case 2:
                     if (line.includes('github.com')) {
                         parts = line.split('/');
+                        console.log("Parts: ", parts);
                         packageName = parts[parts.length - 1];
                         packageOwner = parts[parts.length - 2];
                     }
@@ -523,12 +519,6 @@ function getGithubDetailsFromNpm(npmUrl) {
     });
 }
 exports.getGithubDetailsFromNpm = getGithubDetailsFromNpm;
-function printAllMetrics(packages) {
-    for (var _i = 0, packages_1 = packages; _i < packages_1.length; _i++) {
-        var packageObj = packages_1[_i];
-        packageObj.printMetrics();
-    }
-}
 module.exports = {
     retrieveGithubKey: retrieveGithubKey,
     getPackageObject: getPackageObject,
@@ -539,5 +529,5 @@ module.exports = {
     getGithubDetailsFromNpm: getGithubDetailsFromNpm,
     calculateAllMetrics: calculateAllMetrics,
     fetchUrlsFromFile: fetchUrlsFromFile,
-    fetchUrlData: fetchUrlData,
+    fetchUrlData: fetchUrlData
 };

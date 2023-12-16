@@ -209,8 +209,6 @@ exports.handler = async (event) => {
         };
     }
 
-    console.log("Admin Perms: ", isAdmin, storedAdmin);
-    console.log("Admin Types: ", typeof isAdmin, typeof storedAdmin);
     if(isAdmin && !storedAdmin){
         console.log('Requested admin token for non-admin user');
         return {

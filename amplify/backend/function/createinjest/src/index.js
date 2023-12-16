@@ -1,8 +1,10 @@
 const AWS = require('aws-sdk');
+const jwt = require('jsonwebtoken');
 const unzipper = require('unzipper'); // npm package needed for extraction
 AWS.config.update({ region: 'us-east-2' });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const dynamoDBNotClient = new AWS.DynamoDB();
 const s3 = new AWS.S3();
 
 const {fetchUrlData, calculateAllMetrics} = require("./fetch_url")
@@ -12,18 +14,33 @@ const { Octokit } = require('@octokit/rest');
 const { SecretsManagerClient, GetSecretValueCommand, } = require("@aws-sdk/client-secrets-manager");
 
 const tableName = 'pkgmetadata';
+const userTable = 'phase2users';
+const authTable = 'AuthTokens';
 const bucketName = 'packageregistry';
 const folderName = 'nongradedpackages';
 const secret_name = "GITHUB_TOKEN";
+const jwt_secret = "JWT_SECRET_KEY";
 const contentfoldername = 'packagecontent'; //folder name for content, to avoid dynamo size limit. 
 
 const streamToString = (stream) =>
   new Promise((resolve, reject) => {
     const chunks = [];
-    stream.on('data', (chunk) => chunks.push(chunk));
-    stream.on('error', reject);
-    stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-});
+    stream.on('data', (chunk) => {
+      console.log(`Received chunk:`, chunk.toString('utf8'));
+      chunks.push(chunk);
+    });
+    stream.on('error', (err) => {
+      console.error('Stream Error:', err);
+      reject(err);
+    });
+    stream.on('end', () => {
+      const concatenatedChunks = Buffer.concat(chunks).toString('utf8');
+      console.log(`Final concatenated content:`, concatenatedChunks);
+      resolve(concatenatedChunks);
+    });
+  });
+
+
 
 exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgram) => {
     const s3Stream = s3.getObject({ Bucket: bucketName, Key: `${folderName}/${fileName}` }).createReadStream();
@@ -40,9 +57,13 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgra
 
         if (packageJSONRegex.test(fullPath.toLowerCase())) {
             const packageJSONContent = await streamToString(entry);
-            //console.log('packageJson:', packageJSONContent);
+            console.log('packageJson before parse:', packageJSONContent);
 
             const packageData = JSON.parse(packageJSONContent);
+            if (!packageData.name || !packageData.version) {
+                console.error('Invalid package.json file');
+                return null;
+            }
             console.log("package.json: ",packageData)
             packageName = packageData.name;
             packageVersion = packageData.version;
@@ -161,7 +182,71 @@ exports.processZipFile = async (fileName, packageContent, packageS3Url, JSProgra
     };
 };
 
+async function validateToken(auth_token, secret) {
+    try{
+        if(auth_token && auth_token.includes('"')){
+            auth_token = auth_token.replace(/"/g, '');
+        }
+        console.log("Token: ", auth_token)
+        const payload = jwt.verify(auth_token, secret);
+        const {username, isAdmin} = payload;
 
+        const params = {
+            TableName: authTable,
+            Key: {
+                "authToken": {S: auth_token}
+            }
+        };
+
+        //attempt to find token in database
+        let authData;
+        const data = await dynamoDBNotClient.getItem(params).promise();
+        if(data.Item){
+            authData = data.Item;
+        }
+        else {
+            console.error('token not found');
+            return false;
+        }
+
+        //make sure the token is valid for the user
+        const dbUsername = authData.username.S;
+        if(dbUsername !== username){
+            console.error('no user match');
+            return false;
+        }
+
+        //make sure the token has usages left
+        let usageLeft = authData.usages.N;
+        if(usageLeft > 0){
+            usageLeft -= 1;
+        }
+        else {
+            console.error('no API usage left');
+            return false;
+        }
+
+        const updateParams = {
+            TableName: authTable,
+            Key: {
+                "authToken": {S: auth_token}
+            },
+            UpdateExpression: "SET usages = :newUsage",
+            ExpressionAttributeValues: {
+                ":newUsage": {N: usageLeft.toString()}
+            },
+        };
+        // Perform the update operation
+        const dynamoResult = await dynamoDBNotClient.updateItem(updateParams).promise();
+        console.log('Update DynamoDB successful', dynamoResult);
+
+        return [isAdmin, username];
+
+    } catch (err) {
+        console.error('validation error: ', err);
+        throw new Error('Failed to validate token');
+    }
+}
   
 function extractGitHubURL(repository) {
     if (!repository) {
@@ -181,47 +266,6 @@ function extractGitHubURL(repository) {
   
     return null;
 }
-
-const updateDynamoDBRating = async (packageId, metricScores) => {
-    //Update MetricScore with net score
-    try {
-        //destructure metricScores array
-        const [
-            { netScore },
-            { busFactor },
-            { correctness },
-            { goodPinningPractice },
-            { licenseScore },
-            { pullRequest },
-            { rampUp },
-            { responsiveMaintainer }
-        ] = metricScores;
-
-        const updateParams = {
-            TableName: tableName,
-            Key: {
-                "pkgID": packageId,
-            },
-            UpdateExpression: "SET NetScore = :netScore, BusFactor = :busFactor, Correctness = :correctness, GoodPinningPractice = :goodPinningPractice, \
-            LicenseScore = :licenseScore, PullRequest = :pullRequest, RampUp = :rampUp, ResponsiveMaintainer = :responsiveMaintainer",
-            ExpressionAttributeValues: {
-                ":netScore": netScore,
-                ":busFactor": busFactor,
-                ":correctness": correctness,
-                ":goodPinningPractice": goodPinningPractice,
-                ":licenseScore": licenseScore,
-                ":pullRequest": pullRequest,
-                ":rampUp": rampUp,
-                ":responsiveMaintainer": responsiveMaintainer,
-            },
-        };
-        const dynamoResult = await dynamoDb.update(updateParams).promise();
-        console.log('Update DynamoDB successful', dynamoResult);
-    } catch (dbError) {
-        console.error('DynamoDB Update Error:', dbError);
-        throw new Error('Failed to update package metadata');
-    }
-};
 
 exports.JSHandler = async (event, secret) => {
     
@@ -344,12 +388,12 @@ exports.uploadHandler = async (event, secret) => {
         const response = await exports.processZipFile(fileName, packageContent, uploadResult.Location, JSProgram);
         if (!response) {
             return {
-                statusCode: 404,
+                statusCode: 400,
                 headers: {
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Headers": "*",
                 },
-                body: JSON.stringify({ message: 'Could not find package metadata, no package.json exists' }),
+                body: JSON.stringify({ message: 'Could not find package metadata, no package.json exists or it is a bad package.json' }),
             };
         }
 
@@ -494,7 +538,7 @@ exports.ingestHandler = async (event, secret, JSProgram) => {
         const response = await exports.processZipFile(fileName, packageContent, uploadResult.Location, JSProgram);
         if (!response) {
             return {
-                statusCode: 404,
+                statusCode: 400,
                 headers: {
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Headers": "*",
@@ -560,7 +604,7 @@ exports.handler = async (event) => {
     } catch (error) {
         console.error('Secrets Error:', error);
         return {
-            statusCode: 500,
+            statusCode: 400,
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*",
@@ -572,6 +616,97 @@ exports.handler = async (event) => {
     const secretString = response.SecretString;
     const secretObject = JSON.parse(secretString);
     const secret = secretObject.GITHUB_TOKEN;
+
+    //get JWT secret
+    try {
+        response = await client.send(
+            new GetSecretValueCommand({
+                SecretId: jwt_secret
+            })
+        );
+    } catch (error) {
+        console.error('Secrets Error:', error);
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Failed to retrieve JWT key' }),
+        };
+    }
+
+    const jwtString = response.SecretString;
+    const jwtObject = JSON.parse(jwtString);
+    const jwt_token = jwtObject.JWT_SECRET_KEY;
+
+    let auth_token;
+    console.log("Headers: ", event.headers);
+    //retrieve authentication token
+    try{
+        if(event.headers['X-Authorization']){
+            auth_token = event.headers['X-Authorization'];
+        }
+        else if(event.headers['x-authorization']){
+            auth_token = event.headers['x-authorization'];
+        }
+    }catch(err){
+        console.error("Error: ", err)
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Invalid Authentication Token' }),
+        };
+    }
+
+    if (auth_token === '' || auth_token === null) {
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Authentication Token not provided' }),
+        };
+    }
+
+    let isAdmin, username;
+    try{
+        [isAdmin, username] = await validateToken(auth_token, jwt_token);
+
+        const params = {
+            TableName: userTable,
+            Key: {
+                "username": username
+            }
+        };
+
+        const data = await dynamoDb.get(params).promise();
+        if(isAdmin === false && data.Item.uploadAllow === false){
+            console.log('Invalid permissions to create user');
+            return {
+                statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+                body: JSON.stringify({ message: 'Invalid Permissions for upload' }),
+            };
+        }
+    }catch(authErr){
+        console.error("Auth Error: ", authErr);
+        return {
+            statusCode: 400,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+            body: JSON.stringify({ message: 'Validation of token failed' }),
+        };
+    }
 
     let body;
     try {
